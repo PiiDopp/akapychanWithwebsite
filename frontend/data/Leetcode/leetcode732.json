@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode732",
+  "coding_practice": [
+    {
+      "title": "My Calendar III",
+      "description": "A k-booking happens when k events have some non-empty intersection (i.e., there is some time that is common to all k events.)\n\nYou are given some events [startTime, endTime), after each given event, return an integer k representing the maximum k-booking between all the previous events.\n\nImplement the MyCalendarThree class:\n\nMyCalendarThree() Initializes the object.\nint book(int startTime, int endTime) Returns an integer k representing the largest integer such that there exists a k-booking in the calendar.",
+      "examples": [
+        {
+          "input": "[\"MyCalendarThree\", \"book\", \"book\", \"book\", \"book\", \"book\", \"book\"], [[], [10, 20], [50, 60], [10, 40], [5, 15], [5, 10], [25, 55]]",
+          "output": "[null, 1, 1, 2, 3, 3, 3]",
+          "explanation": "MyCalendarThree myCalendarThree = new MyCalendarThree();\nmyCalendarThree.book(10, 20); // return 1\nmyCalendarThree.book(50, 60); // return 1\nmyCalendarThree.book(10, 40); // return 2\nmyCalendarThree.book(5, 15); // return 3\nmyCalendarThree.book(5, 10); // return 3\nmyCalendarThree.book(25, 55); // return 3"
+        }
+      ],
+      "constraints": "0 <= startTime < endTime <= 10^9\nAt most 400 calls will be made to book.",
+      "solution": "import bisect\n\nclass MyCalendarThree(object):\n\n    def __init__(self):\n        self.timeline = []\n\n    def book(self, start, end):\n        bisect.insort(self.timeline, (start, 1))\n        bisect.insort(self.timeline, (end, -1))\n        active = 0\n        max_active = 0\n        for time, delta in self.timeline:\n            active += delta\n            max_active = max(max_active, active)\n        return max_active",
+      "explanation": "1. 使用 timeline 列表儲存每個事件的開始與結束時間，開始時間加 1，結束時間減 1。\n2. 使用 bisect.insort 保持 timeline 排序。\n3. 遍歷 timeline，計算目前同時進行的事件數 active，並更新 max_active。\n4. 每次 book 返回當前最大 k-booking 值 max_active。",
+      "tag": "1120",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode726",
+  "coding_practice": [
+    {
+      "title": "Number of Atoms",
+      "description": "Given a string formula representing a chemical formula, return the count of each atom.\n\nThe atomic element always starts with an uppercase character, then zero or more lowercase letters, representing the name.\n\nOne or more digits representing that element's count may follow if the count is greater than 1. If the count is 1, no digits will follow.\n\nFor example, \"H2O\" and \"H2O2\" are possible, but \"H1O2\" is impossible.\nTwo formulas are concatenated together to produce another formula.\n\nFor example, \"H2O2He3Mg4\" is also a formula.\nA formula placed in parentheses, and a count (optionally added) is also a formula.\n\nFor example, \"(H2O2)\" and \"(H2O2)3\" are formulas.\nReturn the count of all elements as a string in the following form: the first name (in sorted order), followed by its count (if that count is more than 1), followed by the second name (in sorted order), followed by its count (if that count is more than 1), and so on.\n\nThe test cases are generated so that all the values in the output fit in a 32-bit integer.",
+      "examples": [
+        {
+          "input": "formula = \"H2O\"",
+          "output": "\"H2O\"",
+          "explanation": "The count of elements are {'H': 2, 'O': 1}."
+        },
+        {
+          "input": "formula = \"Mg(OH)2\"",
+          "output": "\"H2MgO2\"",
+          "explanation": "The count of elements are {'H': 2, 'Mg': 1, 'O': 2}."
+        },
+        {
+          "input": "formula = \"K4(ON(SO3)2)2\"",
+          "output": "\"K4N2O14S4\"",
+          "explanation": "The count of elements are {'K': 4, 'N': 2, 'O': 14, 'S': 4}."
+        }
+      ],
+      "constraints": "1 <= formula.length <= 1000\nformula consists of English letters, digits, '(', and ')'.\nformula is always valid.",
+      "solution": "class Solution(object):\n    def countOfAtoms(self, formula):\n        from collections import Counter\n        n = len(formula)\n        self.i = 0\n\n        def parse():\n            cnt = Counter()\n            while self.i < n and formula[self.i] != ')':\n                if formula[self.i] == '(':\n                    self.i += 1\n                    inner = parse()\n                    self.i += 1  # skip ')'\n                    mult = 0\n                    while self.i < n and formula[self.i].isdigit():\n                        mult = mult * 10 + int(formula[self.i])\n                        self.i += 1\n                    if mult == 0:\n                        mult = 1\n                    for k, v in inner.items():\n                        cnt[k] += v * mult\n                else:\n                    start = self.i\n                    self.i += 1\n                    while self.i < n and formula[self.i].islower():\n                        self.i += 1\n                    name = formula[start:self.i]\n                    num = 0\n                    while self.i < n and formula[self.i].isdigit():\n                        num = num * 10 + int(formula[self.i])\n                        self.i += 1\n                    if num == 0:\n                        num = 1\n                    cnt[name] += num\n            return cnt\n\n        counts = parse()\n        parts = []\n        for atom in sorted(counts.keys()):\n            parts.append(atom + (str(counts[atom]) if counts[atom] > 1 else \"\"))\n        return \"\".join(parts)",
+      "explanation": "1. 使用遞迴函式 parse() 處理巢狀括號結構。\n2. 當遇到 '(' 時，進入遞迴解析內層內容，並在遇到 ')' 後乘上倍數。\n3. 當遇到元素名稱（如 H、O、Mg），取出名稱與後方數字（若無則為 1）。\n4. 將所有元素與數量累積到 Counter。\n5. 遞迴結束後，將所有元素依字母排序並組合成結果字串輸出。",
+      "tag": "910",
+      "difficult": "hard"
+    }
+  ]
+}

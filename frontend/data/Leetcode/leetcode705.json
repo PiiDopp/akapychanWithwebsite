@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode705",
+  "coding_practice": [
+    {
+      "title": "Design HashSet",
+      "description": "Design a HashSet without using any built-in hash table libraries.\n\nImplement MyHashSet class:\n\nvoid add(key) Inserts the value key into the HashSet.\nbool contains(key) Returns whether the value key exists in the HashSet or not.\nvoid remove(key) Removes the value key in the HashSet. If key does not exist in the HashSet, do nothing.",
+      "examples": [
+        {
+          "input": "[\"MyHashSet\", \"add\", \"add\", \"contains\", \"contains\", \"add\", \"contains\", \"remove\", \"contains\"]\n[[], [1], [2], [1], [3], [2], [2], [2], [2]]",
+          "output": "[null, null, null, true, false, null, true, null, false]",
+          "explanation": "MyHashSet myHashSet = new MyHashSet();\\nmyHashSet.add(1);      // set = [1]\\nmyHashSet.add(2);      // set = [1, 2]\\nmyHashSet.contains(1); // return True\\nmyHashSet.contains(3); // return False, (not found)\\nmyHashSet.add(2);      // set = [1, 2]\\nmyHashSet.contains(2); // return True\\nmyHashSet.remove(2);   // set = [1]\\nmyHashSet.contains(2); // return False, (already removed)"
+        }
+      ],
+      "constraints": "0 <= key <= 10^6\nAt most 10^4 calls will be made to add, remove, and contains.",
+      "solution": "class MyHashSet:\n    def __init__(self):\n        self.size = 10000\n        self.buckets = [[] for _ in range(self.size)]\n    \n    def _hash(self, key):\n        return key % self.size\n\n    def add(self, key):\n        h = self._hash(key)\n        if key not in self.buckets[h]:\n            self.buckets[h].append(key)\n\n    def remove(self, key):\n        h = self._hash(key)\n        if key in self.buckets[h]:\n            self.buckets[h].remove(key)\n\n    def contains(self, key):\n        h = self._hash(key)\n        return key in self.buckets[h]",
+      "explanation": "1. 使用列表 buckets 作為 hash table，每個 bucket 是一個 list 來處理衝突。\\n2. _hash(key) 計算 key 對 size 取模，決定放在哪個 bucket。\\n3. add: 若 key 不在對應 bucket 中，加入該 bucket。\\n4. remove: 若 key 在 bucket 中，刪除該 key。\\n5. contains: 檢查 key 是否在 bucket 中。\\n6. 時間複雜度平均 O(1)，最壞 O(n)，空間複雜度 O(n)。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

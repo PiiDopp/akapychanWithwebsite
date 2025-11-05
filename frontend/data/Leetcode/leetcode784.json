@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode784",
+  "coding_practice": [
+    {
+      "title": "Letter Case Permutation",
+      "description": "Given a string s, you can transform every letter individually to be lowercase or uppercase to create another string.\n\nReturn a list of all possible strings we could create. Return the output in any order.",
+      "examples": [
+        {
+          "input": "s = \"a1b2\"",
+          "output": "[\"a1b2\",\"a1B2\",\"A1b2\",\"A1B2\"]"
+        },
+        {
+          "input": "s = \"3z4\"",
+          "output": "[\"3z4\",\"3Z4\"]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 12\ns consists of lowercase English letters, uppercase English letters, and digits.",
+      "solution": "class Solution:\n    def letterCasePermutation(self, s):\n        res = ['']\n        for char in s:\n            if char.isalpha():\n                res = [r + c for r in res for c in [char.lower(), char.upper()]]\n            else:\n                res = [r + char for r in res]\n        return res",
+      "explanation": "1. 初始化結果列表 res = ['']。\n2. 遍歷每個字符 char。\n3. 如果是字母，對 res 中的每個字符串 r 分別加上 char 的大小寫，生成新列表。\n4. 如果不是字母，直接加到每個 r 的後面。\n5. 最終返回 res。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode808",
+  "coding_practice": [
+    {
+      "title": "Soup Servings",
+      "description": "You have two soups, A and B, each starting with n mL. On every turn, one of the following four serving operations is chosen at random, each with probability 0.25 independent of all previous turns:\n\npour 100 mL from type A and 0 mL from type B\npour 75 mL from type A and 25 mL from type B\npour 50 mL from type A and 50 mL from type B\npour 25 mL from type A and 75 mL from type B\nNote:\n\nThere is no operation that pours 0 mL from A and 100 mL from B.\nThe amounts from A and B are poured simultaneously during the turn.\nIf an operation asks you to pour more than you have left of a soup, pour all that remains of that soup.\nThe process stops immediately after any turn in which one of the soups is used up.\n\nReturn the probability that A is used up before B, plus half the probability that both soups are used up in the same turn. Answers within 10-5 of the actual answer will be accepted.",
+      "examples": [
+        {
+          "input": "n = 50",
+          "output": "0.62500",
+          "explanation": "If we perform either of the first two serving operations, soup A will become empty first.\nIf we perform the third operation, A and B will become empty at the same time.\nIf we perform the fourth operation, B will become empty first.\nSo the total probability of A becoming empty first plus half the probability that A and B become empty at the same time, is 0.25 * (1 + 1 + 0.5 + 0) = 0.625."
+        },
+        {
+          "input": "n = 100",
+          "output": "0.71875",
+          "explanation": "If we perform the first serving operation, soup A will become empty first.\nIf we perform the second serving operations, A will become empty on performing operation [1, 2, 3], and both A and B become empty on performing operation 4.\nIf the third operation, A will become empty on performing operation [1, 2], and both A and B become empty on performing operation 3.\nIf the fourth operation, A will become empty on performing operation 1, and both A and B become empty on performing operation 2.\nSo the total probability is 0.71875."
+        }
+      ],
+      "constraints": "0 <= n <= 10^9",
+      "solution": "class Solution:\n    def soupServings(self, N):\n        if N >= 4800:  # approximation for large N\n            return 1.0\n\n        memo = {}\n        def dfs(a, b):\n            if (a, b) in memo:\n                return memo[(a, b)]\n            if a <= 0 and b <= 0:\n                return 0.5\n            if a <= 0:\n                return 1\n            if b <= 0:\n                return 0\n            res = 0.25 * (dfs(a-100, b) + dfs(a-75, b-25) + dfs(a-50, b-50) + dfs(a-25, b-75))\n            memo[(a, b)] = res\n            return res\n\n        N = (N + 24) // 25 * 25  # scale down to multiples of 25\n        return dfs(N, N)",
+      "explanation": "1. 如果 N >= 4800，可以直接返回 1.0 作為近似值。\n2. 使用 DFS 遞迴計算剩餘 A, B 量的情況，每次減去 4 種可能操作的量。\n3. 用字典 memo 做記憶化，避免重複計算相同狀態。\n4. 當 A <= 0 且 B <= 0 時，返回 0.5（兩者同時耗盡）。\n5. 當只有 A <= 0，返回 1；當只有 B <= 0，返回 0。\n6. 將 N 四捨五入到 25 的倍數以減少狀態數量，提高效率。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

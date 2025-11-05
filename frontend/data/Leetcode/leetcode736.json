@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode736",
+  "coding_practice": [
+    {
+      "title": "Parse Lisp Expression",
+      "description": "You are given a string expression representing a Lisp-like expression to return the integer value of.\n\nThe syntax for these expressions is given as follows.\n\nAn expression is either an integer, let expression, add expression, mult expression, or an assigned variable. Expressions always evaluate to a single integer.\n(An integer could be positive or negative.)\nA let expression takes the form \"(let v1 e1 v2 e2 ... vn en expr)\", where let is always the string \"let\", then there are one or more pairs of alternating variables and expressions, meaning that the first variable v1 is assigned the value of the expression e1, the second variable v2 is assigned the value of the expression e2, and so on sequentially; and then the value of this let expression is the value of the expression expr.\nAn add expression takes the form \"(add e1 e2)\" where add is always the string \"add\", there are always two expressions e1, e2 and the result is the addition of the evaluation of e1 and the evaluation of e2.\nA mult expression takes the form \"(mult e1 e2)\" where mult is always the string \"mult\", there are always two expressions e1, e2 and the result is the multiplication of the evaluation of e1 and the evaluation of e2.\nFor this question, we will use a smaller subset of variable names. A variable starts with a lowercase letter, then zero or more lowercase letters or digits. Additionally, for your convenience, the names \"add\", \"let\", and \"mult\" are protected and will never be used as variable names.\nFinally, there is the concept of scope. When an expression of a variable name is evaluated, within the context of that evaluation, the innermost scope (in terms of parentheses) is checked first for the value of that variable, and then outer scopes are checked sequentially. It is guaranteed that every expression is legal. Please see the examples for more details on the scope.",
+      "examples": [
+        {
+          "input": "expression = \"(let x 2 (mult x (let x 3 y 4 (add x y))))\"",
+          "output": "14",
+          "explanation": "In the expression (add x y), when checking for the value of the variable x, we check from the innermost scope to the outermost in the context of the variable we are trying to evaluate. Since x = 3 is found first, the value of x is 3."
+        },
+        {
+          "input": "expression = \"(let x 3 x 2 x)\"",
+          "output": "2",
+          "explanation": "Assignment in let statements is processed sequentially."
+        },
+        {
+          "input": "expression = \"(let x 1 y 2 x (add x y) (add x y))\"",
+          "output": "5",
+          "explanation": "The first (add x y) evaluates as 3, and is assigned to x. The second (add x y) evaluates as 3+2 = 5."
+        }
+      ],
+      "constraints": "1 <= expression.length <= 2000\nThere are no leading or trailing spaces in expression.\nAll tokens are separated by a single space in expression.\nThe answer and all intermediate calculations of that answer are guaranteed to fit in a 32-bit integer.\nThe expression is guaranteed to be legal and evaluate to an integer.",
+      "solution": "class Solution:\n    def evaluate(self, expression):\n        def eval_expr(expr, env):\n            if expr[0] != '(':\n                if expr[0].isalpha():\n                    return env[expr]\n                return int(expr)\n            expr = expr[1:-1]\n            tokens = []\n            balance = 0\n            start = 0\n            for i, c in enumerate(expr):\n                if c == '(':\n                    balance += 1\n                elif c == ')':\n                    balance -= 1\n                elif c == ' ' and balance == 0:\n                    tokens.append(expr[start:i])\n                    start = i + 1\n            tokens.append(expr[start:])\n            op = tokens[0]\n            if op == 'add':\n                return eval_expr(tokens[1], env.copy()) + eval_expr(tokens[2], env.copy())\n            elif op == 'mult':\n                return eval_expr(tokens[1], env.copy()) * eval_expr(tokens[2], env.copy())\n            elif op == 'let':\n                new_env = env.copy()\n                i = 1\n                while i < len(tokens) - 1:\n                    var = tokens[i]\n                    val = eval_expr(tokens[i + 1], new_env)\n                    new_env[var] = val\n                    i += 2\n                return eval_expr(tokens[-1], new_env)\n        return eval_expr(expression, {})",
+      "explanation": "1. 定義遞迴函數 eval_expr 處理每個子表達式。\n2. 若 expr 是單一 token（整數或變數），直接回傳值或查 env。\n3. 若 expr 是括號表達式，先將外層括號去掉，再按平衡括號切分 tokens。\n4. 根據運算符 add/mult/let 分別遞迴計算：add/mult 直接計算兩個子表達式，let 則建立新環境依序賦值並計算最後表達式。\n5. 每個 let 都 copy env，確保作用域正確，最終回傳整個 expression 的值。",
+      "tag": "712",
+      "difficult": "hard"
+    }
+  ]
+}

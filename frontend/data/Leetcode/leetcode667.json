@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode667",
+  "coding_practice": [
+    {
+      "title": "Beautiful Arrangement II",
+      "description": "Given two integers n and k, construct a list answer that contains n different positive integers ranging from 1 to n and obeys the following requirement:\n\nSuppose this list is answer = [a1, a2, a3, ... , an], then the list [|a1 - a2|, |a2 - a3|, |a3 - a4|, ... , |an-1 - an|] has exactly k distinct integers.\nReturn the list answer. If there multiple valid answers, return any of them.",
+      "examples": [
+        {
+          "input": "n = 3, k = 1",
+          "output": "[1,2,3]",
+          "explanation": "The [1,2,3] has three different positive integers ranging from 1 to 3, and the [1,1] has exactly 1 distinct integer: 1"
+        },
+        {
+          "input": "n = 3, k = 2",
+          "output": "[1,3,2]",
+          "explanation": "The [1,3,2] has three different positive integers ranging from 1 to 3, and the [2,1] has exactly 2 distinct integers: 1 and 2."
+        }
+      ],
+      "constraints": "1 <= k < n <= 10^4",
+      "solution": "class Solution:\n    def constructArray(self, n, k):\n        res = []\n        left, right = 1, k + 1\n        \n        # 先生成 k 個不同差值\n        for i in range(k + 1):\n            if i % 2 == 0:\n                res.append(left)\n                left += 1\n            else:\n                res.append(right)\n                right -= 1\n        \n        # 剩下的直接遞增填充\n        for i in range(k + 2, n + 1):\n            res.append(i)\n        \n        return res",
+      "explanation": "1. 初始化 left = 1, right = k+1，用於交替生成 k 個不同差值。\\n2. 前 k+1 個數字交替取 left 和 right，形成 k 個不同差值。\\n3. 剩下的數字從 k+2 到 n 直接遞增填充，保持連續性且不影響差值集合。\\n4. 返回生成的列表，即可保證差值集合大小為 k，時間複雜度 O(n)。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

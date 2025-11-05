@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode788",
+  "coding_practice": [
+    {
+      "title": "Rotated Digits",
+      "description": "An integer x is a good if after rotating each digit individually by 180 degrees, we get a valid number that is different from x. Each digit must be rotated - we cannot choose to leave it alone.\n\nA number is valid if each digit remains a digit after rotation. For example:\n\n0, 1, and 8 rotate to themselves,\n2 and 5 rotate to each other,\n6 and 9 rotate to each other, and\nthe rest of the numbers do not rotate to any other number and become invalid.\nGiven an integer n, return the number of good integers in the range [1, n].",
+      "examples": [
+        {
+          "input": "n = 10",
+          "output": "4",
+          "explanation": "There are four good numbers in the range [1, 10] : 2, 5, 6, 9. Note that 1 and 10 are not good numbers, since they remain unchanged after rotating."
+        },
+        {
+          "input": "n = 1",
+          "output": "0"
+        },
+        {
+          "input": "n = 2",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= n <= 10^4",
+      "solution": "class Solution:\n    def rotatedDigits(self, n):\n        good = {'2', '5', '6', '9'}\n        valid = {'0','1','2','5','6','8','9'}\n        count = 0\n        for num in range(1, n+1):\n            s = str(num)\n            if all(c in valid for c in s) and any(c in good for c in s):\n                count += 1\n        return count",
+      "explanation": "1. 定義 valid 集合包含可以旋轉後仍然有效的數字。\n2. 定義 good 集合包含旋轉後會變成不同數字的數字。\n3. 對 1 到 n 的每個數字，檢查是否所有位數都在 valid 且至少有一位在 good。\n4. 符合條件的計數累加，返回最終結果。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

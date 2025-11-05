@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode762",
+  "coding_practice": [
+    {
+      "title": "Prime Number of Set Bits in Binary Representation",
+      "description": "Given two integers left and right, return the count of numbers in the inclusive range [left, right] having a prime number of set bits in their binary representation.\n\nRecall that the number of set bits an integer has is the number of 1's present when written in binary.\n\nFor example, 21 written in binary is 10101, which has 3 set bits.",
+      "examples": [
+        {
+          "input": "left = 6, right = 10",
+          "output": "4",
+          "explanation": "6  -> 110 (2 set bits, 2 is prime)\n7  -> 111 (3 set bits, 3 is prime)\n8  -> 1000 (1 set bit, 1 is not prime)\n9  -> 1001 (2 set bits, 2 is prime)\n10 -> 1010 (2 set bits, 2 is prime)\n4 numbers have a prime number of set bits."
+        },
+        {
+          "input": "left = 10, right = 15",
+          "output": "5",
+          "explanation": "10 -> 1010 (2 set bits, 2 is prime)\n11 -> 1011 (3 set bits, 3 is prime)\n12 -> 1100 (2 set bits, 2 is prime)\n13 -> 1101 (3 set bits, 3 is prime)\n14 -> 1110 (3 set bits, 3 is prime)\n15 -> 1111 (4 set bits, 4 is not prime)\n5 numbers have a prime number of set bits."
+        }
+      ],
+      "constraints": "1 <= left <= right <= 10^6\n0 <= right - left <= 10^4",
+      "solution": "class Solution:\n    def countPrimeSetBits(self, left, right):\n        primes = {2,3,5,7,11,13,17,19,23,29,31}\n        count = 0\n        for num in range(left, right + 1):\n            bits = bin(num).count('1')\n            if bits in primes:\n                count += 1\n        return count",
+      "explanation": "1. 建立一個包含所有小於 32 的質數的集合 primes。\n2. 遍歷 left 到 right 的每個整數。\n3. 將整數轉成二進位，計算 '1' 的個數。\n4. 若個數在 primes 集合中，計數器加一。\n5. 返回最終計數。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

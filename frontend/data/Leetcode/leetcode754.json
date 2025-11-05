@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode754",
+  "coding_practice": [
+    {
+      "title": "Reach a Number",
+      "description": "You are standing at position 0 on an infinite number line. There is a destination at position target.\n\nYou can make some number of moves numMoves so that:\n\nOn each move, you can either go left or right.\nDuring the ith move (starting from i == 1 to i == numMoves), you take i steps in the chosen direction.\nGiven the integer target, return the minimum number of moves required (i.e., the minimum numMoves) to reach the destination.",
+      "examples": [
+        {
+          "input": "target = 2",
+          "output": "3",
+          "explanation": "On the 1st move, we step from 0 to 1 (1 step).\nOn the 2nd move, we step from 1 to -1 (2 steps).\nOn the 3rd move, we step from -1 to 2 (3 steps)."
+        },
+        {
+          "input": "target = 3",
+          "output": "2",
+          "explanation": "On the 1st move, we step from 0 to 1 (1 step).\nOn the 2nd move, we step from 1 to 3 (2 steps)."
+        }
+      ],
+      "constraints": "-10^9 <= target <= 10^9\ntarget != 0",
+      "solution": "class Solution:\n    def reachNumber(self, target):\n        target = abs(target)\n        step = 0\n        sum_ = 0\n        while sum_ < target or (sum_ - target) % 2 != 0:\n            step += 1\n            sum_ += step\n        return step",
+      "explanation": "1. 取 target 絕對值，因為方向可反向。\n2. 從 step = 0 開始累加 sum_，表示每次向右走 i 步。\n3. 當 sum_ >= target 且 sum_ - target 為偶數時，表示可以通過反向某些步數到達 target。\n4. 返回所需的最小步數 step。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

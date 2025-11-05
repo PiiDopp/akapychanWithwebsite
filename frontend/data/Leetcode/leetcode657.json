@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode657",
+  "coding_practice": [
+    {
+      "title": "Robot Return to Origin",
+      "description": "There is a robot starting at the position (0, 0), the origin, on a 2D plane. Given a sequence of its moves, judge if this robot ends up at (0, 0) after it completes its moves.\n\nYou are given a string moves that represents the move sequence of the robot where moves[i] represents its ith move. Valid moves are 'R' (right), 'L' (left), 'U' (up), and 'D' (down).\n\nReturn true if the robot returns to the origin after it finishes all of its moves, or false otherwise.\n\nNote: The way that the robot is \"facing\" is irrelevant. 'R' will always make the robot move to the right once, 'L' will always make it move left, etc. Also, assume that the magnitude of the robot's movement is the same for each move.",
+      "examples": [
+        {
+          "input": "moves = \"UD\"",
+          "output": "true",
+          "explanation": "The robot moves up once, and then down once. All moves have the same magnitude, so it ended up at the origin where it started. Therefore, we return true."
+        },
+        {
+          "input": "moves = \"LL\"",
+          "output": "false",
+          "explanation": "The robot moves left twice. It ends up two \"moves\" to the left of the origin. We return false because it is not at the origin at the end of its moves."
+        }
+      ],
+      "constraints": "1 <= moves.length <= 2 * 10^4\nmoves only contains the characters 'U', 'D', 'L' and 'R'.",
+      "solution": "class Solution:\n    def judgeCircle(self, moves):\n        x = y = 0\n        for move in moves:\n            if move == 'U':\n                y += 1\n            elif move == 'D':\n                y -= 1\n            elif move == 'L':\n                x -= 1\n            elif move == 'R':\n                x += 1\n        return x == 0 and y == 0",
+      "explanation": "1. 初始化座標 x = 0, y = 0，表示機器人起點。\\n2. 遍歷 moves 字符串，根據 'U', 'D', 'L', 'R' 更新 x 與 y 座標。\\n3. 最後判斷 x 和 y 是否都回到 0，若是則返回 true，否則返回 false。\\n4. 時間複雜度為 O(n)，空間複雜度為 O(1)。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}
+

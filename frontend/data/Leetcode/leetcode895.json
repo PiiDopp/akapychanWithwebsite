@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode895",
+  "coding_practice": [
+    {
+      "title": "Maximum Frequency Stack",
+      "description": "Design a stack-like data structure to push elements to the stack and pop the most frequent element from the stack.\n\nImplement the FreqStack class: \n\nFreqStack() constructs an empty frequency stack. \n\nvoid push(int val) pushes an integer val onto the top of the stack.\n\nint pop() removes and returns the most frequent element in the stack.\n\n  If there is a tie for the most frequent element, the element closest to the stack's top is removed and returned.",
+      "examples": [
+        {
+          "input": "[\"FreqStack\", \"push\", \"push\", \"push\", \"push\", \"push\", \"push\", \"pop\", \"pop\", \"pop\", \"pop\"], [[], [5], [7], [5], [7], [4], [5], [], [], [], []]",
+          "output": "[null, null, null, null, null, null, null, 5, 7, 5, 4]",
+          "explanation": "FreqStack freqStack = new FreqStack();\nfreqStack.push(5); // The stack is [5]\nfreqStack.push(7); // The stack is [5,7]\nfreqStack.push(5); // The stack is [5,7,5]\nfreqStack.push(7); // The stack is [5,7,5,7]\nfreqStack.push(4); // The stack is [5,7,5,7,4]\nfreqStack.push(5); // The stack is [5,7,5,7,4,5]\nfreqStack.pop();   // return 5, as 5 is the most frequent. The stack becomes [5,7,5,7,4].\nfreqStack.pop();   // return 7, as 5 and 7 are the most frequent, but 7 is closest to the top. The stack becomes [5,7,5,4].\nfreqStack.pop();   // return 5, as 5 is the most frequent. The stack becomes [5,7,4].\nfreqStack.pop();   // return 4, as 4, 5 and 7 are the most frequent, but 4 is closest to the top. The stack becomes [5,7]."
+        }
+      ],
+      "constraints": "0 <= val <= 10^9\nAt most 2 * 10^4 calls will be made to push and pop.\nIt is guaranteed that there will be at least one element in the stack before calling pop.",
+      "solution": "import collections\n\nclass FreqStack(object):\n    def __init__(self):\n        self.freq = collections.Counter()\n        self.group = collections.defaultdict(list)\n        self.maxfreq = 0\n\n    def push(self, x):\n        f = self.freq[x] + 1\n        self.freq[x] = f\n        if f > self.maxfreq:\n            self.maxfreq = f\n        self.group[f].append(x)\n\n    def pop(self):\n        x = self.group[self.maxfreq].pop()\n        self.freq[x] -= 1\n        if not self.group[self.maxfreq]:\n            self.maxfreq -= 1\n        return x",
+      "explanation": "1. 使用 Counter freq 記錄每個元素出現的頻率。\n2. 使用 defaultdict(list) group 以頻率為鍵，堆疊對應的元素列表。\n3. push 時，增加元素頻率，並將元素加入對應頻率的堆疊，更新 maxfreq。\n4. pop 時，從 maxfreq 對應的堆疊彈出元素，減少其頻率，如果該堆疊空了則 maxfreq 減 1。",
+      "tag": "1130",
+      "difficult": "hard"
+    }
+  ]
+}

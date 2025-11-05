@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode567",
+  "coding_practice": [
+    {
+      "title": "Permutation in String",
+      "description": "Given two strings s1 and s2, return true if s2 contains a permutation of s1, or false otherwise.\n\nIn other words, return true if one of s1's permutations is the substring of s2.",
+      "examples": [
+        {
+          "input": "s1 = \"ab\", s2 = \"eidbaooo\"",
+          "output": "true",
+          "explanation": "s2 contains one permutation of s1 (\"ba\")."
+        },
+        {
+          "input": "s1 = \"ab\", s2 = \"eidboaoo\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s1.length, s2.length <= 10^4\ns1 and s2 consist of lowercase English letters.",
+      "solution": "class Solution:\n    def checkInclusion(self, s1, s2):\n        from collections import Counter\n\n        len1, len2 = len(s1), len(s2)\n        if len1 > len2:\n            return False\n\n        s1_count = Counter(s1)\n        window_count = Counter(s2[:len1])\n\n        if s1_count == window_count:\n            return True\n\n        for i in range(len1, len2):\n            start_char = s2[i - len1]\n            end_char = s2[i]\n            window_count[end_char] += 1\n            window_count[start_char] -= 1\n            if window_count[start_char] == 0:\n                del window_count[start_char]\n            if window_count == s1_count:\n                return True\n\n        return False",
+      "explanation": "1. 使用 Counter 記錄 s1 的字母頻率。\n2. 初始化滑動視窗 window_count 為 s2 前 len(s1) 個字母的頻率。\n3. 比較 window_count 與 s1_count 是否相等，若相等即存在排列。\n4. 使用滑動視窗，移動一個字母：加入新字母、減去離開的字母，若頻率為 0 則刪除。\n5. 每次滑動後比較 Counter，若相等則回傳 True。\n6. 若遍歷完都沒有匹配，回傳 False。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

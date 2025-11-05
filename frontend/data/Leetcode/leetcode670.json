@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode670",
+  "coding_practice": [
+    {
+      "title": "Maximum Swap",
+      "description": "You are given an integer num. You can swap two digits at most once to get the maximum valued number.\n\nReturn the maximum valued number you can get.",
+      "examples": [
+        {
+          "input": "num = 2736",
+          "output": "7236",
+          "explanation": "Swap the number 2 and the number 7."
+        },
+        {
+          "input": "num = 9973",
+          "output": "9973",
+          "explanation": "No swap."
+        }
+      ],
+      "constraints": "0 <= num <= 10^8",
+      "solution": "class Solution:\n    def maximumSwap(self, num):\n        num = list(str(num))\n        last = {int(x): i for i, x in enumerate(num)}\n        \n        for i, x in enumerate(num):\n            for d in range(9, int(x), -1):\n                if d in last and last[d] > i:\n                    num[i], num[last[d]] = num[last[d]], num[i]\n                    return int(''.join(num))\n        return int(''.join(num))",
+      "explanation": "1. 將數字轉為字元列表，方便交換。\\n2. 記錄每個數字最後出現的索引。\\n3. 從左到右遍歷每個數字，尋找比當前數字大的最大數字 d，如果 d 出現在後面，則交換。\\n4. 交換一次後返回結果，若沒有可交換的數字，直接返回原數字。\\n5. 時間複雜度 O(n)，空間複雜度 O(1)。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

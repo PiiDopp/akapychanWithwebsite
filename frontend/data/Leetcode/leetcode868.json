@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode868",
+  "coding_practice": [
+    {
+      "title": "Binary Gap",
+      "description": "Given a positive integer n, find and return the longest distance between any two adjacent 1's in the binary representation of n. If there are no two adjacent 1's, return 0. \n\nTwo 1's are adjacent if there are only 0's separating them (possibly no 0's). The distance between two 1's is the absolute difference between their bit positions. For example, the two 1's in \"1001\" have a distance of 3.",
+      "examples": [
+        {
+          "input": "n = 22",
+          "output": "2",
+          "explanation": "22 in binary is \"10110\". \nThe first adjacent pair of 1's is \"10110\" with a distance of 2. \nThe second adjacent pair of 1's is \"10110\" with a distance of 1. \nThe answer is the largest of these two distances, which is 2. \nNote that \"10110\" is not a valid pair since there is a 1 separating the two 1's underlined."
+        },
+        {
+          "input": "n = 8",
+          "output": "0",
+          "explanation": "8 in binary is \"1000\". \nThere are not any adjacent pairs of 1's in the binary representation of 8, so we return 0."
+        },
+        {
+          "input": "n = 5",
+          "output": "2",
+          "explanation": " 5 in binary is \"101\""
+        }
+      ],
+      "constraints": "1 <= n <= 10^9",
+      "solution": "class Solution(object):\n    def binaryGap(self, n):\n        last = -1\n        max_gap = 0\n        pos = 0\n        \n        while n > 0:\n            if n & 1:\n                if last != -1:\n                    max_gap = max(max_gap, pos - last)\n                last = pos\n            n >>= 1\n            pos += 1\n        \n        return max_gap",
+      "explanation": "1. 使用 pos 記錄當前位元位置，last 記錄上一次出現 1 的位置。\n2. 遍歷二進位，遇到 1 時計算當前距離並更新 max_gap。\n3. 最後返回最大距離。",
+      "tag": "1030",
+      "difficult": "easy"
+    }
+  ]
+}

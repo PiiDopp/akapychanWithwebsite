@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode890",
+  "coding_practice": [
+    {
+      "title": "Find and Replace Pattern",
+      "description": "Given a list of strings words and a string pattern, return a list of words[i] that match pattern. You may return the answer in any order.\n\nA word matches the pattern if there exists a permutation of letters p so that after replacing every letter x in the pattern with p(x), we get the desired word.\n\nRecall that a permutation of letters is a bijection from letters to letters: every letter maps to another letter, and no two letters map to the same letter.",
+      "examples": [
+        {
+          "input": "words = [\"abc\",\"deq\",\"mee\",\"aqq\",\"dkd\",\"ccc\"], pattern = \"abb\"",
+          "output": "[\"mee\",\"aqq\"]",
+          "explanation": "\"mee\" matches the pattern because there is a permutation {a -> m, b -> e, ...}. \n\"ccc\" does not match the pattern because {a -> c, b -> c, ...} is not a permutation, since a and b map to the same letter."
+        },
+        {
+          "input": "words = [\"a\",\"b\",\"c\"], pattern = \"a\"",
+          "output": "[\"a\",\"b\",\"c\"]"
+        }
+      ],
+      "constraints": "1 <= pattern.length <= 20\n1 <= words.length <= 50\nwords[i].length == pattern.length\npattern and words[i] are lowercase English letters.",
+      "solution": "class Solution(object):\n    def findAndReplacePattern(self, words, pattern):\n        \"\"\"\n        :type words: List[str]\n        :type pattern: str\n        :rtype: List[str]\n        \"\"\"\n        res = []\n        for word in words:\n            if len(word) != len(pattern):\n                continue\n            w_to_p = {}\n            p_to_w = {}\n            match = True\n            for w_char, p_char in zip(word, pattern):\n                if w_char in w_to_p and w_to_p[w_char] != p_char:\n                    match = False\n                    break\n                if p_char in p_to_w and p_to_w[p_char] != w_char:\n                    match = False\n                    break\n                w_to_p[w_char] = p_char\n                p_to_w[p_char] = w_char\n            if match:\n                res.append(word)\n        return res",
+      "explanation": "1. 定義一個 encode 函數，把每個單字轉成依照第一次出現順序的編碼，例如 'abb' -> 'abb', 'mee' -> 'mee'.\n2. 將 pattern 編碼後得到 pattern_code。\n3. 遍歷 words，將每個單字編碼後與 pattern_code 比較，相同則加入結果。\n4. 回傳符合 pattern 的所有單字列表。",
+      "tag": "723",
+      "difficult": "medium"
+    }
+  ]
+}

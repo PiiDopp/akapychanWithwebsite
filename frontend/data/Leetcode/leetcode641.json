@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode641",
+  "coding_practice": [
+    {
+      "title": "Design Circular Deque",
+      "description": "Design your implementation of the circular double-ended queue (deque).\n\nImplement the MyCircularDeque class:\n\nMyCircularDeque(int k) Initializes the deque with a maximum size of k.\nboolean insertFront() Adds an item at the front of Deque. Returns true if the operation is successful, or false otherwise.\nboolean insertLast() Adds an item at the rear of Deque. Returns true if the operation is successful, or false otherwise.\nboolean deleteFront() Deletes an item from the front of Deque. Returns true if the operation is successful, or false otherwise.\nboolean deleteLast() Deletes an item from the rear of Deque. Returns true if the operation is successful, or false otherwise.\nint getFront() Returns the front item from the Deque. Returns -1 if the deque is empty.\nint getRear() Returns the last item from Deque. Returns -1 if the deque is empty.\nboolean isEmpty() Returns true if the deque is empty, or false otherwise.\nboolean isFull() Returns true if the deque is full, or false otherwise.",
+      "examples": [
+        {
+          "input": "[\"MyCircularDeque\", \"insertLast\", \"insertLast\", \"insertFront\", \"insertFront\", \"getRear\", \"isFull\", \"deleteLast\", \"insertFront\", \"getFront\"]\\n[[3], [1], [2], [3], [4], [], [], [], [4], []]",
+          "output": "[null, true, true, true, false, 2, true, true, true, 4]",
+          "explanation": "MyCircularDeque myCircularDeque = new MyCircularDeque(3);\\nmyCircularDeque.insertLast(1);  // return True\\nmyCircularDeque.insertLast(2);  // return True\\nmyCircularDeque.insertFront(3); // return True\\nmyCircularDeque.insertFront(4); // return False, the queue is full.\\nmyCircularDeque.getRear();      // return 2\\nmyCircularDeque.isFull();       // return True\\nmyCircularDeque.deleteLast();   // return True\\nmyCircularDeque.insertFront(4); // return True\\nmyCircularDeque.getFront();     // return 4"
+        }
+      ],
+      "constraints": "1 <= k <= 1000\\n0 <= value <= 1000\\nAt most 2000 calls will be made to insertFront, insertLast, deleteFront, deleteLast, getFront, getRear, isEmpty, isFull.",
+      "solution": "class MyCircularDeque:\\n    def __init__(self, k):\\n        self.k = k\\n        self.buf = [0] * k\\n        self.head = 0\\n        self.count = 0\\n\\n    def insertFront(self, value):\\n        if self.count == self.k:\\n            return False\\n        self.head = (self.head - 1) % self.k\\n        self.buf[self.head] = value\\n        self.count += 1\\n        return True\\n\\n    def insertLast(self, value):\\n        if self.count == self.k:\\n            return False\\n        idx = (self.head + self.count) % self.k\\n        self.buf[idx] = value\\n        self.count += 1\\n        return True\\n\\n    def deleteFront(self):\\n        if self.count == 0:\\n            return False\\n        self.head = (self.head + 1) % self.k\\n        self.count -= 1\\n        return True\\n\\n    def deleteLast(self):\\n        if self.count == 0:\\n            return False\\n        self.count -= 1\\n        return True\\n\\n    def getFront(self):\\n        if self.count == 0:\\n            return -1\\n        return self.buf[self.head]\\n\\n    def getRear(self):\\n        if self.count == 0:\\n            return -1\\n        idx = (self.head + self.count - 1) % self.k\\n        return self.buf[idx]\\n\\n    def isEmpty(self):\\n        return self.count == 0\\n\\n    def isFull(self):\\n        return self.count == self.k",
+      "explanation": "1. 使用固定大小的 list 作為環形緩衝區，紀錄資料。\\n2. 用 head 紀錄當前隊首位置，count 紀錄目前元素數量。\\n3. insertFront 會往前移動 head 並插入元素，insertLast 則在 (head + count) 位置插入。\\n4. deleteFront 將 head 向後移動一格；deleteLast 則只減少 count。\\n5. getFront 與 getRear 依據 head 與 count 的相對位置回傳對應值。\\n6. isEmpty 與 isFull 透過 count 與 k 的比較判斷是否為空或滿。",
+      "tag": "1110",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode819",
+  "coding_practice": [
+    {
+      "title": "Most Common Word",
+      "description": "Given a string paragraph and a string array of the banned words banned, return the most frequent word that is not banned. It is guaranteed there is at least one word that is not banned, and that the answer is unique.\n\nThe words in paragraph are case-insensitive and the answer should be returned in lowercase.\n\nNote that words can not contain punctuation symbols.",
+      "examples": [
+        {
+          "input": "paragraph = \"Bob hit a ball, the hit BALL flew far after it was hit.\", banned = [\"hit\"]",
+          "output": "ball",
+          "explanation": "\"hit\" occurs 3 times, but it is a banned word.\n\"ball\" occurs twice (and no other word does), so it is the most frequent non-banned word in the paragraph.\nNote that words in the paragraph are not case sensitive,\nthat punctuation is ignored (even if adjacent to words, such as \"ball,\"), \nand that \"hit\" isn't the answer even though it occurs more because it is banned."
+        },
+        {
+          "input": "paragraph = \"a.\", banned = []",
+          "output": "a"
+        }
+      ],
+      "constraints": "1 <= paragraph.length <= 1000\nparagraph consists of English letters, space ' ', or one of the symbols: \"!?',;.\".\n0 <= banned.length <= 100\n1 <= banned[i].length <= 10\nbanned[i] consists of only lowercase English letters.",
+      "solution": "class Solution(object):\n    def mostCommonWord(self, paragraph, banned):\n        \"\"\"\n        :type paragraph: str\n        :type banned: List[str]\n        :rtype: str\n        \"\"\"\n        import re\n        from collections import Counter\n        \n        words = re.findall(r'\\w+', paragraph.lower())\n        banned_set = set(banned)\n        counts = Counter(w for w in words if w not in banned_set)\n        return counts.most_common(1)[0][0]",
+      "explanation": "1. 使用正則表達式將 paragraph 中所有單詞提取出來，並轉成小寫。\n2. 建立 banned_set 方便快速判斷是否為禁止單詞。\n3. 使用 Counter 計算每個非禁止單詞的出現次數。\n4. 返回出現次數最多的單詞。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}
+

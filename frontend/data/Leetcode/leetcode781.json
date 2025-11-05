@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode781",
+  "coding_practice": [
+    {
+      "title": "Rabbits in Forest",
+      "description": "There is a forest with an unknown number of rabbits. We asked n rabbits \"How many rabbits have the same color as you?\" and collected the answers in an integer array answers where answers[i] is the answer of the ith rabbit.\n\nGiven the array answers, return the minimum number of rabbits that could be in the forest.",
+      "examples": [
+        {
+          "input": "answers = [1,1,2]",
+          "output": "5",
+          "explanation": "The two rabbits that answered \"1\" could both be the same color, say red. The rabbit that answered \"2\" can't be red. Say the rabbit that answered \"2\" was blue. Then there should be 2 other blue rabbits in the forest that didn't answer. The smallest possible number of rabbits in the forest is therefore 5: 3 that answered plus 2 that didn't."
+        },
+        {
+          "input": "answers = [10,10,10]",
+          "output": "11"
+        }
+      ],
+      "constraints": "1 <= answers.length <= 1000\n0 <= answers[i] < 1000",
+      "solution": "class Solution:\n    def numRabbits(self, answers):\n        from collections import Counter\n        count = Counter(answers)\n        result = 0\n        for k, v in count.items():\n            groups = (v + k) // (k + 1)\n            result += groups * (k + 1)\n        return result",
+      "explanation": "1. 使用 Counter 統計每個回答出現的次數。\n2. 對於回答 k 的兔子，最多有 k+1 只兔子同色。\n3. 計算所需群組數 groups = ceil(v / (k+1))，再乘以 k+1 加入結果。\n4. 對所有不同回答累加，得到最少兔子總數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

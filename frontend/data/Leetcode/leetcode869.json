@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode869",
+  "coding_practice": [
+    {
+      "title": "Reordered Power of 2",
+      "description": "You are given an integer n. We reorder the digits in any order (including the original order) such that the leading digit is not zero.\n\nReturn true if and only if we can do this so that the resulting number is a power of two.",
+      "examples": [
+        {
+          "input": "n = 1",
+          "output": "true"
+        },
+        {
+          "input": "n = 10",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= n <= 10^9",
+      "solution": "class Solution(object):\n    def reorderedPowerOf2(self, N):\n        from collections import Counter\n        count_N = Counter(str(N))\n        for i in range(31):\n            if Counter(str(1 << i)) == count_N:\n                return True\n        return False",
+      "explanation": "1. 計算 N 的數字計數 count_N。\n2. 遍歷 2 的次方 2^i (i = 0~30)，將其轉為字符串計數。\n3. 若有任何次方的數字計數與 N 相同，返回 True。\n4. 若遍歷完無匹配，返回 False。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode857",
+  "coding_practice": [
+    {
+      "title": "Minimum Cost to Hire K Workers",
+      "description": "There are n workers. You are given two integer arrays quality and wage where quality[i] is the quality of the ith worker and wage[i] is the minimum wage expectation for the ith worker.\n\nWe want to hire exactly k workers to form a paid group. To hire a group of k workers, we must pay them according to the following rules:\n\nEvery worker in the paid group must be paid at least their minimum wage expectation.\nIn the group, each worker's pay must be directly proportional to their quality. This means if a worker’s quality is double that of another worker in the group, then they must be paid twice as much as the other worker.\nGiven the integer k, return the least amount of money needed to form a paid group satisfying the above conditions. Answers within 10-5 of the actual answer will be accepted.",
+      "examples": [
+        {
+          "input": "quality = [10,20,5], wage = [70,50,30], k = 2",
+          "output": "105.00000",
+          "explanation": "We pay 70 to 0th worker and 35 to 2nd worker."
+        },
+        {
+          "input": "quality = [3,1,10,10,1], wage = [4,8,2,2,7], k = 3",
+          "output": "30.66667",
+          "explanation": "We pay 4 to 0th worker, 13.33333 to 2nd and 3rd workers separately."
+        }
+      ],
+      "constraints": "n == quality.length == wage.length\n1 <= k <= n <= 10^4\n1 <= quality[i], wage[i] <= 10^4",
+      "solution": "from heapq import heappush, heappop\n\nclass Solution(object):\n    def mincostToHireWorkers(self, quality, wage, k):\n        n, cost = len(quality), float(\"inf\")\n        wq_ratio = [(float(w) / q, q) for w, q in zip(wage, quality)]\n        total_q, q_heap = 0, []\n\n        wq_ratio.sort(key=lambda x: x[0])\n        for wq, q in wq_ratio:\n            total_q += q\n            heappush(q_heap, -q)\n\n            if len(q_heap) > k:\n                total_q += heappop(q_heap)\n            \n            if len(q_heap) == k:\n                cost = min(cost, total_q * wq)\n\n        return cost",
+      "explanation": "1. 計算每個工人的 wage/quality 比率 wq_ratio，表示每單位質量的工資需求。\n2. 對工人按照比率從小到大排序。\n3. 使用最大堆來維護當前選擇的 k 個工人質量總和 total_q，保證選擇的工人總成本最小。\n4. 遍歷排序後的工人列表，每次加入堆後，如果堆大於 k，彈出最大質量以保持選擇 k 個工人。\n5. 當堆大小等於 k 時，計算當前總成本 total_q * wq，更新最小值。\n6. 返回最小成本。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

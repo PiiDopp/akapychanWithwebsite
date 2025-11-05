@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode698",
+  "coding_practice": [
+    {
+      "title": "Partition to K Equal Sum Subsets",
+      "description": "Given an integer array nums and an integer k, return true if it is possible to divide this array into k non-empty subsets whose sums are all equal.",
+      "examples": [
+        {
+          "input": "nums = [4,3,2,3,5,2,1], k = 4",
+          "output": "true",
+          "explanation": "It is possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums."
+        },
+        {
+          "input": "nums = [1,2,3,4], k = 3",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= k <= nums.length <= 16\n1 <= nums[i] <= 10^4\nThe frequency of each element is in the range [1, 4].",
+      "solution": "class Solution:\n    def canPartitionKSubsets(self, nums, k):\n        total = sum(nums)\n        if total % k != 0:\n            return False\n        target = total // k\n        n = len(nums)\n        nums.sort(reverse=True)\n        memo = {}\n\n        def dfs(used, curr_sum, k_remaining):\n            if k_remaining == 0:\n                return True\n            if (used, curr_sum, k_remaining) in memo:\n                return memo[(used, curr_sum, k_remaining)]\n            for i in range(n):\n                if not (used >> i) & 1 and curr_sum + nums[i] <= target:\n                    if dfs(used | (1 << i), (curr_sum + nums[i]) % target, k_remaining - ((curr_sum + nums[i]) // target)):\n                        memo[(used, curr_sum, k_remaining)] = True\n                        return True\n            memo[(used, curr_sum, k_remaining)] = False\n            return False\n        \n        return dfs(0, 0, k)",
+      "explanation": "1. 計算總和 total，如果 total % k != 0，直接返回 False。\\n2. 計算每個子集的目標和 target = total // k。\\n3. 將 nums 排序降序以便先嘗試大數字，提高剪枝效率。\\n4. 使用 DFS + bitmask，bitmask 用來表示哪些元素已被使用。\\n5. 當 curr_sum 等於 target，表示完成一個子集，遞迴下一個子集。\\n6. 用 memo 記錄已訪問狀態，避免重複計算。\\n7. DFS 遍歷所有可能組合，若找到一組合法子集分配則返回 True，否則返回 False。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

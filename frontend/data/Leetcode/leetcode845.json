@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode845",
+  "coding_practice": [
+    {
+      "title": "Longest Mountain in Array",
+      "description": "You may recall that an array arr is a mountain array if and only if:\n\narr.length >= 3\nThere exists some index i (0-indexed) with 0 < i < arr.length - 1 such that:\narr[0] < arr[1] < ... < arr[i - 1] < arr[i]\narr[i] > arr[i + 1] > ... > arr[arr.length - 1]\n\nGiven an integer array arr, return the length of the longest subarray, which is a mountain. Return 0 if there is no mountain subarray.",
+      "examples": [
+        {
+          "input": "arr = [2,1,4,7,3,2,5]",
+          "output": "5",
+          "explanation": "The largest mountain is [1,4,7,3,2] which has length 5."
+        },
+        {
+          "input": "arr = [2,2,2]",
+          "output": "0",
+          "explanation": "There is no mountain."
+        }
+      ],
+      "constraints": "1 <= arr.length <= 10^4\n0 <= arr[i] <= 10^4",
+      "follow up": "Can you solve it using only one pass?\nCan you solve it in O(1) space?",
+      "solution": "class Solution(object):\n    def longestMountain(self, arr):\n        \"\"\"\n        :type arr: List[int]\n        :rtype: int\n        \"\"\"\n        n = len(arr)\n        max_len = 0\n        i = 1\n        \n        while i < n - 1:\n            if arr[i-1] < arr[i] > arr[i+1]:\n                left = i - 1\n                right = i + 1\n                \n                while left > 0 and arr[left-1] < arr[left]:\n                    left -= 1\n                while right < n - 1 and arr[right] > arr[right+1]:\n                    right += 1\n                \n                max_len = max(max_len, right - left + 1)\n                i = right + 1\n            else:\n                i += 1\n        \n        return max_len",
+      "explanation": "1. 從索引 1 開始遍歷陣列，尋找局部峰值（arr[i-1] < arr[i] > arr[i+1]）。\n2. 找到峰值後，向左擴展找到山的起點，向右擴展找到山的終點。\n3. 計算該山的長度，更新最大長度 max_len。\n4. 若不是峰值，繼續向後移動索引。\n5. 遍歷完成後返回最大山長度，若不存在山，則 max_len 為 0。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

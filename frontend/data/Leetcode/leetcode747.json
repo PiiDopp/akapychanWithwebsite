@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode747",
+  "coding_practice": [
+    {
+      "title": "Largest Number At Least Twice of Others",
+      "description": "You are given an integer array nums where the largest integer is unique.\n\nDetermine whether the largest element in the array is at least twice as much as every other number in the array. If it is, return the index of the largest element, or return -1 otherwise.",
+      "examples": [
+        {
+          "input": "[3,6,1,0]",
+          "output": "1",
+          "explanation": "6 is the largest integer.\nFor every other number in the array x, 6 is at least twice as big as x.\nThe index of value 6 is 1, so we return 1."
+        },
+        {
+          "input": "[1,2,3,4]",
+          "output": "-1",
+          "explanation": "4 is less than twice the value of 3, so we return -1."
+        }
+      ],
+      "constraints": "2 <= nums.length <= 50\n0 <= nums[i] <= 100\nThe largest element in nums is unique.",
+      "solution": "class Solution:\n    def dominantIndex(self, nums):\n        if not nums:\n            return -1\n        max_num = max(nums)\n        max_index = nums.index(max_num)\n        for i, num in enumerate(nums):\n            if i != max_index and max_num < 2 * num:\n                return -1\n        return max_index",
+      "explanation": "1. 找到 nums 中的最大值 max_num 及其索引 max_index。\n2. 遍歷 nums，檢查每個非最大值 num 是否滿足 max_num >= 2 * num。\n3. 若有任意 num 不滿足條件，回傳 -1。\n4. 若所有條件滿足，回傳 max_index。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

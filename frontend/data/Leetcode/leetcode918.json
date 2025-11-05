@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode918",
+  "coding_practice": [
+    {
+      "title": "Maximum Sum Circular Subarray",
+      "description": "Given a circular integer array nums of length n, return the maximum possible sum of a non-empty subarray of nums.\nA circular array means the end of the array connects to the beginning of the array. Formally, the next element of nums[i] is nums[(i + 1) % n] and the previous element of nums[i] is nums[(i - 1 + n) % n].\nA subarray may only include each element of the fixed buffer nums at most once. Formally, for a subarray nums[i], nums[i + 1], ..., nums[j], there does not exist i <= k1, k2 <= j with k1 % n == k2 % n.",
+      "examples": [
+        {
+          "input": "nums = [1,-2,3,-2]",
+          "output": "3",
+          "explanation": "Subarray [3] has maximum sum 3."
+        },
+        {
+          "input": "nums = [5,-3,5]",
+          "output": "10",
+          "explanation": "Subarray [5,5] has maximum sum 5 + 5 = 10."
+        },
+        {
+          "input": "nums = [-3,-2,-3]",
+          "output": "-2",
+          "explanation": "Subarray [-2] has maximum sum -2."
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 3 * 10^4\n-3 * 10^4 <= nums[i] <= 3 * 10^4",
+      "solution": "class Solution(object):\n    def maxSubarraySumCircular(self, A):\n        \"\"\"\n        :type A: List[int]\n        :rtype: int\n        \"\"\"\n        total = 0\n        max_sum = float('-inf')\n        cur_max = 0\n        min_sum = float('inf')\n        cur_min = 0\n        \n        for num in A:\n            # Maximum subarray sum (standard Kadane's)\n            cur_max = max(num, cur_max + num)\n            max_sum = max(max_sum, cur_max)\n            \n            # Minimum subarray sum (to handle circular)\n            cur_min = min(num, cur_min + num)\n            min_sum = min(min_sum, cur_min)\n            \n            total += num\n        \n        return max_sum if max_sum < 0 else max(max_sum, total - min_sum)",
+      "explanation": "1. 使用 Kadane's 演算法找到非循環陣列的最大子陣列和 (cur_max 與 max_sum)。\n2. 同時使用類似 Kadane's 演算法找到最小子陣列和 (cur_min 與 min_sum)，以處理循環情況。\n3. 計算整個陣列總和 total。\n4. 如果 max_sum < 0，表示所有數字都是負數，直接回傳 max_sum。\n5. 否則回傳 max(max_sum, total - min_sum)，total - min_sum 即為跨越陣列邊界的循環最大子陣列和。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

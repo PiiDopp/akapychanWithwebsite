@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode592",
+  "coding_practice": [
+    {
+      "title": "Fraction Addition and Subtraction",
+      "description": "Given a string expression representing an expression of fraction addition and subtraction, return the calculation result in string format.\n\nThe final result should be an irreducible fraction. If your final result is an integer, change it to the format of a fraction that has a denominator 1. So in this case, 2 should be converted to 2/1.",
+      "examples": [
+        {
+          "input": "expression = \"-1/2+1/2\"",
+          "output": "0/1"
+        },
+        {
+          "input": "expression = \"-1/2+1/2+1/3\"",
+          "output": "1/3"
+        },
+        {
+          "input": "expression = \"1/3-1/2\"",
+          "output": "-1/6"
+        }
+      ],
+      "constraints": "The input string only contains '0' to '9', '/', '+' and '-'. So does the output. \nEach fraction (input and output) has the format ±numerator/denominator. If the first input fraction or the output is positive, then '+' will be omitted. \nThe input only contains valid irreducible fractions, where the numerator and denominator of each fraction will always be in the range [1, 10]. If the denominator is 1, it means this fraction is actually an integer in a fraction format defined above. \nThe number of given fractions will be in the range [1, 10]. \nThe numerator and denominator of the final result are guaranteed to be valid and in the range of 32-bit int.",
+      "solution": "from fractions import Fraction\nimport re\n\nclass Solution:\n    def fractionAddition(self, expression):\n        fractions = re.findall(r'[+-]?\\d+/\\d+', expression)\n        result = sum(Fraction(frac) for frac in fractions)\n        return \"{}/{}\".format(result.numerator, result.denominator)",
+      "explanation": "1. 使用正則表達式提取 expression 中的所有分數（包含符號）。\n2. 將每個分數轉換為 Fraction 類型，使用 sum() 累加得到最終結果。\n3. 將最終 Fraction 的分子與分母格式化為字符串形式返回，即為最簡分數。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}
+

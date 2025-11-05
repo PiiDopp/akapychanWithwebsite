@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode789",
+  "coding_practice": [
+    {
+      "title": "Escape The Ghosts",
+      "description": "You are playing a simplified PAC-MAN game on an infinite 2-D grid. You start at the point [0, 0], and you are given a destination point target = [xtarget, ytarget] that you are trying to get to. There are several ghosts on the map with their starting positions given as a 2D array ghosts, where ghosts[i] = [xi, yi] represents the starting position of the ith ghost. All inputs are integral coordinates.\n\nEach turn, you and all the ghosts may independently choose to either move 1 unit in any of the four cardinal directions: north, east, south, or west, or stay still. All actions happen simultaneously.\n\nYou escape if and only if you can reach the target before any ghost reaches you. If you reach any square (including the target) at the same time as a ghost, it does not count as an escape.\n\nReturn true if it is possible to escape regardless of how the ghosts move, otherwise return false.",
+      "examples": [
+        {
+          "input": "ghosts = [[1,0],[0,3]], target = [0,1]",
+          "output": "true",
+          "explanation": "You can reach the destination (0, 1) after 1 turn, while the ghosts located at (1, 0) and (0, 3) cannot catch up with you."
+        },
+        {
+          "input": "ghosts = [[1,0]], target = [2,0]",
+          "output": "false",
+          "explanation": "You need to reach the destination (2, 0), but the ghost at (1, 0) lies between you and the destination."
+        },
+        {
+          "input": "ghosts = [[2,0]], target = [1,0]",
+          "output": "false",
+          "explanation": "The ghost can reach the target at the same time as you."
+        }
+      ],
+      "constraints": "1 <= ghosts.length <= 100\nghosts[i].length == 2\n-10^4 <= xi, yi <= 10^4\nThere can be multiple ghosts in the same location.\ntarget.length == 2\n-10^4 <= xtarget, ytarget <= 10^4",
+      "solution": "class Solution:\n    def escapeGhosts(self, ghosts, target):\n        player_dist = abs(target[0]) + abs(target[1])\n        for gx, gy in ghosts:\n            ghost_dist = abs(target[0] - gx) + abs(target[1] - gy)\n            if ghost_dist <= player_dist:\n                return False\n        return True",
+      "explanation": "1. 計算玩家從 (0,0) 到目標的曼哈頓距離 player_dist。\n2. 遍歷每個鬼魂，計算其到目標的曼哈頓距離 ghost_dist。\n3. 若 ghost_dist <= player_dist，表示鬼魂可以先到或同時到達目標，返回 False。\n4. 若所有鬼魂距離均大於玩家距離，返回 True。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}
+

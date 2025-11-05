@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode686",
+  "coding_practice": [
+    {
+      "title": "Repeated String Match",
+      "description": "Given two strings a and b, return the minimum number of times you should repeat string a so that string b is a substring of it. If it is impossible for b to be a substring of a after repeating it, return -1.\n\nNotice: string \"abc\" repeated 0 times is \"\", repeated 1 time is \"abc\" and repeated 2 times is \"abcabc\".",
+      "examples": [
+        {
+          "input": "a = \"abcd\", b = \"cdabcdab\"",
+          "output": "3",
+          "explanation": "We return 3 because by repeating a three times \"abcdabcdabcd\", b is a substring of it."
+        },
+        {
+          "input": "a = \"a\", b = \"aa\"",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= a.length, b.length <= 10^4\na and b consist of lowercase English letters.",
+      "solution": "class Solution:\n    def repeatedStringMatch(self, A, B):\n        repeat = (len(B) + len(A) - 1) // len(A)\n        s = A * repeat\n        if B in s:\n            return repeat\n        s += A\n        if B in s:\n            return repeat + 1\n        return -1",
+      "explanation": "1. 計算 B 的長度除以 A 的長度後向上取整，得到至少需要重複的次數 repeat。\n2. 將 A 重複 repeat 次，檢查 B 是否為其子串，如果是，直接回傳 repeat。\n3. 若不是，再多重複一次 A（repeat+1），檢查 B 是否為子串，如果是，回傳 repeat+1。\n4. 若仍然找不到，返回 -1。",
+      "tag": "612",
+      "difficult": "medium"
+    }
+  ]
+}

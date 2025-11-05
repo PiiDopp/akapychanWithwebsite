@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode914",
+  "coding_practice": [
+    {
+      "title": "X of a Kind in a Deck of Cards",
+      "description": "You are given an integer array deck where deck[i] represents the number written on the ith card.\n\nPartition the cards into one or more groups such that:\n\nEach group has exactly x cards where x > 1, and\nAll the cards in one group have the same integer written on them.\nReturn true if such partition is possible, or false otherwise.",
+      "examples": [
+        {
+          "input": "deck = [1,2,3,4,4,3,2,1]",
+          "output": "true",
+          "explanation": "Possible partition [1,1],[2,2],[3,3],[4,4]."
+        },
+        {
+          "input": "deck = [1,1,1,2,2,2,3,3]",
+          "output": "false",
+          "explanation": "No possible partition."
+        }
+      ],
+      "constraints": "1 <= deck.length <= 10^4\n0 <= deck[i] < 10^4",
+      "solution": "class Solution(object):\n    def hasGroupsSizeX(self, deck):\n        \"\"\"\n        :type deck: List[int]\n        :rtype: bool\n        \"\"\"\n        from collections import Counter\n        from fractions import gcd\n        from functools import reduce\n\n        count = Counter(deck).values()\n        def list_gcd(nums):\n            from functools import reduce\n            return reduce(gcd, nums)\n\n        return list_gcd(count) >= 2",
+      "explanation": "1. 使用 Counter 計算每個數字出現的次數。\n2. 計算所有出現次數的最大公因數 (GCD)。\n3. 若 GCD >= 2，表示可以將卡片分組，每組大小為 GCD，且每組內卡片數字相同。\n4. 否則無法分組，回傳 False。",
+      "tag": "1030",
+      "difficult": "easy"
+    }
+  ]
+}

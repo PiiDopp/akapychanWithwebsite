@@ -7,15 +7,15 @@
       "examples": [
         {
           "input": "s = \"0\"",
-          "output": true
+          "output": "true"
         },
         {
           "input": "s = \"e\"",
-          "output": false
+          "output": "false"
         },
         {
           "input": "s = \".\"",
-          "output": false
+          "output": "false"
         }
       ],
       "constraints": "1 <= s.length <= 20\ns consists of only English letters (both uppercase and lowercase), digits (0-9), plus '+', minus '-', or dot '.'.",

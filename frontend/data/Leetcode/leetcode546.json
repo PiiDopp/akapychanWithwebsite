@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode546",
+  "coding_practice": [
+    {
+      "title": "Remove Boxes",
+      "description": "You are given several boxes with different colors represented by different positive numbers.\n\nYou may experience several rounds to remove boxes until there is no box left. Each time you can choose some continuous boxes with the same color (i.e., composed of k boxes, k >= 1), remove them and get k * k points.\n\nReturn the maximum points you can get.",
+      "examples": [
+        {
+          "input": "boxes = [1,3,2,2,2,3,4,3,1]",
+          "output": "23",
+          "explanation": "[1, 3, 2, 2, 2, 3, 4, 3, 1]  \n----> [1, 3, 3, 4, 3, 1] (3*3=9 points)  \n----> [1, 3, 3, 3, 1] (1*1=1 points)  \n----> [1, 1] (3*3=9 points)  \n----> [] (2*2=4 points)"
+        },
+        {
+          "input": "boxes = [1,1,1]",
+          "output": "9"
+        },
+        {
+          "input": "boxes = [1]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= boxes.length <= 100\n1 <= boxes[i] <= 100",
+      "solution": "import sys\nsys.setrecursionlimit(10000)\n\nclass Solution:\n    def removeBoxes(self, boxes):\n        memo = {}\n        n = len(boxes)\n\n        def dp(l, r, k):\n            if l > r:\n                return 0\n            if (l, r, k) in memo:\n                return memo[(l, r, k)]\n\n            while r > l and boxes[r] == boxes[r - 1]:\n                r -= 1\n                k += 1\n\n            res = dp(l, r - 1, 0) + (k + 1) ** 2\n\n            for i in range(l, r):\n                if boxes[i] == boxes[r]:\n                    res = max(res, dp(l, i, k + 1) + dp(i + 1, r - 1, 0))\n\n            memo[(l, r, k)] = res\n            return res\n\n        return dp(0, n - 1, 0)",
+      "explanation": "1. 使用三維遞迴 dp(l, r, k) 表示考慮 boxes[l..r] 並且右側有 k 個與 boxes[r] 相同的盒子可以合併。\n2. 若右端 r 與 r-1 相同，合併並增加 k。\n3. 計算直接刪除 boxes[r] 的分數: dp(l, r-1, 0) + (k+1)^2。\n4. 嘗試將右端相同顏色的盒子與中間某位置相同顏色的盒子合併，以最大化分數。\n5. 使用 memo 紀錄已計算的狀態以避免重複計算。",
+      "tag": "511",
+      "difficult": "hard"
+    }
+  ]
+}

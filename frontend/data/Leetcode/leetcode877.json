@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode877",
+  "coding_practice": [
+    {
+      "title": "Stone Game",
+      "description": "Alice and Bob play a game with piles of stones. There are an even number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].\n\nThe objective of the game is to end with the most stones. The total number of stones across all the piles is odd, so there are no ties.\n\nAlice and Bob take turns, with Alice starting first. Each turn, a player takes the entire pile of stones either from the beginning or from the end of the row. This continues until there are no more piles left, at which point the person with the most stones wins.\n\nAssuming Alice and Bob play optimally, return true if Alice wins the game, or false if Bob wins.",
+      "examples": [
+        {
+          "input": "piles = [5,3,4,5]",
+          "output": "true",
+          "explanation": "Alice starts first, and can only take the first 5 or the last 5.\nSay she takes the first 5, so that the row becomes [3, 4, 5].\nIf Bob takes 3, then the board is [4, 5], and Alice takes 5 to win with 10 points.\nIf Bob takes the last 5, then the board is [3, 4], and Alice takes 4 to win with 9 points.\nThis demonstrated that taking the first 5 was a winning move for Alice, so we return true."
+        },
+        {
+          "input": "piles = [3,7,2,3]",
+          "output": "true"
+        }
+      ],
+      "constraints": "2 <= piles.length <= 500\npiles.length is even.\n1 <= piles[i] <= 500\nsum(piles[i]) is odd",
+      "solution": "class Solution(object):\n    def stoneGame(self, piles):\n        \"\"\"\n        :type piles: List[int]\n        :rtype: bool\n        \"\"\"\n        # Alice always wins if she plays optimally with even number of piles\n        return True",
+      "explanation": "1. 題目保證總石頭數量為奇數且堆數為偶數。\n2. Alice 先手，對偶數堆遊戲，她總能選擇所有偶數位或奇數位的總和更大的一組。\n3. 因此 Alice 一定能贏，直接返回 True。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

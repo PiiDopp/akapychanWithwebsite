@@ -19,6 +19,8 @@ export const PATHS = {
   leetRoot: '/data/Leetcode',
   leetIndex: '/data/leetcode_index.json',
   judge: '/api/judge',
+  hint: '/api/hint',       
+  answer: '/api/answer',   
   translate: '/api/translate',
 };
 

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode746",
+  "coding_practice": [
+    {
+      "title": "Min Cost Climbing Stairs",
+      "description": "You are given an integer array cost where cost[i] is the cost of ith step on a staircase. Once you pay the cost, you can either climb one or two steps.\n\nYou can either start from the step with index 0, or the step with index 1.\n\nReturn the minimum cost to reach the top of the floor.",
+      "examples": [
+        {
+          "input": "[10,15,20]",
+          "output": "15",
+          "explanation": "You will start at index 1.\n- Pay 15 and climb two steps to reach the top.\nThe total cost is 15."
+        },
+        {
+          "input": "[1,100,1,1,1,100,1,1,100,1]",
+          "output": "6",
+          "explanation": "You will start at index 0.\n- Pay 1 and climb two steps to reach index 2.\n- Pay 1 and climb two steps to reach index 4.\n- Pay 1 and climb two steps to reach index 6.\n- Pay 1 and climb one step to reach index 7.\n- Pay 1 and climb two steps to reach index 9.\n- Pay 1 and climb one step to reach the top.\nThe total cost is 6."
+        }
+      ],
+      "constraints": "2 <= cost.length <= 1000\n0 <= cost[i] <= 999",
+      "solution": "class Solution:\n    def minCostClimbingStairs(self, cost):\n        n = len(cost)\n        if n == 0:\n            return 0\n        elif n == 1:\n            return cost[0]\n        dp = [0] * n\n        dp[0], dp[1] = cost[0], cost[1]\n        for i in range(2, n):\n            dp[i] = cost[i] + min(dp[i-1], dp[i-2])\n        return min(dp[-1], dp[-2])",
+      "explanation": "1. 使用 dp 陣列記錄到每個台階的最小花費。\n2. 初始化 dp[0] = cost[0], dp[1] = cost[1]。\n3. 對於每個 i >= 2，dp[i] = cost[i] + min(dp[i-1], dp[i-2])。\n4. 最後回傳 min(dp[-1], dp[-2])，表示從最後兩個台階到頂樓的最小花費。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

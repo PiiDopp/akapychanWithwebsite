@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode855",
+  "coding_practice": [
+    {
+      "title": "Exam Room",
+      "description": "There is an exam room with n seats in a single row labeled from 0 to n - 1.\n\nWhen a student enters the room, they must sit in the seat that maximizes the distance to the closest person. If there are multiple such seats, they sit in the seat with the lowest number. If no one is in the room, then the student sits at seat number 0.\n\nDesign a class that simulates the mentioned exam room.\n\nImplement the ExamRoom class:\n\nExamRoom(int n) Initializes the object of the exam room with the number of the seats n.\nint seat() Returns the label of the seat at which the next student will set.\nvoid leave(int p) Indicates that the student sitting at seat p will leave the room. It is guaranteed that there will be a student sitting at seat p.",
+      "examples": [
+        {
+          "input": "[\"ExamRoom\", \"seat\", \"seat\", \"seat\", \"seat\", \"leave\", \"seat\"], [[10], [], [], [], [], [4], []]",
+          "output": "[null, 0, 9, 4, 2, null, 5]",
+          "explanation": "ExamRoom examRoom = new ExamRoom(10);\nexamRoom.seat(); // return 0, no one is in the room, then the student sits at seat number 0.\nexamRoom.seat(); // return 9, the student sits at the last seat number 9.\nexamRoom.seat(); // return 4, the student sits at the last seat number 4.\nexamRoom.seat(); // return 2, the student sits at the last seat number 2.\nexamRoom.leave(4);\nexamRoom.seat(); // return 5, the student sits at the last seat number 5."
+        }
+      ],
+      "constraints": "1 <= n <= 10^9\nIt is guaranteed that there is a student sitting at seat p.\nAt most 10^4 calls will be made to seat and leave.",
+      "solution": "class ExamRoom(object):\n    def __init__(self, N):\n        self.N = N\n        self.students = []\n\n    def seat(self):\n        if not self.students:\n            self.students.append(0)\n            return 0\n\n        max_dist = self.students[0]\n        seat = 0\n\n        for i in range(1, len(self.students)):\n            prev = self.students[i - 1]\n            curr = self.students[i]\n            dist = (curr - prev) // 2\n            if dist > max_dist:\n                max_dist = dist\n                seat = prev + dist\n\n        if self.N - 1 - self.students[-1] > max_dist:\n            seat = self.N - 1\n\n        self.students.append(seat)\n        self.students.sort()\n        return seat\n\n    def leave(self, p):\n        self.students.remove(p)",
+      "explanation": "1. 初始化 ExamRoom，維護一個已坐學生的排序列表 students。\n2. seat(): 若房間無人，坐 0。\n3. 否則遍歷每個相鄰學生間距，找到最大距離的中點作為座位。\n4. 考慮最後一個座位與房間末端的距離是否更大。\n5. leave(p): 將座位 p 的學生從列表中移除。",
+      "tag": "712",
+      "difficult": "medium"
+    }
+  ]
+}

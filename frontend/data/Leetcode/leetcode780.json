@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode780",
+  "coding_practice": [
+    {
+      "title": "Reaching Points",
+      "description": "Given four integers sx, sy, tx, and ty, return true if it is possible to convert the point (sx, sy) to the point (tx, ty) through some operations, or false otherwise.\n\nThe allowed operation on some point (x, y) is to convert it to either (x, x + y) or (x + y, y).",
+      "examples": [
+        {
+          "input": "sx = 1, sy = 1, tx = 3, ty = 5",
+          "output": "true",
+          "explanation": "One series of moves that transforms the starting point to the target is:\n(1, 1) -> (1, 2)\n(1, 2) -> (3, 2)\n(3, 2) -> (3, 5)"
+        },
+        {
+          "input": "sx = 1, sy = 1, tx = 2, ty = 2",
+          "output": "false"
+        },
+        {
+          "input": "sx = 1, sy = 1, tx = 1, ty = 1",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= sx, sy, tx, ty <= 10^9",
+      "solution": "class Solution:\n    def reachingPoints(self, sx, sy, tx, ty):\n        while tx >= sx and ty >= sy:\n            if tx == ty:\n                break\n            if tx > ty:\n                if ty > sy:\n                    tx %= ty\n                else:\n                    return (tx - sx) % ty == 0\n            else:\n                if tx > sx:\n                    ty %= tx\n                else:\n                    return (ty - sy) % tx == 0\n        return tx == sx and ty == sy",
+      "explanation": "1. 觀察操作可知，目標點一定可以由右下方向左上方不斷減少得出。\n2. 使用 while 循環反向減少 tx 或 ty，直到小於或等於 sx, sy。\n3. 若 tx == sx 或 ty == sy，判斷剩下的差值是否可以整除對方。\n4. 若最終 tx == sx 且 ty == sy，返回 True，否則返回 False。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

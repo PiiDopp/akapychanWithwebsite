@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode650",
+  "coding_practice": [
+    {
+      "title": "2 Keys Keyboard",
+      "description": "There is only one character 'A' on the screen of a notepad. You can perform one of two operations on this notepad for each step:\n\nCopy All: You can copy all the characters present on the screen (a partial copy is not allowed).\nPaste: You can paste the characters which are copied last time.\nGiven an integer n, return the minimum number of operations to get the character 'A' exactly n times on the screen.",
+      "examples": [
+        {
+          "input": "n = 3",
+          "output": "3",
+          "explanation": "Initially, we have one character 'A'.\\nIn step 1, we use Copy All operation.\\nIn step 2, we use Paste operation to get 'AA'.\\nIn step 3, we use Paste operation to get 'AAA'."
+        },
+        {
+          "input": "n = 1",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= n <= 1000",
+      "solution": "class Solution:\n    def minSteps(self, n):\n        res = 0\n        d = 2\n        while n > 1:\n            while n % d == 0:\n                res += d\n                n //= d\n            d += 1\n        return res",
+      "explanation": "1. 將 n 分解質因數，每個質因數 d 表示一組操作: Copy + (d-1) 次 Paste。\\n2. 對 n 持續除以質因數，累加 res，直到 n 變為 1。\\n3. 最終 res 即為達到 n 個 'A' 的最少操作次數。\\n4. 時間複雜度為 O(sqrt(n))。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

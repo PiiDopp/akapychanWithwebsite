@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode1991",
+  "coding_practice": [
+    {
+      "title": "Find the Middle Index in Array",
+      "description": "Given a 0-indexed integer array nums, find the leftmost middleIndex (i.e., the smallest amongst all the possible ones).\n\nA middleIndex is an index where nums[0] + nums[1] + ... + nums[middleIndex-1] == nums[middleIndex+1] + nums[middleIndex+2] + ... + nums[nums.length-1].\n\nIf middleIndex == 0, the left side sum is considered to be 0. Similarly, if middleIndex == nums.length - 1, the right side sum is considered to be 0.\n\nReturn the leftmost middleIndex that satisfies the condition, or -1 if there is no such index.",
+      "examples": [
+        {
+          "input": "nums = [2,3,-1,8,4]",
+          "output": "3",
+          "explanation": "The sum of the numbers before index 3 is: 2 + 3 + -1 = 4\nThe sum of the numbers after index 3 is: 4 = 4"
+        },
+        {
+          "input": "nums = [1,-1,4]",
+          "output": "2",
+          "explanation": "The sum of the numbers before index 2 is: 1 + -1 = 0\nThe sum of the numbers after index 2 is: 0"
+        },
+        {
+          "input": "nums = [2,5]",
+          "output": "-1",
+          "explanation": "There is no valid middleIndex."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 100\n-1000 <= nums[i] <= 1000",
+      "note": "This question is the same as 724. Find Pivot Index",
+      "solution": "class Solution:\n    def findMiddleIndex(self, nums):\n        total = sum(nums)\n        left_sum = 0\n        for i, num in enumerate(nums):\n            if left_sum == total - left_sum - num:\n                return i\n            left_sum += num\n        return -1",
+      "explanation": "1. 先計算整個陣列的總和 total。\n2. 使用 left_sum 紀錄當前索引左側的總和。\n3. 逐一檢查每個索引 i，判斷左側總和是否等於右側總和（即 total - left_sum - num）。\n4. 若相等則回傳該索引，否則持續更新 left_sum 並往後檢查。\n5. 若遍歷結束仍無符合條件的索引，回傳 -1。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

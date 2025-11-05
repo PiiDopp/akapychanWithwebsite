@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode887",
+  "coding_practice": [
+    {
+      "title": "Super Egg Drop",
+      "description": "You are given k identical eggs and you have access to a building with n floors labeled from 1 to n.\n\nYou know that there exists a floor f where 0 <= f <= n such that any egg dropped at a floor higher than f will break, and any egg dropped at or below floor f will not break.\n\nEach move, you may take an unbroken egg and drop it from any floor x (where 1 <= x <= n). If the egg breaks, you can no longer use it. However, if the egg does not break, you may reuse it in future moves.\n\nReturn the minimum number of moves that you need to determine with certainty what the value of f is.",
+      "examples": [
+        {
+          "input": "k = 1, n = 2",
+          "output": "2",
+          "explanation": "Drop the egg from floor 1. If it breaks, we know that f = 0.\nOtherwise, drop the egg from floor 2. If it breaks, we know that f = 1.\nIf it does not break, then we know f = 2.\nHence, we need at minimum 2 moves to determine with certainty what the value of f is."
+        },
+        {
+          "input": "k = 2, n = 6",
+          "output": "3"
+        },
+        {
+          "input": "k = 3, n = 14",
+          "output": "4"
+        }
+      ],
+      "constraints": "1 <= k <= 100\n1 <= n <= 10^4",
+      "solution": "class Solution(object):\n    def superEggDrop(self, K, N):\n        \"\"\"\n        :type K: int\n        :type N: int\n        :rtype: int\n        \"\"\"\n        # dp[m][k] = max floors we can check with m moves and k eggs\n        dp = [0] * (K + 1)\n        moves = 0\n        while dp[K] < N:\n            moves += 1\n            for k in range(K, 0, -1):\n                dp[k] = dp[k] + dp[k - 1] + 1\n        return moves",
+      "explanation": "1. 使用 dp[k] 表示用 k 顆蛋在 moves 步內可以檢查的最大樓層。\n2. 每一步 moves 更新 dp[k] = dp[k] + dp[k-1] + 1，表示一顆蛋破和不破的兩種情況可以覆蓋的樓層數。\n3. 重複增加 moves 直到 dp[K] >= N，即可得到最小步數。",
+      "tag": "520",
+      "difficult": "hard"
+    }
+  ]
+}

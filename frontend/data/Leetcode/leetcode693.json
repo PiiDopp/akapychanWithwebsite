@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode693",
+  "coding_practice": [
+    {
+      "title": "Binary Number with Alternating Bits",
+      "description": "Given a positive integer, check whether it has alternating bits: namely, if two adjacent bits will always have different values.",
+      "examples": [
+        {
+          "input": "n = 5",
+          "output": "true",
+          "explanation": "The binary representation of 5 is: 101"
+        },
+        {
+          "input": "n = 7",
+          "output": "false",
+          "explanation": "The binary representation of 7 is: 111."
+        },
+        {
+          "input": "n = 11",
+          "output": "false",
+          "explanation": "The binary representation of 11 is: 1011."
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def hasAlternatingBits(self, n):\n        prev_bit = n & 1\n        n >>= 1\n        while n > 0:\n            curr_bit = n & 1\n            if curr_bit == prev_bit:\n                return False\n            prev_bit = curr_bit\n            n >>= 1\n        return True",
+      "explanation": "1. 取 n 的最低位 prev_bit。\\n2. 將 n 右移一位，依次檢查每一位 curr_bit 是否與 prev_bit 相同。\\n3. 若相同則返回 False，表示不是交替二進位。\\n4. 若整個數字檢查完畢都沒有相同的相鄰位，返回 True。\\n5. 時間複雜度為 O(log n)，即 n 的二進位長度。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

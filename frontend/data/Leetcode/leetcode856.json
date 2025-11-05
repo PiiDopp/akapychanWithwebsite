@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode856",
+  "coding_practice": [
+    {
+      "title": "Score of Parentheses",
+      "description": "Given a balanced parentheses string s, return the score of the string.\n\nThe score of a balanced parentheses string is based on the following rule:\n\n\"()\" has score 1.\nAB has score A + B, where A and B are balanced parentheses strings.\n(A) has score 2 * A, where A is a balanced parentheses string.",
+      "examples": [
+        {
+          "input": "s = \"()\"",
+          "output": "1"
+        },
+        {
+          "input": "s = \"(())\"",
+          "output": "2"
+        },
+        {
+          "input": "s = \"()()\"",
+          "output": "2"
+        }
+      ],
+      "constraints": "2 <= s.length <= 50\ns consists of only '(' and ')'.\ns is a balanced parentheses string.",
+      "solution": "class Solution(object):\n    def scoreOfParentheses(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        stack = [0]\n        for c in s:\n            if c == '(':\n                stack.append(0)\n            else:\n                v = stack.pop()\n                stack[-1] += max(2 * v, 1)\n        return stack[0]",
+      "explanation": "1. 使用堆疊 stack 來追蹤每層括號的分數。\n2. 遇到 '(' 時，將 0 推入 stack 代表新的一層。\n3. 遇到 ')' 時，彈出當前層的分數 v，將 2*v 或 1 (若為空括號) 加到上一層的分數上。\n4. 最終 stack[0] 即為整個字串的總分。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode825",
+  "coding_practice": [
+    {
+      "title": "Friends Of Appropriate Ages",
+      "description": "There are n persons on a social media website. You are given an integer array ages where ages[i] is the age of the ith person.\n\nA Person x will not send a friend request to a person y (x != y) if any of the following conditions is true:\n\nage[y] <= 0.5 * age[x] + 7\nage[y] > age[x]\nage[y] > 100 && age[x] < 100\nOtherwise, x will send a friend request to y.\n\nNote that if x sends a request to y, y will not necessarily send a request to x. Also, a person will not send a friend request to themself.\n\nReturn the total number of friend requests made.",
+      "examples": [
+        {
+          "input": "ages = [16,16]",
+          "output": "2",
+          "explanation": "2 people friend request each other."
+        },
+        {
+          "input": "ages = [16,17,18]",
+          "output": "2",
+          "explanation": "Friend requests are made 17 -> 16, 18 -> 17."
+        },
+        {
+          "input": "ages = [20,30,100,110,120]",
+          "output": "3",
+          "explanation": "Friend requests are made 110 -> 100, 120 -> 110, 120 -> 100."
+        }
+      ],
+      "constraints": "n == ages.length\n1 <= n <= 2 * 10^4\n1 <= ages[i] <= 120",
+      "solution": "class Solution:\n    def numFriendRequests(self, ages):\n        from collections import Counter\n        count = Counter(ages)\n        res = 0\n        for a in count:\n            for b in count:\n                if b <= 0.5 * a + 7:\n                    continue\n                if b > a:\n                    continue\n                res += count[a] * count[b] if a != b else count[a] * (count[a] - 1)\n        return res",
+      "explanation": "1. 使用 Counter 計算每個年齡出現的次數。\n2. 遍歷所有年齡組合 a 和 b，根據題目條件判斷 a 是否可以向 b 發送好友請求。\n3. 若可以，則累加 count[a] * count[b]，若 a==b，則減去自身的請求數 count[a] * (count[a]-1)。\n4. 返回所有累加結果。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

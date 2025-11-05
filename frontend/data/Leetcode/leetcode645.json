@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode645",
+  "coding_practice": [
+    {
+      "title": "Set Mismatch",
+      "description": "You have a set of integers s, which originally contains all the numbers from 1 to n. Unfortunately, due to some error, one of the numbers in s got duplicated to another number in the set, which results in repetition of one number and loss of another number.\n\nYou are given an integer array nums representing the data status of this set after the error.\n\nFind the number that occurs twice and the number that is missing and return them in the form of an array.",
+      "examples": [
+        {
+          "input": "nums = [1,2,2,4]",
+          "output": "[2,3]"
+        },
+        {
+          "input": "nums = [1,1]",
+          "output": "[1,2]"
+        }
+      ],
+      "constraints": "2 <= nums.length <= 10^4\n1 <= nums[i] <= 10^4",
+      "solution": "class Solution:\n    def findErrorNums(self, nums):\n        n = len(nums)\n        num_set = set(nums)\n        duplicate = sum(nums) - sum(num_set)\n        missing = n * (n + 1) // 2 - sum(num_set)\n        return [duplicate, missing]",
+      "explanation": "1. 將輸入的 nums 轉為集合 num_set，以去除重複元素。\\n2. 重複的數字可由 sum(nums) - sum(num_set) 得到。\\n3. 缺少的數字可由 1 到 n 的總和減去集合的總和得到。\\n4. 最後回傳 [重複數字, 缺少數字]。\\n5. 此方法時間複雜度為 O(n)，空間複雜度為 O(n)。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

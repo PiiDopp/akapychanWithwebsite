@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode49",
+  "coding_practice": [
+    {
+      "title": "Group Anagrams",
+      "description": "Given an array of strings strs, group the anagrams together. You can return the answer in any order.",
+      "examples": [
+        {
+          "input": "strs = [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]",
+          "output": "[[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]",
+          "explanation": "There is no string in strs that can be rearranged to form \"bat\".\nThe strings \"nat\" and \"tan\" are anagrams as they can be rearranged to form each other.\nThe strings \"ate\", \"eat\", and \"tea\" are anagrams as they can be rearranged to form each other."
+        },
+        {
+          "input": "strs = [\"\"]",
+          "output": "[[\"\"]]"
+        },
+        {
+          "input": "strs = [\"a\"]",
+          "output": "[[\"a\"]]"
+        }
+      ],
+      "constraints": "1 <= strs.length <= 104\n0 <= strs[i].length <= 100\nstrs[i] consists of lowercase English letters.",
+      "solution": "class Solution(object):\n    def groupAnagrams(self, strs):\n        \"\"\"\n        :type strs: List[str]\n        :rtype: List[List[str]]\n        \"\"\"\n        from collections import defaultdict\n\n        anagrams = defaultdict(list)\n        for s in strs:\n            key = tuple(sorted(s))  # 將字串排序後作為 key\n            anagrams[key].append(s)\n\n        return list(anagrams.values())",
+      "explanation": "1. 使用 defaultdict(list) 收集同組異位詞。\n2. 對每個字串 s，將其字母排序後轉成 tuple 作為 key。\n3. 將原字串加入對應 key 的 list。\n4. 最後返回字典中所有 values 作為結果。\n5. 複雜度分析：\n   5.1 時間複雜度：O(n k log k)（n 為字串數量，k 為平均字串長度）\n   5.2 空間複雜度：O(n k)（存儲所有字串）",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

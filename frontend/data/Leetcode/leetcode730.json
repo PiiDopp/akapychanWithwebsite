@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode730",
+  "coding_practice": [
+    {
+      "title": "Count Different Palindromic Subsequences",
+      "description": "Given a string s, return the number of different non-empty palindromic subsequences in s. Since the answer may be very large, return it modulo 10^9 + 7.\n\nA subsequence of a string is obtained by deleting zero or more characters from the string.\n\nA sequence is palindromic if it is equal to the sequence reversed.\n\nTwo sequences a_1, a_2, ... and b_1, b_2, ... are different if there is some i for which a_i != b_i.",
+      "examples": [
+        {
+          "input": "s = \"bccb\"",
+          "output": "6",
+          "explanation": "The 6 different non-empty palindromic subsequences are 'b', 'c', 'bb', 'cc', 'bcb', 'bccb'.\nNote that 'bcb' is counted only once, even though it occurs twice."
+        },
+        {
+          "input": "s = \"abcdabcdabcdabcdabcdabcdabcdabcddcbadcbadcbadcbadcbadcbadcbadcba\"",
+          "output": "104860361",
+          "explanation": "There are 3104860382 different non-empty palindromic subsequences, which is 104860361 modulo 10^9 + 7."
+        }
+      ],
+      "constraints": "1 <= s.length <= 1000\ns[i] is either 'a', 'b', 'c', or 'd'.",
+      "solution": "class Solution(object):\n    def countPalindromicSubsequences(self, S):\n        MOD = 10 ** 9 + 7\n        n = len(S)\n        dp = [[0] * n for _ in range(n)]\n        \n        for i in range(n-1, -1, -1):\n            dp[i][i] = 1\n            for j in range(i+1, n):\n                if S[i] == S[j]:\n                    l, r = i+1, j-1\n                    while l <= r and S[l] != S[i]:\n                        l += 1\n                    while l <= r and S[r] != S[i]:\n                        r -= 1\n                    if l > r:\n                        dp[i][j] = dp[i+1][j-1]*2 + 2\n                    elif l == r:\n                        dp[i][j] = dp[i+1][j-1]*2 + 1\n                    else:\n                        dp[i][j] = dp[i+1][j-1]*2 - dp[l+1][r-1]\n                else:\n                    dp[i][j] = dp[i+1][j] + dp[i][j-1] - dp[i+1][j-1]\n                dp[i][j] = (dp[i][j] + MOD) % MOD\n        return dp[0][n-1]",
+      "explanation": "1. 使用二維 dp 陣列 dp[i][j] 表示子字串 S[i..j] 的不同回文子序列數量。\n2. 迴圈從右到左遍歷 i，並從 i+1 到 n 遍歷 j。\n3. 若 S[i] == S[j]，檢查內部子字串是否存在相同字母，依情況分三種處理公式。\n4. 若 S[i] != S[j]，則 dp[i][j] = dp[i+1][j] + dp[i][j-1] - dp[i+1][j-1]。\n5. 每步驟模 10^9+7 以避免數值過大。\n6. 最後回傳 dp[0][n-1] 作為結果。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

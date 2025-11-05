@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode564",
+  "coding_practice": [
+    {
+      "title": "Find the Closest Palindrome",
+      "description": "Given a string n representing an integer, return the closest integer (not including itself), which is a palindrome. If there is a tie, return the smaller one.\n\nThe closest is defined as the absolute difference minimized between two integers.",
+      "examples": [
+        {
+          "input": "n = \"123\"",
+          "output": "\"121\""
+        },
+        {
+          "input": "n = \"1\"",
+          "output": "\"0\"",
+          "explanation": "0 and 2 are the closest palindromes but we return the smallest which is 0."
+        }
+      ],
+      "constraints": "1 <= n.length <= 18\nn consists of only digits.\nn does not have leading zeros.\nn is representing an integer in the range [1, 10^18 - 1].",
+      "solution": "class Solution:\n    def nearestPalindromic(self, n):\n        length = len(n)\n        num = int(n)\n        candidates = set()\n\n        # 特殊情況\n        candidates.add(str(10 ** length + 1))\n        candidates.add(str(10 ** (length - 1) - 1))\n\n        prefix = int(n[:(length + 1) // 2])\n        for i in [-1, 0, 1]:\n            new_prefix = str(prefix + i)\n            if length % 2 == 0:\n                palin = new_prefix + new_prefix[::-1]\n            else:\n                palin = new_prefix + new_prefix[:-1][::-1]\n            candidates.add(palin)\n\n        candidates.discard(n)\n\n        res = None\n        for cand in candidates:\n            if res is None or abs(int(cand) - num) < abs(int(res) - num) or (abs(int(cand) - num) == abs(int(res) - num) and int(cand) < int(res)):\n                res = cand\n\n        return res",
+      "explanation": "1. 生成特殊情況的候選回文：10^length+1 和 10^(length-1)-1。\n2. 取前半部分 prefix，對 prefix-1, prefix, prefix+1 生成回文。\n3. 根據長度奇偶，生成完整回文字串。\n4. 移除自身 n，遍歷候選集，選擇與 n 差距最小的回文；若相等則選擇數值較小的。\n5. 返回最終結果。",
+      "tag": "511",
+      "difficult": "hard"
+    }
+  ]
+}

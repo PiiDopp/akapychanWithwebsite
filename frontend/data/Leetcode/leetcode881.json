@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode881",
+  "coding_practice": [
+    {
+      "title": "Boats to Save People",
+      "description": "You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit. Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most limit.\nReturn the minimum number of boats to carry every given person.",
+      "examples": [
+        {
+          "input": "people = [1,2], limit = 3",
+          "output": "1",
+          "explanation": "1 boat (1, 2)"
+        },
+        {
+          "input": "people = [3,2,2,1], limit = 3",
+          "output": "3",
+          "explanation": "3 boats (1, 2), (2) and (3)"
+        },
+        {
+          "input": "people = [3,5,3,4], limit = 5",
+          "output": "4",
+          "explanation": "4 boats (3), (3), (4), (5)"
+        }
+      ],
+      "constraints": "1 <= people.length <= 5 * 10^4\n1 <= people[i] <= limit <= 3 * 10^4",
+      "solution": "class Solution(object):\n    def numRescueBoats(self, people, limit):\n        \"\"\"\n        :type people: List[int]\n        :type limit: int\n        :rtype: int\n        \"\"\"\n        people.sort()\n        i, j = 0, len(people) - 1\n        boats = 0\n        while i <= j:\n            if people[i] + people[j] <= limit:\n                i += 1\n            j -= 1\n            boats += 1\n        return boats",
+      "explanation": "1. 將人按重量排序。\n2. 使用雙指針 i 從最輕的人開始，j 從最重的人開始。\n3. 如果最輕和最重的人加起來不超過 limit，就讓他們同乘一船，i++。\n4. 無論是否配對，j-- 表示最重的人已上船。\n5. 每次迴圈 boats++。\n6. 最後返回 boats 作為最少船數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

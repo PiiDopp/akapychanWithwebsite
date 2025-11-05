@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode791",
+  "coding_practice": [
+    {
+      "title": "Custom Sort String",
+      "description": "You are given two strings order and s. All the characters of order are unique and were sorted in some custom order previously.\n\nPermute the characters of s so that they match the order that order was sorted. More specifically, if a character x occurs before a character y in order, then x should occur before y in the permuted string.\n\nReturn any permutation of s that satisfies this property.",
+      "examples": [
+        {
+          "input": "order = \"cba\", s = \"abcd\"",
+          "output": "\"cbad\"",
+          "explanation": "\"a\", \"b\", \"c\" appear in order, so the order of \"a\", \"b\", \"c\" should be \"c\", \"b\", and \"a\". \nSince \"d\" does not appear in order, it can be at any position in the returned string. \"dcba\", \"cdba\", \"cbda\" are also valid outputs."
+        },
+        {
+          "input": "order = \"bcafg\", s = \"abcd\"",
+          "output": "\"bcad\"",
+          "explanation": "The characters \"b\", \"c\", and \"a\" from order dictate the order for the characters in s. The character \"d\" in s does not appear in order, so its position is flexible. \n\nFollowing the order of appearance in order, \"b\", \"c\", and \"a\" from s should be arranged as \"b\", \"c\", \"a\". \"d\" can be placed at any position since it's not in order. The output \"bcad\" correctly follows this rule. Other arrangements like \"dbca\" or \"bcda\" would also be valid, as long as \"b\", \"c\", \"a\" maintain their order. "
+        }
+      ],
+      "constraints": "1 <= order.length <= 26\n1 <= s.length <= 200\norder and s consist of lowercase English letters.\nAll the characters of order are unique.",
+      "solution": "class Solution:\n    def customSortString(self, order, s):\n        from collections import Counter\n        count = Counter(s)\n        result = []\n        for c in order:\n            result.append(c * count[c])\n            count[c] = 0\n        for c in count:\n            result.append(c * count[c])\n        return ''.join(result)",
+      "explanation": "1. 使用 Counter 計算 s 中每個字母出現次數。\n2. 按照 order 的順序將字母添加到結果中，並將該字母的計數歸零。\n3. 對於不在 order 中的字母，保持原有數量加入結果。\n4. 最終返回拼接好的字符串。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

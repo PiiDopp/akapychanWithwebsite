@@ -165,6 +165,115 @@ app.all("/api/judge", (req, res) => {
   return res.status(404).json({ error: "Not found" });
 });
 
+app.post("/api/hint", async (req, res) => {
+  try {
+    const {
+      problem_id, data_id,
+      code, user_code,
+      practice_idx, practiceIdx,
+      data_path, dataPath,
+      source, data_source,
+      mode, force_mode,
+    } = req.body || {};
+
+    // 統一成 Python 端要的鍵名
+    const bodyForPython = {
+      problem_id: String(problem_id ?? data_id ?? ""),
+      code: code ?? user_code ?? "",
+      practice_idx: practice_idx ?? practiceIdx ?? undefined,
+      data_path: data_path ?? dataPath ?? undefined,
+      source: source ?? data_source ?? undefined,
+      mode: mode ?? force_mode ?? undefined,
+    };
+
+    if (!bodyForPython.problem_id) {
+      return res.status(400).json({ error: "缺少 problem_id" });
+    }
+    if (!bodyForPython.code) {
+      return res.status(400).json({ error: "缺少 code（或 user_code）" });
+    }
+
+    const upstream = await fetch(`${PY_BACKEND}/hint`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyForPython),
+    });
+
+    const text = await upstream.text().catch(() => "");
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch {}
+
+    if (!upstream.ok) {
+      const msg = data?.error || data?.detail || text || `HTTP ${upstream.status}`;
+      return res.status(upstream.status).json({
+        error: `Python 服務錯誤：${String(msg).slice(0, 200)}`
+      });
+    }
+    if (!data || typeof data !== "object") {
+      return res.status(502).json({ error: "上游回應非 JSON 或為空" });
+    }
+    return res.json(data);
+  } catch (err) {
+    console.error("[/api/hint] proxy error:", err);
+    return res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+app.all("/api/hint", (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: `Method ${req.method} not allowed. Use POST /api/hint` });
+  }
+  return res.status(404).json({ error: "Not found" });
+});
+
+app.post("/api/answer", async (req, res) => {
+  try {
+    const { problem_id, data_id, practice_idx, practiceIdx } = req.body || {};
+
+    const bodyForPython = {
+      problem_id: String(problem_id ?? data_id ?? ""),
+      practice_idx: practice_idx ?? practiceIdx ?? 0,
+    };
+
+    if (!bodyForPython.problem_id) {
+      return res.status(400).json({ error: "缺少 problem_id（或 data_id）" });
+    }
+
+    const upstream = await fetch(`${PY_BACKEND}/answer`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyForPython),
+    });
+
+    const text = await upstream.text().catch(() => "");
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch {}
+
+    if (!upstream.ok) {
+      const msg = data?.error || data?.detail || text || `HTTP ${upstream.status}`;
+      return res.status(upstream.status).json({
+        error: `Python 服務錯誤：${String(msg).slice(0, 200)}`,
+      });
+    }
+
+    if (!data || typeof data !== "object") {
+      return res.status(502).json({ error: "上游回應非 JSON 或為空" });
+    }
+
+    return res.json(data);
+  } catch (err) {
+    console.error("[/api/answer] proxy error:", err);
+    return res.status(500).json({ error: String(err?.message || err) });
+  }
+});
+
+app.all("/api/answer", (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: `Method ${req.method} not allowed. Use POST /api/answer` });
+  }
+  return res.status(404).json({ error: "Not found" });
+});
+
 // 根路徑回主頁（避免 * 兜回所有路徑導致 A 連結無法跳頁）
 app.get("/", (_req, res) => {
   res.sendFile(path.join(FRONTEND_DIR, "html", "welcome.html"));

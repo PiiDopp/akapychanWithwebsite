@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode478",
+  "coding_practice": [
+    {
+      "title": "Generate Random Point in a Circle",
+      "description": "Given the radius and the position of the center of a circle, implement the function randPoint which generates a uniform random point inside the circle.\n\nImplement the Solution class:\n\nSolution(double radius, double x_center, double y_center) initializes the object with the radius of the circle radius and the position of the center (x_center, y_center).\nrandPoint() returns a random point inside the circle. A point on the circumference of the circle is considered to be in the circle. The answer is returned as an array [x, y].",
+      "examples": [
+        {
+          "input": "[\"Solution\", \"randPoint\", \"randPoint\", \"randPoint\"]\n[[1.0, 0.0, 0.0], [], [], []]",
+          "output": "[null, [-0.02493, -0.38077], [0.82314, 0.38945], [0.36572, 0.17248]]",
+          "explanation": "Solution solution = new Solution(1.0, 0.0, 0.0);\nsolution.randPoint(); // return [-0.02493, -0.38077]\nsolution.randPoint(); // return [0.82314, 0.38945]\nsolution.randPoint(); // return [0.36572, 0.17248]"
+        }
+      ],
+      "constraints": "0 < radius <= 10^8\n-10^7 <= x_center, y_center <= 10^7\nAt most 3 * 10^4 calls will be made to randPoint.",
+      "solution": "import random\nimport math\n\nclass Solution:\n\n    def __init__(self, radius, x_center, y_center):\n        self.radius = radius\n        self.x_center = x_center\n        self.y_center = y_center\n\n    def randPoint(self):\n        # 使用極座標隨機生成點\n        r = self.radius * math.sqrt(random.random())  # sqrt 保證均勻分布\n        theta = random.uniform(0, 2 * math.pi)\n        x = self.x_center + r * math.cos(theta)\n        y = self.y_center + r * math.sin(theta)\n        return [x, y]",
+      "explanation": "1. 使用極座標 (r, theta) 生成圓內點，其中 r 的平方根用於確保均勻分布。\n2. theta 隨機在 [0, 2*pi) 之間均勻分布。\n3. 將極座標轉換為笛卡爾座標 x = x_center + r*cos(theta), y = y_center + r*sin(theta) 返回。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode633",
+  "coding_practice": [
+    {
+      "title": "Sum of Square Numbers",
+      "description": "Given a non-negative integer c, decide whether there're two integers a and b such that a^2 + b^2 = c.",
+      "examples": [
+        {
+          "input": "c = 5",
+          "output": "true",
+          "explanation": "1 * 1 + 2 * 2 = 5"
+        },
+        {
+          "input": "c = 3",
+          "output": "false"
+        }
+      ],
+      "constraints": "0 <= c <= 2^31 - 1",
+      "solution": "import math\n\nclass Solution:\n    def judgeSquareSum(self, c):\n        left, right = 0, int(math.sqrt(c))\n        while left <= right:\n            total = left * left + right * right\n            if total == c:\n                return True\n            elif total < c:\n                left += 1\n            else:\n                right -= 1\n        return False",
+      "explanation": "1. 使用雙指標 left 和 right，分別指向 0 和 sqrt(c) 的整數部分。\n2. 計算 total = left^2 + right^2。\n3. 若 total 等於 c，返回 True。\n4. 若 total 小於 c，left += 1；若 total 大於 c，right -= 1。\n5. 當 left > right，仍未找到符合條件的組合，返回 False。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode593",
+  "coding_practice": [
+    {
+      "title": "Valid Square",
+      "description": "Given the coordinates of four points in 2D space p1, p2, p3 and p4, return true if the four points construct a square.\n\nThe coordinate of a point pi is represented as [x_i, y_i]. The input is not given in any order.\n\nA valid square has four equal sides with positive length and four equal angles (90-degree angles).",
+      "examples": [
+        {
+          "input": "p1 = [0,0], p2 = [1,1], p3 = [1,0], p4 = [0,1]",
+          "output": "true"
+        },
+        {
+          "input": "p1 = [0,0], p2 = [1,1], p3 = [1,0], p4 = [0,12]",
+          "output": "false"
+        },
+        {
+          "input": "p1 = [1,0], p2 = [-1,0], p3 = [0,1], p4 = [0,-1]",
+          "output": "true"
+        }
+      ],
+      "constraints": "p1.length == p2.length == p3.length == p4.length == 2\n-10^4 <= x_i, y_i <= 10^4",
+      "solution": "class Solution:\n    def validSquare(self, p1, p2, p3, p4):\n        def dist_sq(a, b):\n            return (a[0]-b[0])**2 + (a[1]-b[1])**2\n        \n        points = [p1, p2, p3, p4]\n        dists = []\n        \n        for i in range(4):\n            for j in range(i+1, 4):\n                dists.append(dist_sq(points[i], points[j]))\n        \n        dists.sort()\n        \n        return (dists[0] > 0 and\n                dists[0] == dists[1] == dists[2] == dists[3] and\n                dists[4] == dists[5] and\n                dists[4] == 2 * dists[0])",
+      "explanation": "1. 計算每兩個點之間的平方距離。\n2. 將所有六個距離排序。\n3. 前四個距離應為邊長相等且大於 0。\n4. 後兩個距離應為對角線且相等。\n5. 對角線平方應為邊長平方的兩倍。\n6. 若以上條件皆符合，返回 True，否則 False。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

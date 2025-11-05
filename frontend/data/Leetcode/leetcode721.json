@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode721",
+  "coding_practice": [
+    {
+      "title": "Accounts Merge",
+      "description": "Given a list of accounts where each element accounts[i] is a list of strings, where the first element accounts[i][0] is a name, and the rest of the elements are emails representing emails of the account.\n\nNow, we would like to merge these accounts. Two accounts definitely belong to the same person if there is some common email to both accounts. Note that even if two accounts have the same name, they may belong to different people as people could have the same name. A person can have any number of accounts initially, but all of their accounts definitely have the same name.\n\nAfter merging the accounts, return the accounts in the following format: the first element of each account is the name, and the rest of the elements are emails in sorted order. The accounts themselves can be returned in any order.",
+      "examples": [
+        {
+          "input": "accounts = [[\"John\",\"johnsmith@mail.com\",\"john_newyork@mail.com\"],[\"John\",\"johnsmith@mail.com\",\"john00@mail.com\"],[\"Mary\",\"mary@mail.com\"],[\"John\",\"johnnybravo@mail.com\"]]",
+          "output": "[[\"John\",\"john00@mail.com\",\"john_newyork@mail.com\",\"johnsmith@mail.com\"],[\"Mary\",\"mary@mail.com\"],[\"John\",\"johnnybravo@mail.com\"]]",
+          "explanation": "The first and second John's are the same person as they have the common email \"johnsmith@mail.com\". \nThe third John and Mary are different people as none of their email addresses are used by other accounts. \nWe could return these lists in any order, for example the answer [['Mary', 'mary@mail.com'], ['John', 'johnnybravo@mail.com'],  \n['John', 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com']] would still be accepted."
+        },
+        {
+          "input": "accounts = [[\"Gabe\",\"Gabe0@m.co\",\"Gabe3@m.co\",\"Gabe1@m.co\"],[\"Kevin\",\"Kevin3@m.co\",\"Kevin5@m.co\",\"Kevin0@m.co\"],[\"Ethan\",\"Ethan5@m.co\",\"Ethan4@m.co\",\"Ethan0@m.co\"],[\"Hanzo\",\"Hanzo3@m.co\",\"Hanzo1@m.co\",\"Hanzo0@m.co\"],[\"Fern\",\"Fern5@m.co\",\"Fern1@m.co\",\"Fern0@m.co\"]]",
+          "output": "[[\"Ethan\",\"Ethan0@m.co\",\"Ethan4@m.co\",\"Ethan5@m.co\"],[\"Gabe\",\"Gabe0@m.co\",\"Gabe1@m.co\",\"Gabe3@m.co\"],[\"Hanzo\",\"Hanzo0@m.co\",\"Hanzo1@m.co\",\"Hanzo3@m.co\"],[\"Kevin\",\"Kevin0@m.co\",\"Kevin3@m.co\",\"Kevin5@m.co\"],[\"Fern\",\"Fern0@m.co\",\"Fern1@m.co\",\"Fern5@m.co\"]]"
+        }
+      ],
+      "constraints": "1 <= accounts.length <= 1000\n2 <= accounts[i].length <= 10\n1 <= accounts[i][j].length <= 30\naccounts[i][0] consists of English letters.\naccounts[i][j] (for j > 0) is a valid email.",
+      "solution": "from collections import defaultdict\n\nclass Solution:\n    def accountsMerge(self, accounts):\n        parent = {}\n\n        def find(x):\n            parent.setdefault(x, x)\n            if parent[x] != x:\n                parent[x] = find(parent[x])\n            return parent[x]\n\n        email_to_name = {}\n        for acc in accounts:\n            name = acc[0]\n            first_email = acc[1]\n            rest = acc[2:]\n            for email in [first_email] + rest:\n                parent_email = find(first_email)\n                parent_email2 = find(email)\n                parent[parent_email2] = parent_email\n                email_to_name[email] = name\n\n        merged = defaultdict(list)\n        for email in email_to_name:\n            root = find(email)\n            merged[root].append(email)\n\n        return [[email_to_name[root]] + sorted(emails) for root, emails in merged.items()]",
+      "explanation": "1. 使用 Union-Find (Disjoint Set) 來連接每個帳號的 email。初始化 parent 字典。\n2. 遍歷 accounts，將每個帳號的第一個 email 與該帳號的其他 emails 做 union，並記錄 email 對應的姓名。\n3. 遍歷所有 email，找出其根節點 root，將同屬於同一個 root 的 emails 收集到一起。\n4. 將每個 root 的 email 清單排序，並加上對應姓名後，組成最終的結果。排序確保每個帳號內的 emails 是按字母序排列。",
+      "tag": "1220",
+      "difficult": "medium"
+    }
+  ]
+}

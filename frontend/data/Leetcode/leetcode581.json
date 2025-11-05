@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode581",
+  "coding_practice": [
+    {
+      "title": "Shortest Unsorted Continuous Subarray",
+      "description": "Given an integer array nums, you need to find one continuous subarray such that if you only sort this subarray in non-decreasing order, then the whole array will be sorted in non-decreasing order.\n\nReturn the shortest such subarray and output its length.",
+      "examples": [
+        {
+          "input": "nums = [2,6,4,8,10,9,15]",
+          "output": "5",
+          "explanation": "You need to sort [6, 4, 8, 10, 9] in ascending order to make the whole array sorted in ascending order."
+        },
+        {
+          "input": "nums = [1,2,3,4]",
+          "output": "0"
+        },
+        {
+          "input": "nums = [1]",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-10^5 <= nums[i] <= 10^5",
+      "follow up": "Can you solve it in O(n) time complexity?",
+      "solution": "class Solution:\n    def findUnsortedSubarray(self, nums):\n        n = len(nums)\n        start, end = -1, -2  # 初始化為空子數組情況\n        min_val, max_val = nums[-1], nums[0]\n\n        for i in range(1, n):\n            max_val = max(max_val, nums[i])\n            min_val = min(min_val, nums[n - 1 - i])\n            if nums[i] < max_val:\n                end = i\n            if nums[n - 1 - i] > min_val:\n                start = n - 1 - i\n\n        return end - start + 1",
+      "explanation": "1. 初始化 start = -1, end = -2，可處理原本已排序的情況。\n2. 從左到右遍歷，更新 max_val，如果當前元素小於 max_val，更新 end。\n3. 從右到左遍歷，更新 min_val，如果當前元素大於 min_val，更新 start。\n4. 返回 end - start + 1 即為最短子數組長度。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

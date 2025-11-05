@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode713",
+  "coding_practice": [
+    {
+      "title": "Subarray Product Less Than K",
+      "description": "Given an array of integers nums and an integer k, return the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than k.",
+      "examples": [
+        {
+          "input": "nums = [10,5,2,6], k = 100",
+          "output": "8",
+          "explanation": "The 8 subarrays that have product less than 100 are: \n[10], [5], [2], [6], [10, 5], [5, 2], [2, 6], [5, 2, 6] \nNote that [10, 5, 2] is not included as the product of 100 is not strictly less than k."
+        },
+        {
+          "input": "nums = [1,2,3], k = 0",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 3*10^4\\n1 <= nums[i] <= 1000\\n0 <= k <= 10^6",
+      "solution": "class Solution:\n    def numSubarrayProductLessThanK(self, nums, k):\n        if k <= 1:\n            return 0\n        prod = 1\n        result = left = 0\n        for right, val in enumerate(nums):\n            prod *= val\n            while prod >= k:\n                prod //= nums[left]\n                left += 1\n            result += right - left + 1\n        return result",
+      "explanation": "1. 使用滑動窗口維護目前子陣列的乘積 prod。\\n2. 當 prod >= k 時，移動 left 指針並更新 prod，使其小於 k。\\n3. 對每個 right，增加 right-left+1 到結果，表示以 right 結尾的有效子陣列數量。\\n4. 返回總結果。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode893",
+  "coding_practice": [
+    {
+      "title": "Groups of Special-Equivalent Strings",
+      "description": "You are given an array of strings of the same length words.\nIn one move, you can swap any two even indexed characters or any two odd indexed characters of a string words[i].\nTwo strings words[i] and words[j] are special-equivalent if after any number of moves, words[i] == words[j].\nA group of special-equivalent strings from words is a non-empty subset of words such that:\n\nEvery pair of strings in the group are special equivalent, and\nThe group is the largest size possible (i.e., there is not a string words[i] not in the group such that words[i] is special-equivalent to every string in the group).\nReturn the number of groups of special-equivalent strings from words.",
+      "examples": [
+        {
+          "input": "words = [\"abcd\",\"cdab\",\"cbad\",\"xyzz\",\"zzxy\",\"zzyx\"]",
+          "output": "3",
+          "explanation": "One group is [\"abcd\", \"cdab\", \"cbad\"], since they are all pairwise special equivalent, and none of the other strings is all pairwise special equivalent to these. The other two groups are [\"xyzz\", \"zzxy\"] and [\"zzyx\"]. Note that in particular, \"zzxy\" is not special equivalent to \"zzyx\"."
+        },
+        {
+          "input": "words = [\"abc\",\"acb\",\"bac\",\"bca\",\"cab\",\"cba\"]",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= words.length <= 1000\n1 <= words[i].length <= 20\nwords[i] consist of lowercase English letters.\nAll the strings are of the same length.",
+      "solution": "class Solution(object):\n    def numSpecialEquivGroups(self, A):\n        \"\"\"\n        :type A: List[str]\n        :rtype: int\n        \"\"\"\n        unique = set()\n        for word in A:\n            # 將偶數位和奇數位分開排序，作為字串特徵\n            key = (tuple(sorted(word[::2])), tuple(sorted(word[1::2])))\n            unique.add(key)\n        return len(unique)",
+      "explanation": "1. 對每個字串，將偶數索引的字母和奇數索引的字母分別排序。\n2. 將排序後的偶數字母 tuple 與奇數字母 tuple 組成 key，加入集合 unique。\n3. 集合 unique 的大小即為不同的 special-equivalent 字串組數量。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

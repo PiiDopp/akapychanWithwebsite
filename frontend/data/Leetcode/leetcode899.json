@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode899",
+  "coding_practice": [
+    {
+      "title": "Orderly Queue",
+      "description": "You are given a string s and an integer k. You can choose one of the first k letters of s and append it at the end of the string.\n\nReturn the lexicographically smallest string you could have after applying the mentioned step any number of moves.",
+      "examples": [
+        {
+          "input": "s = \"cba\", k = 1",
+          "output": "\"acb\"",
+          "explanation": "In the first move, we move the 1st character 'c' to the end, obtaining the string \"bac\". In the second move, we move the 1st character 'b' to the end, obtaining the final result \"acb\"."
+        },
+        {
+          "input": "s = \"baaca\", k = 3",
+          "output": "\"aaabc\"",
+          "explanation": "In the first move, we move the 1st character 'b' to the end, obtaining the string \"aacab\". In the second move, we move the 3rd character 'c' to the end, obtaining the final result \"aaabc\"."
+        }
+      ],
+      "constraints": "1 <= k <= s.length <= 1000\ns consist of lowercase English letters",
+      "solution": "class Solution(object):\n    def orderlyQueue(self, S, K):\n        if K == 1:\n            return min(S[i:] + S[:i] for i in range(len(S)))\n        else:\n            return ''.join(sorted(S))",
+      "explanation": "1. 當 K == 1 時，字串只能旋轉，最小字典序字串是所有旋轉字串中最小的。\n2. 當 K > 1 時，可以通過多次操作實現任意排列，因此將字串排序即可得到最小字典序字串。",
+      "tag": "722",
+      "difficult": "hard"
+    }
+  ]
+}

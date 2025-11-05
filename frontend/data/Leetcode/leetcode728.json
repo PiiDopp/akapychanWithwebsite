@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode728",
+  "coding_practice": [
+    {
+      "title": "Self Dividing Numbers",
+      "description": "A self-dividing number is a number that is divisible by every digit it contains.\n\nFor example, 128 is a self-dividing number because 128 % 1 == 0, 128 % 2 == 0, and 128 % 8 == 0.\nA self-dividing number is not allowed to contain the digit zero.\n\nGiven two integers left and right, return a list of all the self-dividing numbers in the range [left, right] (both inclusive).",
+      "examples": [
+        {
+          "input": "left = 1, right = 22",
+          "output": "[1,2,3,4,5,6,7,8,9,11,12,15,22]"
+        },
+        {
+          "input": "left = 47, right = 85",
+          "output": "[48,55,66,77]"
+        }
+      ],
+      "constraints": "1 <= left <= right <= 10^4",
+      "solution": "class Solution(object):\n    def selfDividingNumbers(self, left, right):\n        res = []\n        for num in range(left, right + 1):\n            temp = num\n            divisible = True\n            while temp > 0:\n                digit = temp % 10\n                if digit == 0 or num % digit != 0:\n                    divisible = False\n                    break\n                temp //= 10\n            if divisible:\n                res.append(num)\n        return res",
+      "explanation": "1. 依序遍歷 left 到 right 的每個數字。\n2. 對每個數字，逐位取出每個數字 digit。\n3. 若 digit 為 0 或無法整除 num，則該數字不是自除數。\n4. 若所有 digit 都能整除 num，將該數字加入結果列表。\n5. 最後回傳結果列表。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

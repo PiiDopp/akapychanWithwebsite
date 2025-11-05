@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode827",
+  "coding_practice": [
+    {
+      "title": "Making A Large Island",
+      "description": "You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.\n\nReturn the size of the largest island in grid after applying this operation.\n\nAn island is a 4-directionally connected group of 1s.",
+      "examples": [
+        {
+          "input": "grid = [[1,0],[0,1]]",
+          "output": "3",
+          "explanation": "Change one 0 to 1 and connect two 1s, then we get an island with area = 3."
+        },
+        {
+          "input": "grid = [[1,1],[1,0]]",
+          "output": "4",
+          "explanation": "Change the 0 to 1 and make the island bigger, only one island with area = 4."
+        },
+        {
+          "input": "grid = [[1,1],[1,1]]",
+          "output": "4",
+          "explanation": "Can't change any 0 to 1, only one island with area = 4."
+        }
+      ],
+      "constraints": "n == grid.length\nn == grid[i].length\n1 <= n <= 500\ngrid[i][j] is either 0 or 1",
+      "solution": "class Solution(object):\n    def largestIsland(self, grid):\n        n = len(grid)\n        index = 2\n        area = {}\n        \n        def dfs(i, j, index):\n            stack = [(i, j)]\n            grid[i][j] = index\n            count = 1\n            while stack:\n                x, y = stack.pop()\n                for dx, dy in ((0,1),(1,0),(0,-1),(-1,0)):\n                    nx, ny = x+dx, y+dy\n                    if 0<=nx<n and 0<=ny<n and grid[nx][ny]==1:\n                        grid[nx][ny] = index\n                        count += 1\n                        stack.append((nx, ny))\n            return count\n        \n        for i in range(n):\n            for j in range(n):\n                if grid[i][j]==1:\n                    area[index] = dfs(i, j, index)\n                    index += 1\n        \n        res = max(area.values() or [0])\n        for i in range(n):\n            for j in range(n):\n                if grid[i][j]==0:\n                    seen = set()\n                    temp = 1\n                    for dx, dy in ((0,1),(1,0),(0,-1),(-1,0)):\n                        ni, nj = i+dx, j+dy\n                        if 0<=ni<n and 0<=nj<n and grid[ni][nj]>1 and grid[ni][nj] not in seen:\n                            temp += area[grid[ni][nj]]\n                            seen.add(grid[ni][nj])\n                    res = max(res, temp)\n        return res",
+      "explanation": "1. 遍歷 grid 將每個島嶼標記不同 index，並記錄其面積。\n2. 遍歷每個 0，檢查其四周相鄰島嶼，累加面積，計算變成 1 後的可能最大島嶼。\n3. 返回遍歷所有 0 後的最大面積。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

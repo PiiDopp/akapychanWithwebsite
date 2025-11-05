@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode904",
+  "coding_practice": [
+    {
+      "title": "Fruit Into Baskets",
+      "description": "You are visiting a farm that has a single row of fruit trees arranged from left to right. The trees are represented by an integer array fruits where fruits[i] is the type of fruit the ith tree produces.\n\nYou want to collect as much fruit as possible. However, the owner has some strict rules that you must follow:\n\nYou only have two baskets, and each basket can only hold a single type of fruit. There is no limit on the amount of fruit each basket can hold.\nStarting from any tree of your choice, you must pick exactly one fruit from every tree (including the start tree) while moving to the right. The picked fruits must fit in one of your baskets.\nOnce you reach a tree with fruit that cannot fit in your baskets, you must stop.\nGiven the integer array fruits, return the maximum number of fruits you can pick.",
+      "examples": [
+        {
+          "input": "fruits = [1,2,1]",
+          "output": "3",
+          "explanation": "We can pick from all 3 trees."
+        },
+        {
+          "input": "fruits = [0,1,2,2]",
+          "output": "3",
+          "explanation": "We can pick from trees [1,2,2]. If we had started at the first tree, we would only pick from trees [0,1]."
+        },
+        {
+          "input": "fruits = [1,2,3,2,2]",
+          "output": "4",
+          "explanation": "We can pick from trees [2,3,2,2]. If we had started at the first tree, we would only pick from trees [1,2]."
+        }
+      ],
+      "constraints": "1 <= fruits.length <= 10^5\n0 <= fruits[i] < fruits.length",
+      "solution": "class Solution(object):\n    def totalFruit(self, fruits):\n        from collections import defaultdict\n        count = defaultdict(int)\n        left = 0\n        max_fruit = 0\n        for right, fruit in enumerate(fruits):\n            count[fruit] += 1\n            while len(count) > 2:\n                count[fruits[left]] -= 1\n                if count[fruits[left]] == 0:\n                    del count[fruits[left]]\n                left += 1\n            max_fruit = max(max_fruit, right - left + 1)\n        return max_fruit",
+      "explanation": "1. 使用滑動窗口紀錄目前範圍內的水果種類數量。\n2. 用字典 count 記錄每種水果的數量。\n3. 若種類數超過 2，左邊界 left 右移，直到種類數回到 2。\n4. 每步更新最大收集數 max_fruit。\n5. 最終返回 max_fruit。",
+      "tag": "723",
+      "difficult": "medium"
+    }
+  ]
+}

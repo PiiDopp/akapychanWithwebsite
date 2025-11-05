@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode738",
+  "coding_practice": [
+    {
+      "title": "Monotone Increasing Digits",
+      "description": "An integer has monotone increasing digits if and only if each pair of adjacent digits x and y satisfy x <= y.\n\nGiven an integer n, return the largest number that is less than or equal to n with monotone increasing digits.",
+      "examples": [
+        {
+          "input": "n = 10",
+          "output": "9"
+        },
+        {
+          "input": "n = 1234",
+          "output": "1234"
+        },
+        {
+          "input": "n = 332",
+          "output": "299"
+        }
+      ],
+      "constraints": "0 <= n <= 10^9",
+      "solution": "class Solution:\n    def monotoneIncreasingDigits(self, n):\n        digits = list(str(n))\n        i = 1\n        while i < len(digits) and digits[i] >= digits[i - 1]:\n            i += 1\n        if i < len(digits):\n            while i > 0 and digits[i] < digits[i - 1]:\n                digits[i - 1] = str(int(digits[i - 1]) - 1)\n                i -= 1\n            for j in range(i + 1, len(digits)):\n                digits[j] = '9'\n        return int(''.join(digits))",
+      "explanation": "1. 將 n 轉為字串列表 digits，以便操作每個數字。\n2. 從左到右找到第一個不滿足遞增條件的位置 i。\n3. 若有違規，從該位置往左回溯，將左側數字減 1，並將右側所有數字設為 9。\n4. 最後將 digits 拼回整數並回傳。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

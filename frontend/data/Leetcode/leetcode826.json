@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode826",
+  "coding_practice": [
+    {
+      "title": "Most Profit Assigning Work",
+      "description": "You have n jobs and m workers. You are given three arrays: difficulty, profit, and worker where:\n\ndifficulty[i] and profit[i] are the difficulty and the profit of the ith job, and\nworker[j] is the ability of jth worker (i.e., the jth worker can only complete a job with difficulty at most worker[j]).\nEvery worker can be assigned at most one job, but one job can be completed multiple times.\n\nFor example, if three workers attempt the same job that pays $1, then the total profit will be $3. If a worker cannot complete any job, their profit is $0.\nReturn the maximum profit we can achieve after assigning the workers to the jobs.",
+      "examples": [
+        {
+          "input": "difficulty = [2,4,6,8,10], profit = [10,20,30,40,50], worker = [4,5,6,7]",
+          "output": "100",
+          "explanation": "Workers are assigned jobs of difficulty [4,4,6,6] and they get a profit of [20,20,30,30] separately."
+        },
+        {
+          "input": "difficulty = [85,47,57], profit = [24,66,99], worker = [40,25,25]",
+          "output": "0"
+        }
+      ],
+      "constraints": "n == difficulty.length\nn == profit.length\nm == worker.length\n1 <= n, m <= 10^4\n1 <= difficulty[i], profit[i], worker[i] <= 10^5",
+      "solution": "class Solution:\n    def maxProfitAssignment(self, difficulty, profit, worker):\n        jobs = sorted(zip(difficulty, profit))\n        worker.sort()\n        res = 0\n        max_profit = 0\n        i = 0\n        n = len(jobs)\n        for w in worker:\n            while i < n and jobs[i][0] <= w:\n                max_profit = max(max_profit, jobs[i][1])\n                i += 1\n            res += max_profit\n        return res",
+      "explanation": "1. 將工作難度與利潤組合，按難度排序。\n2. 將工人能力從小到大排序。\n3. 遍歷每個工人，找到其能做的最大難度工作，更新最大利潤。\n4. 將每個工人的最大利潤累加作為總利潤返回。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

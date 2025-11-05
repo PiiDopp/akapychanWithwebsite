@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode707",
+  "coding_practice": [
+    {
+      "title": "Design Linked List",
+      "description": "Design your implementation of the linked list. You can choose to use a singly or doubly linked list.\\nA node in a singly linked list should have two attributes: val and next. val is the value of the current node, and next is a pointer/reference to the next node.\\nIf you want to use the doubly linked list, you will need one more attribute prev to indicate the previous node in the linked list. Assume all nodes in the linked list are 0-indexed.\\n\\nImplement the MyLinkedList class:\\n\\nMyLinkedList() Initializes the MyLinkedList object.\\nint get(int index) Get the value of the indexth node in the linked list. If the index is invalid, return -1.\\nvoid addAtHead(int val) Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list.\\nvoid addAtTail(int val) Append a node of value val as the last element of the linked list.\\nvoid addAtIndex(int index, int val) Add a node of value val before the indexth node in the linked list. If index equals the length of the linked list, the node will be appended to the end of the linked list. If index is greater than the length, the node will not be inserted.\\nvoid deleteAtIndex(int index) Delete the indexth node in the linked list, if the index is valid.",
+      "examples": [
+        {
+          "input": "[\"MyLinkedList\", \"addAtHead\", \"addAtTail\", \"addAtIndex\", \"get\", \"deleteAtIndex\", \"get\"]\n[[], [1], [3], [1, 2], [1], [1], [1]]",
+          "output": "[null, null, null, null, 2, null, 3]",
+          "explanation": "MyLinkedList myLinkedList = new MyLinkedList();\\nmyLinkedList.addAtHead(1);\\nmyLinkedList.addAtTail(3);\\nmyLinkedList.addAtIndex(1, 2);    // linked list becomes 1->2->3\\nmyLinkedList.get(1);              // return 2\\nmyLinkedList.deleteAtIndex(1);    // now the linked list is 1->3\\nmyLinkedList.get(1);              // return 3"
+        }
+      ],
+      "constraints": "0 <= index, val <= 1000\\nPlease do not use the built-in LinkedList library.\\nAt most 2000 calls will be made to get, addAtHead, addAtTail, addAtIndex and deleteAtIndex.",
+      "solution": "class MyLinkedList:\n    class Node:\n        def __init__(self, val=0):\n            self.val = val\n            self.next = None\n\n    def __init__(self):\n        self.head = None\n        self.size = 0\n\n    def get(self, index):\n        if index < 0 or index >= self.size:\n            return -1\n        curr = self.head\n        for _ in range(index):\n            curr = curr.next\n        return curr.val\n\n    def addAtHead(self, val):\n        node = self.Node(val)\n        node.next = self.head\n        self.head = node\n        self.size += 1\n\n    def addAtTail(self, val):\n        node = self.Node(val)\n        if not self.head:\n            self.head = node\n        else:\n            curr = self.head\n            while curr.next:\n                curr = curr.next\n            curr.next = node\n        self.size += 1\n\n    def addAtIndex(self, index, val):\n        if index < 0 or index > self.size:\n            return\n        if index == 0:\n            self.addAtHead(val)\n            return\n        node = self.Node(val)\n        curr = self.head\n        for _ in range(index - 1):\n            curr = curr.next\n        node.next = curr.next\n        curr.next = node\n        self.size += 1\n\n    def deleteAtIndex(self, index):\n        if index < 0 or index >= self.size:\n            return\n        if index == 0:\n            self.head = self.head.next\n        else:\n            curr = self.head\n            for _ in range(index - 1):\n                curr = curr.next\n            curr.next = curr.next.next\n        self.size -= 1",
+      "explanation": "1. 建立 Node 類別，包含 val 與 next 屬性。\\n2. 使用 head 指向 linked list 的頭節點，size 記錄長度。\\n3. get: 遍歷到 index 節點返回其值，若 index 不合法返回 -1。\\n4. addAtHead: 建立新節點，將其 next 指向 head，再更新 head。\\n5. addAtTail: 遍歷到最後一個節點，將其 next 指向新節點；若 head 為空，直接設 head。\\n6. addAtIndex: 遍歷到 index-1 節點，插入新節點；index=0 時調用 addAtHead，index>size 不插入。\\n7. deleteAtIndex: 遍歷到 index-1 節點，將其 next 指向下一個節點的下一個；index=0 時更新 head。\\n8. 每次插入或刪除後更新 size。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

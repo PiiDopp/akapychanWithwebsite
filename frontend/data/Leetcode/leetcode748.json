@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode748",
+  "coding_practice": [
+    {
+      "title": "Shortest Completing Word",
+      "description": "Given a string licensePlate and an array of strings words, find the shortest completing word in words.\n\nA completing word is a word that contains all the letters in licensePlate. Ignore numbers and spaces in licensePlate, and treat letters as case insensitive. If a letter appears more than once in licensePlate, then it must appear in the word the same number of times or more.\n\nFor example, if licensePlate = \"aBc 12c\", then it contains letters 'a', 'b' (ignoring case), and 'c' twice. Possible completing words are \"abccdef\", \"caaacab\", and \"cbca\".\n\nReturn the shortest completing word in words. It is guaranteed an answer exists. If there are multiple shortest completing words, return the first one that occurs in words.",
+      "examples": [
+        {
+          "input": "licensePlate = \"1s3 PSt\", words = [\"step\",\"steps\",\"stripe\",\"stepple\"]",
+          "output": "\"steps\"",
+          "explanation": "licensePlate contains letters 's', 'p', 's' (ignoring case), and 't'.\n\"step\" contains 't' and 'p', but only contains 1 's'.\n\"steps\" contains 't', 'p', and both 's' characters.\n\"stripe\" is missing an 's'.\n\"stepple\" is missing an 's'.\nSince \"steps\" is the only word containing all the letters, that is the answer."
+        },
+        {
+          "input": "licensePlate = \"1s3 456\", words = [\"looks\",\"pest\",\"stew\",\"show\"]",
+          "output": "\"pest\"",
+          "explanation": "licensePlate only contains the letter 's'. All the words contain 's', but among these \"pest\", \"stew\", and \"show\" are shortest. The answer is \"pest\" because it is the word that appears earliest of the 3."
+        }
+      ],
+      "constraints": "1 <= licensePlate.length <= 7\nlicensePlate contains digits, letters (uppercase or lowercase), or space ' '.\n1 <= words.length <= 1000\n1 <= words[i].length <= 15\nwords[i] consists of lower case English letters.",
+      "solution": "class Solution:\n    def shortestCompletingWord(self, licensePlate, words):\n        import collections\n        plate_count = collections.Counter(c.lower() for c in licensePlate if c.isalpha())\n        res = None\n        for word in words:\n            word_count = collections.Counter(word)\n            if all(word_count[c] >= plate_count[c] for c in plate_count):\n                if res is None or len(word) < len(res):\n                    res = word\n        return res",
+      "explanation": "1. 過濾 licensePlate 中的字母並統計數量，忽略大小寫。\n2. 遍歷 words，統計每個單詞的字母數量。\n3. 若單詞包含所有 licensePlate 的字母且次數足夠，判斷是否比目前結果更短。\n4. 返回最短且符合條件的單詞。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

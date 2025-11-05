@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode697",
+  "coding_practice": [
+    {
+      "title": "Degree of an Array",
+      "description": "Given a non-empty array of non-negative integers nums, the degree of this array is defined as the maximum frequency of any one of its elements.\n\nYour task is to find the smallest possible length of a (contiguous) subarray of nums, that has the same degree as nums.",
+      "examples": [
+        {
+          "input": "nums = [1,2,2,3,1]",
+          "output": "2",
+          "explanation": "The input array has a degree of 2 because both elements 1 and 2 appear twice.\\nOf the subarrays that have the same degree: [1, 2, 2, 3, 1], [1, 2, 2, 3], [2, 2, 3, 1], [1, 2, 2], [2, 2, 3], [2, 2].\\nThe shortest length is 2. So return 2."
+        },
+        {
+          "input": "nums = [1,2,2,3,1,4,2]",
+          "output": "6",
+          "explanation": "The degree is 3 because the element 2 is repeated 3 times.\\nSo [2,2,3,1,4,2] is the shortest subarray, therefore returning 6."
+        }
+      ],
+      "constraints": "nums.length will be between 1 and 50,000.\nnums[i] will be an integer between 0 and 49,999.",
+      "solution": "class Solution:\n    def findShortestSubArray(self, nums):\n        from collections import defaultdict\n        \n        left, right, count = {}, {}, {}\n        for i, num in enumerate(nums):\n            if num not in left:\n                left[num] = i\n            right[num] = i\n            count[num] = count.get(num, 0) + 1\n        \n        degree = max(count.values())\n        min_length = float('inf')\n        \n        for num in count:\n            if count[num] == degree:\n                min_length = min(min_length, right[num] - left[num] + 1)\n        \n        return min_length",
+      "explanation": "1. 遍歷 nums，記錄每個元素的首次出現索引 left、最後出現索引 right 以及出現次數 count。\\n2. 計算整個數組的 degree，即最大頻率。\\n3. 遍歷 count，對於出現次數等於 degree 的元素，計算其子陣列長度 right[num]-left[num]+1，更新最小長度。\\n4. 返回 min_length 即為最短子陣列長度。\\n5. 時間複雜度 O(n)，空間複雜度 O(n)。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

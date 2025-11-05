@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode815",
+  "coding_practice": [
+    {
+      "title": "Bus Routes",
+      "description": "You are given an array routes representing bus routes where routes[i] is a bus route that the ith bus repeats forever.\n\nFor example, if routes[0] = [1, 5, 7], this means that the 0th bus travels in the sequence 1 -> 5 -> 7 -> 1 -> 5 -> 7 -> 1 -> ... forever.\nYou will start at the bus stop source (You are not on any bus initially), and you want to go to the bus stop target. You can travel between bus stops by buses only.\n\nReturn the least number of buses you must take to travel from source to target. Return -1 if it is not possible.",
+      "examples": [
+        {
+          "input": "routes = [[1,2,7],[3,6,7]], source = 1, target = 6",
+          "output": "2",
+          "explanation": "The best strategy is take the first bus to the bus stop 7, then take the second bus to the bus stop 6."
+        },
+        {
+          "input": "routes = [[7,12],[4,5,15],[6],[15,19],[9,12,13]], source = 15, target = 12",
+          "output": "-1"
+        }
+      ],
+      "constraints": "1 <= routes.length <= 500\n1 <= routes[i].length <= 10^5\nAll the values of routes[i] are unique\nsum(routes[i].length) <= 10^5\n0 <= routes[i][j] < 10^6\n0 <= source, target < 10^6",
+      "solution": "class Solution:\n    def numBusesToDestination(self, routes, S, T):\n        from collections import defaultdict, deque\n        if S == T:\n            return 0\n        \n        stop_to_buses = defaultdict(set)\n        for i, route in enumerate(routes):\n            for stop in route:\n                stop_to_buses[stop].add(i)\n        \n        visited_buses = set()\n        visited_stops = set([S])\n        queue = deque([(S, 0)])\n        \n        while queue:\n            stop, buses_taken = queue.popleft()\n            if stop == T:\n                return buses_taken\n            for bus in stop_to_buses[stop]:\n                if bus not in visited_buses:\n                    visited_buses.add(bus)\n                    for next_stop in routes[bus]:\n                        if next_stop not in visited_stops:\n                            visited_stops.add(next_stop)\n                            queue.append((next_stop, buses_taken + 1))\n        return -1",
+      "explanation": "1. 建立 stop_to_buses 字典，每個站點對應可搭的公交車集合。\n2. 使用 BFS 從 source 開始，每個節點記錄當前站點和已搭乘公交車數量。\n3. 對於當前站點，遍歷所有可搭的公交車，將新站點加入隊列。\n4. 若到達 target，返回搭乘的公交車數量。\n5. 若 BFS 遍歷完仍未到達 target，返回 -1。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

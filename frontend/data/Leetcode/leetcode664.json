@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode664",
+  "coding_practice": [
+    {
+      "title": "Strange Printer",
+      "description": "There is a strange printer with the following two special properties:\n\nThe printer can only print a sequence of the same character each time.\nAt each turn, the printer can print new characters starting from and ending at any place and will cover the original existing characters.\nGiven a string s, return the minimum number of turns the printer needed to print it.",
+      "examples": [
+        {
+          "input": "s = \"aaabbb\"",
+          "output": "2",
+          "explanation": "Print \"aaa\" first and then print \"bbb\"."
+        },
+        {
+          "input": "s = \"aba\"",
+          "output": "2",
+          "explanation": "Print \"aaa\" first and then print \"b\" from the second place of the string, which will cover the existing character 'a'."
+        }
+      ],
+      "constraints": "1 <= s.length <= 100\ns consists of lowercase English letters.",
+      "solution": "class Solution:\n    def strangePrinter(self, s):\n        n = len(s)\n        if n == 0:\n            return 0\n        dp = [[0] * n for _ in range(n)]\n        \n        for i in range(n-1, -1, -1):\n            dp[i][i] = 1\n            for j in range(i+1, n):\n                dp[i][j] = 1 + dp[i+1][j]\n                for k in range(i+1, j+1):\n                    if s[k] == s[i]:\n                        if k+1 <= j:\n                            dp[i][j] = min(dp[i][j], dp[i][k-1] + dp[k+1][j])\n                        else:\n                            dp[i][j] = min(dp[i][j], dp[i][k-1])\n        return dp[0][n-1]",
+      "explanation": "1. 使用 dp[i][j] 表示打印子字串 s[i:j+1] 的最少次數。\\n2. 初始化 dp[i][i] = 1，每個單字符至少一次打印。\\n3. 遍歷所有子字串，假設第一個字符是 s[i]，初始次數為 1 + dp[i+1][j]。\\n4. 遍歷 i+1 到 j 的索引 k，如果 s[k] == s[i]，表示可以合併打印，更新 dp[i][j]。\\n5. 最終 dp[0][n-1] 即為整個字串最少打印次數。\\n6. 時間複雜度 O(n^3)，空間複雜度 O(n^2)。",
+      "tag": "511",
+      "difficult": "hard"
+    }
+  ]
+}

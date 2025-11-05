@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode875",
+  "coding_practice": [
+    {
+      "title": "Koko Eating Bananas",
+      "description": "Koko loves to eat bananas. There are n piles of bananas, the ith pile has piles[i] bananas. The guards have gone and will come back in h hours.\n\nKoko can decide her bananas-per-hour eating speed of k. Each hour, she chooses some pile of bananas and eats k bananas from that pile. If the pile has less than k bananas, she eats all of them instead and will not eat any more bananas during this hour.\n\nKoko likes to eat slowly but still wants to finish eating all the bananas before the guards return.\n\nReturn the minimum integer k such that she can eat all the bananas within h hours.",
+      "examples": [
+        {
+          "input": "piles = [3,6,7,11], h = 8",
+          "output": "4"
+        },
+        {
+          "input": "piles = [30,11,23,4,20], h = 5",
+          "output": "30"
+        },
+        {
+          "input": "piles = [30,11,23,4,20], h = 6",
+          "output": "23"
+        }
+      ],
+      "constraints": "1 <= piles.length <= 10^4\npiles.length <= h <= 10^9\n1 <= piles[i] <= 10^9",
+      "solution": "class Solution(object):\n    def minEatingSpeed(self, piles, H):\n        import math\n        left, right = 1, max(piles)\n        while left < right:\n            mid = (left + right) // 2\n            hours = sum(math.ceil(pile / float(mid)) for pile in piles)\n            if hours <= H:\n                right = mid\n            else:\n                left = mid + 1\n        return left",
+      "explanation": "1. 使用二分搜尋法，範圍是 1 到最大堆的香蕉數。\n2. 對每個速度 mid，計算吃完所有香蕉所需的總小時數。\n3. 若總小時數 <= H，表示可以嘗試更慢的速度，更新右界。\n4. 否則，速度不足以完成，更新左界。\n5. 最後 left 即為最小可行速度 k。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

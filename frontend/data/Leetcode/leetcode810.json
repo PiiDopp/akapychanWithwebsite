@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode810",
+  "coding_practice": [
+    {
+      "title": "Chalkboard XOR Game",
+      "description": "You are given an array of integers nums represents the numbers written on a chalkboard.\n\nAlice and Bob take turns erasing exactly one number from the chalkboard, with Alice starting first. If erasing a number causes the bitwise XOR of all the elements of the chalkboard to become 0, then that player loses. The bitwise XOR of one element is that element itself, and the bitwise XOR of no elements is 0.\n\nAlso, if any player starts their turn with the bitwise XOR of all the elements of the chalkboard equal to 0, then that player wins.\n\nReturn true if and only if Alice wins the game, assuming both players play optimally.",
+      "examples": [
+        {
+          "input": "nums = [1,1,2]",
+          "output": "false",
+          "explanation": "Alice has two choices: erase 1 or erase 2. If she erases 1, the nums array becomes [1, 2]. The bitwise XOR of all the elements of the chalkboard is 1 XOR 2 = 3. Now Bob can remove any element he wants, because Alice will be the one to erase the last element and she will lose. If Alice erases 2 first, now nums become [1, 1]. The bitwise XOR of all the elements of the chalkboard is 1 XOR 1 = 0. Alice will lose."
+        },
+        {
+          "input": "nums = [0,1]",
+          "output": "true"
+        },
+        {
+          "input": "nums = [1,2,3]",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n0 <= nums[i] < 2^16",
+      "solution": "class Solution:\n    def xorGame(self, nums):\n        from functools import reduce\n        from operator import xor\n\n        xor_all = reduce(xor, nums)\n        # 如果 XOR 已經為 0，Alice 先手直接贏\n        if xor_all == 0:\n            return True\n        # 如果陣列長度為偶數，Alice 也可以保證勝利\n        if len(nums) % 2 == 0:\n            return True\n        # 否則，Alice 先手輸\n        return False",
+      "explanation": "1. 計算陣列中所有數的 XOR。\n2. 如果 XOR 為 0，先手 Alice 直接贏，回傳 True。\n3. 如果陣列長度為偶數，Alice 先手總能找到策略讓對手輸，回傳 True。\n4. 若長度為奇數且 XOR != 0，Alice 無法保證勝利，回傳 False。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode591",
+  "coding_practice": [
+    {
+      "title": "Tag Validator",
+      "description": "Given a string representing a code snippet, implement a tag validator to parse the code and return whether it is valid. \n\nA code snippet is valid if all the following rules hold: \n\n1.The code must be wrapped in a valid closed tag. Otherwise, the code is invalid. \n\n2.A closed tag (not necessarily valid) has exactly the following format : <TAG_NAME>TAG_CONTENT</TAG_NAME>. Among them, <TAG_NAME> is the start tag, and </TAG_NAME> is the end tag. The TAG_NAME in start and end tags should be the same. A closed tag is valid if and only if the TAG_NAME and TAG_CONTENT are valid. \n\n3.A valid TAG_NAME only contain upper-case letters, and has length in range [1,9]. Otherwise, the TAG_NAME is invalid. \n\n4.A valid TAG_CONTENT may contain other valid closed tags, cdata and any characters (see note1) EXCEPT unmatched <, unmatched start and end tag, and unmatched or closed tags with invalid TAG_NAME. Otherwise, the TAG_CONTENT is invalid. \n\n5.A start tag is unmatched if no end tag exists with the same TAG_NAME, and vice versa. However, you also need to consider the issue of unbalanced when tags are nested. \n\n6.A < is unmatched if you cannot find a subsequent >. And when you find a < or </, all the subsequent characters until the next > should be parsed as TAG_NAME (not necessarily valid). \n\n7.The cdata has the following format : <![CDATA[CDATA_CONTENT]]>. The range of CDATA_CONTENT is defined as the characters between <![CDATA[ and the first subsequent ]]>. \n\n8.CDATA_CONTENT may contain any characters. The function of cdata is to forbid the validator to parse CDATA_CONTENT, so even it has some characters that can be parsed as tag (no matter valid or invalid), you should treat it as regular characters.",
+      "examples": [
+        {
+          "input": "code = \"<DIV>This is the first line <![CDATA[<div>]]></DIV>\"",
+          "output": "true",
+          "explanation": "The code is wrapped in a closed tag : <DIV> and </DIV>.  \nThe TAG_NAME is valid, the TAG_CONTENT consists of some characters and cdata.  \nAlthough CDATA_CONTENT has an unmatched start tag with invalid TAG_NAME, it should be considered as plain text, not parsed as a tag. \nSo TAG_CONTENT is valid, and then the code is valid. Thus return true."
+        },
+        {
+          "input": "code = \"<DIV>>>  ![cdata[]] <![CDATA[<div>]>]]>]]>>]</DIV>\"",
+          "output": "true",
+          "explanation": "We first separate the code into : start_tag|tag_content|end_tag. \nstart_tag -> \"<DIV>\" end_tag -> \"</DIV>\" \ntag_content could also be separated into : text1|cdata|text2. \ntext1 -> \">>  ![cdata[]] \" \ncdata -> \"<![CDATA[<div>]>]]>\", where the CDATA_CONTENT is \"<div>]>\" \ntext2 -> \"]]>>]\" \nThe reason why start_tag is NOT \"<DIV>>>\" is because of the rule 6. \nThe reason why cdata is NOT \"<![CDATA[<div>]>]]>]]>\" is because of the rule 7."
+        },
+        {
+          "input": "code = \"<A>  <B> </A>   </B>\"",
+          "output": "false",
+          "explanation": "Unbalanced. If \"<A>\" is closed, then \"<B>\" must be unmatched, and vice versa."
+        }
+      ],
+      "constraints": "1 <= code.length <= 500\ncode consists of English letters, digits, '<', '>', '/', '!', '[', ']', '.', and ' '.",
+      "solution": "class Solution(object): \n    def isValid(self, code):\n        stack = []\n        i = 0\n        \n        while i < len(code):\n            if i > 0 and not stack:\n                return False\n            if code[i:i+9] == \"<![CDATA[\":\n                j = i + 9\n                i = code.find(\"]]>\", j)\n                if i == -1:\n                    return False\n                i += 3\n            elif code[i:i+2] == \"</\":\n                j = i + 2\n                i = code.find(\">\", j)\n                if i == -1:\n                    return False\n                tag_name = code[j:i]\n                if not stack or stack[-1] != tag_name:\n                    return False\n                stack.pop()\n                i += 1\n            elif code[i] == \"<\":\n                j = i + 1\n                i = code.find(\">\", j)\n                if i == -1 or i == j or i - j > 9:\n                    return False\n                tag_name = code[j:i]\n                if not all('A' <= c <= 'Z' for c in tag_name):\n                    return False\n                stack.append(tag_name)\n                i += 1\n            else:\n                i += 1\n        \n        return not stack and code[0] == \"<\" and code[-1] == \">\"",
+      "explanation": "1. 使用 stack 保存標籤結構，i 作為索引遍歷整個字串。\n2. 如果 i>0 但 stack 空了，說明有多餘文字在外層，返回 False。\n3. 遇到 <![CDATA[ 開頭，找到對應 ]]>，把其中內容當作文字，i 跳過 CDATA。\n4. 遇到 </ 開頭的結束標籤，檢查 stack 頂部是否匹配，匹配則 pop，否則返回 False。\n5. 遇到 < 開頭的新標籤，檢查標籤長度、是否全大寫，合法則 push 到 stack。\n6. 其他字符直接跳過。\n7. 最後返回 stack 空且 code 以 < 開頭、> 結尾，確保最外層標籤合法。",
+      "tag": "530",
+      "difficult": "hard"
+    }
+  ]
+}

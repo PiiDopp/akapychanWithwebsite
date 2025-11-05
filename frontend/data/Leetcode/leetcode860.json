@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode860",
+  "coding_practice": [
+    {
+      "title": "Lemonade Change",
+      "description": "At a lemonade stand, each lemonade costs $5. Customers are standing in a queue to buy from you and order one at a time (in the order specified by bills). Each customer will only buy one lemonade and pay with either a $5, $10, or $20 bill. You must provide the correct change to each customer so that the net transaction is that the customer pays $5.\n\nNote that you do not have any change in hand at first.\n\nGiven an integer array bills where bills[i] is the bill the ith customer pays, return true if you can provide every customer with the correct change, or false otherwise.",
+      "examples": [
+        {
+          "input": "bills = [5,5,5,10,20]",
+          "output": "true",
+          "explanation": "From the first 3 customers, we collect three $5 bills in order.\nFrom the fourth customer, we collect a $10 bill and give back a $5.\nFrom the fifth customer, we give a $10 bill and a $5 bill.\nSince all customers got correct change, we output true."
+        },
+        {
+          "input": "bills = [5,5,10,10,20]",
+          "output": "false",
+          "explanation": "From the first two customers in order, we collect two $5 bills.\nFor the next two customers in order, we collect a $10 bill and give back a $5 bill.\nFor the last customer, we can not give the change of $15 back because we only have two $10 bills.\nSince not every customer received the correct change, the answer is false."
+        }
+      ],
+      "constraints": "1 <= bills.length <= 10^5\nbills[i] is either 5, 10, or 20.",
+      "solution": "class Solution(object):\n    def lemonadeChange(self, bills):\n        five, ten = 0, 0\n        for bill in bills:\n            if bill == 5:\n                five += 1\n            elif bill == 10:\n                if five == 0:\n                    return False\n                five -= 1\n                ten += 1\n            else:\n                if ten > 0 and five > 0:\n                    ten -= 1\n                    five -= 1\n                elif five >= 3:\n                    five -= 3\n                else:\n                    return False\n        return True",
+      "explanation": "1. 初始化 five 和 ten 記錄手上 $5 與 $10 的數量。\n2. 遍歷每位顧客的 bill:\n   - 若 bill = 5，five +1。\n   - 若 bill = 10，需要一張 $5 找零，five -1，ten +1。\n   - 若 bill = 20，優先用一張 $10 和一張 $5 找零，否則用三張 $5 找零，否則返回 False。\n3. 遍歷完成後返回 True。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

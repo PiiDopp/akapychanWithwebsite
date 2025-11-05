@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode752",
+  "coding_practice": [
+    {
+      "title": "Open the Lock",
+      "description": "You have a lock in front of you with 4 circular wheels. Each wheel has 10 slots: '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'. The wheels can rotate freely and wrap around: for example we can turn '9' to be '0', or '0' to be '9'. Each move consists of turning one wheel one slot.\n\nThe lock initially starts at '0000', a string representing the state of the 4 wheels.\n\nYou are given a list of deadends dead ends, meaning if the lock displays any of these codes, the wheels of the lock will stop turning and you will be unable to open it.\n\nGiven a target representing the value of the wheels that will unlock the lock, return the minimum total number of turns required to open the lock, or -1 if it is impossible.",
+      "examples": [
+        {
+          "input": "deadends = [\"0201\",\"0101\",\"0102\",\"1212\",\"2002\"], target = \"0202\"",
+          "output": "6",
+          "explanation": "A sequence of valid moves would be \"0000\" -> \"1000\" -> \"1100\" -> \"1200\" -> \"1201\" -> \"1202\" -> \"0202\".\nA sequence like \"0000\" -> \"0001\" -> \"0002\" -> \"0102\" -> \"0202\" would be invalid, because the wheels of the lock become stuck after the display becomes the dead end \"0102\"."
+        },
+        {
+          "input": "deadends = [\"8888\"], target = \"0009\"",
+          "output": "1",
+          "explanation": "We can turn the last wheel in reverse to move from \"0000\" -> \"0009\"."
+        },
+        {
+          "input": "deadends = [\"8887\",\"8889\",\"8878\",\"8898\",\"8788\",\"8988\",\"7888\",\"9888\"], target = \"8888\"",
+          "output": "-1",
+          "explanation": "We cannot reach the target without getting stuck."
+        }
+      ],
+      "constraints": "1 <= deadends.length <= 500\ndeadends[i].length == 4\ntarget.length == 4\ntarget will not be in the list deadends.\ntarget and deadends[i] consist of digits only.",
+      "solution": "class Solution:\n    def openLock(self, deadends, target):\n        from collections import deque\n        dead = set(deadends)\n        if '0000' in dead:\n            return -1\n        queue = deque([('0000', 0)])\n        visited = set('0000')\n        while queue:\n            state, steps = queue.popleft()\n            if state == target:\n                return steps\n            for i in range(4):\n                digit = int(state[i])\n                for move in [-1, 1]:\n                    new_digit = (digit + move) % 10\n                    new_state = state[:i] + str(new_digit) + state[i+1:]\n                    if new_state not in dead and new_state not in visited:\n                        visited.add(new_state)\n                        queue.append((new_state, steps + 1))\n        return -1",
+      "explanation": "1. 將 deadends 轉成集合便於快速查詢。\n2. 使用 BFS（廣度優先搜索）從 '0000' 開始遍歷狀態。\n3. 對於每個當前狀態，生成 4 個輪子的上下移動可能的新狀態。\n4. 若新狀態不在 deadends 且未訪問過，加入隊列並增加步數。\n5. 若隊列空仍未找到 target，返回 -1。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

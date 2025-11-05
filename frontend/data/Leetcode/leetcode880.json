@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode880",
+  "coding_practice": [
+    {
+      "title": "Decoded String at Index",
+      "description": "You are given an encoded string s. To decode the string to a tape, the encoded string is read one character at a time and the following steps are taken:\nIf the character read is a letter, that letter is written onto the tape.\nIf the character read is a digit d, the entire current tape is repeatedly written d - 1 more times in total.\nGiven an integer k, return the kth letter (1-indexed) in the decoded string.",
+      "examples": [
+        {
+          "input": "s = \"leet2code3\", k = 10",
+          "output": "o",
+          "explanation": "The decoded string is \"leetleetcodeleetleetcodeleetleetcode\". The 10th letter in the string is \"o\"."
+        },
+        {
+          "input": "s = \"ha22\", k = 5",
+          "output": "h",
+          "explanation": "The decoded string is \"hahahaha\". The 5th letter is \"h\"."
+        },
+        {
+          "input": "s = \"a2345678999999999999999\", k = 1",
+          "output": "a",
+          "explanation": "The decoded string is \"a\" repeated 8301530446056247680 times. The 1st letter is \"a\"."
+        }
+      ],
+      "constraints": "2 <= s.length <= 100\ns consists of lowercase English letters and digits 2 through 9.\ns starts with a letter.\n1 <= k <= 10^9\nIt is guaranteed that k is less than or equal to the length of the decoded string.\nThe decoded string is guaranteed to have less than 2^63 letters.",
+      "solution": "class Solution(object):\n    def decodeAtIndex(self, S, K):\n        \"\"\"\n        :type S: str\n        :type K: int\n        :rtype: str\n        \"\"\"\n        size = 0\n        for c in S:\n            if c.isdigit():\n                size *= int(c)\n            else:\n                size += 1\n\n        for c in reversed(S):\n            K %= size\n            if K == 0 and c.isalpha():\n                return c\n            if c.isdigit():\n                size //= int(c)\n            else:\n                size -= 1",
+      "explanation": "1. 首先計算完整解碼後字串的長度 size。\n2. 反向遍歷原始字串 S。\n3. 對於每個字母，檢查 K % size 是否為 0，如果是且是字母，直接返回該字母。\n4. 對於數字 c，表示之前的 tape 被重複 int(c) 次，因此將 size 除以 int(c)。\n5. 對於字母 c，size 減 1。\n6. 這樣可以在不真正展開整個字串的情況下找到第 K 個字母。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

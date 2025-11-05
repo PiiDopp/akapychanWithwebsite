@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode902",
+  "coding_practice": [
+    {
+      "title": "Numbers At Most N Given Digit Set",
+      "description": "Given an array of digits which is sorted in non-decreasing order. You can write numbers using each digits[i] as many times as we want. For example, if digits = ['1','3','5'], we may write numbers such as '13', '551', and '1351315'.\nReturn the number of positive integers that can be generated that are less than or equal to a given integer n.",
+      "examples": [
+        {
+          "input": "digits = [\"1\",\"3\",\"5\",\"7\"], n = 100",
+          "output": "20",
+          "explanation": "The 20 numbers that can be written are: 1, 3, 5, 7, 11, 13, 15, 17, 31, 33, 35, 37, 51, 53, 55, 57, 71, 73, 75, 77."
+        },
+        {
+          "input": "digits = [\"1\",\"4\",\"9\"], n = 1000000000",
+          "output": "29523",
+          "explanation": "We can write 3 one digit numbers, 9 two digit numbers, 27 three digit numbers, \n81 four digit numbers, 243 five digit numbers, 729 six digit numbers, \n2187 seven digit numbers, 6561 eight digit numbers, and 19683 nine digit numbers. \nIn total, this is 29523 integers that can be written using the digits array."
+        },
+        {
+          "input": "digits = [\"7\"], n = 8",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= digits.length <= 9\ndigits[i].length == 1\ndigits[i] is a digit from '1' to '9'.\nAll the values in digits are unique.\ndigits is sorted in non-decreasing order.\n1 <= n <= 10^9",
+      "solution": "class Solution(object):\n    def atMostNGivenDigitSet(self, digits, n):\n        s = str(n)\n        k = len(s)\n        d = len(digits)\n        ans = sum(d**i for i in range(1, k))\n        for i in range(k):\n            smaller = sum(int(d) < int(s[i]) for d in digits)\n            ans += smaller * (d ** (k - i - 1))\n            if s[i] not in digits:\n                return ans\n        return ans + 1",
+      "explanation": "1. 將 n 轉為字串 s，長度為 k，d 為 digits 的長度。\n2. 計算小於 k 位數的數字總數，ans = sum(d**i for i in range(1,k))。\n3. 遍歷每一位 i，計算 digits 中比 s[i] 小的數字個數 smaller，累加 smaller * d**(k-i-1) 到 ans。\n4. 若 s[i] 不在 digits 中，說明後續無法組成符合條件的數字，直接 return ans。\n5. 遍歷完成後，返回 ans + 1 表示包含 n 本身（若可用 digits 組成）。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode709",
+  "coding_practice": [
+    {
+      "title": "To Lower Case",
+      "description": "Given a string s, return the string after replacing every uppercase letter with the same lowercase letter.",
+      "examples": [
+        {
+          "input": "s = \"Hello\"",
+          "output": "\"hello\""
+        },
+        {
+          "input": "s = \"here\"",
+          "output": "\"here\""
+        },
+        {
+          "input": "s = \"LOVELY\"",
+          "output": "\"lovely\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 100\\ns consists of printable ASCII characters.",
+      "solution": "class Solution:\n    def toLowerCase(self, s):\n        result = []\n        for c in s:\n            if 'A' <= c <= 'Z':\n                result.append(chr(ord(c) + 32))\n            else:\n                result.append(c)\n        return ''.join(result)",
+      "explanation": "1. 遍歷字串 s 中每個字元 c。\\n2. 若 c 是大寫字母 (A-Z)，將其轉為小寫，方法是使用 chr(ord(c)+32)。\\n3. 若 c 已經是小寫或非字母，直接加入結果。\\n4. 將結果列表 join 成字串並返回。",
+      "tag": "722",
+      "difficult": "easy"
+    }
+  ]
+}

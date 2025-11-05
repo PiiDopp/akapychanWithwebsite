@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode717",
+  "coding_practice": [
+    {
+      "title": "1-bit and 2-bit Characters",
+      "description": "We have two special characters:\\n- The first character can be represented by one bit 0.\\n- The second character can be represented by two bits (10 or 11).\\nGiven a binary array bits that ends with 0, return true if the last character must be a one-bit character.",
+      "examples": [
+        {
+          "input": "bits = [1,0,0]",
+          "output": "true",
+          "explanation": "The only way to decode it is two-bit character and one-bit character. So the last character is one-bit character."
+        },
+        {
+          "input": "bits = [1,1,1,0]",
+          "output": "false",
+          "explanation": "The only way to decode it is two-bit character and two-bit character. So the last character is not one-bit character."
+        }
+      ],
+      "constraints": "1 <= bits.length <= 1000\\nbits[i] is either 0 or 1.",
+      "solution": "class Solution:\n    def isOneBitCharacter(self, bits):\n        i = 0\n        n = len(bits)\n        while i < n - 1:\n            if bits[i] == 1:\n                i += 2\n            else:\n                i += 1\n        return i == n - 1",
+      "explanation": "1. 使用指標 i 遍歷 bits。\\n2. 當 bits[i] == 1 時，表示遇到二位元字元，i += 2。\\n3. 當 bits[i] == 0 時，表示遇到一位元字元，i += 1。\\n4. 當 i 遍歷到最後一個元素時，如果 i == n-1，代表最後一個是 one-bit character，返回 True，否則 False。",
+      "tag": "1030",
+      "difficult": "easy"
+    }
+  ]
+}

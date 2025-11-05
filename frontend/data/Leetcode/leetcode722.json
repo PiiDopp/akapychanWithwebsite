@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode722",
+  "coding_practice": [
+    {
+      "title": "Remove Comments",
+      "description": "Given a C++ program, remove comments from it. The program source is an array of strings source where source[i] is the ith line of the source code. This represents the result of splitting the original source code string by the newline character '\\n'.\n\nIn C++, there are two types of comments, line comments, and block comments.\n\nThe string \"//\" denotes a line comment, which represents that it and the rest of the characters to the right of it in the same line should be ignored.\nThe string \"/*\" denotes a block comment, which represents that all characters until the next (non-overlapping) occurrence of \"*/\" should be ignored. (Here, occurrences happen in reading order: line by line from left to right.) To be clear, the string \"/*/\" does not yet end the block comment, as the ending would be overlapping the beginning.\nThe first effective comment takes precedence over others.\n\nFor example, if the string \"//\" occurs in a block comment, it is ignored.\nSimilarly, if the string \"/*\" occurs in a line or block comment, it is also ignored.\nIf a certain line of code is empty after removing comments, you must not output that line: each string in the answer list will be non-empty.\n\nThere will be no control characters, single quote, or double quote characters.\n\nFor example, source = \"string s = \\\"/* Not a comment. */\\\";\" will not be a test case.\nAlso, nothing else such as defines or macros will interfere with the comments.\n\nIt is guaranteed that every open block comment will eventually be closed, so \"/*\" outside of a line or block comment always starts a new comment.\n\nFinally, implicit newline characters can be deleted by block comments. Please see the examples below for details.\n\nAfter removing the comments from the source code, return the source code in the same format.",
+      "examples": [
+        {
+          "input": "source = [\"/*Test program */\", \"int main()\", \"{ \", \"  // variable declaration \", \"int a, b, c;\", \"/* This is a test\", \"   multiline  \", \"   comment for \", \"   testing */\", \"a = b + c;\", \"}\"]",
+          "output": "[\"int main()\",\"{ \",\"  \",\"int a, b, c;\",\"a = b + c;\",\"}\"]",
+          "explanation": "The line by line code is visualized as below: \n/*Test program */ \nint main() \n{  \n  // variable declaration  \nint a, b, c; \n/* This is a test \n   multiline   \n   comment for  \n   testing */ \na = b + c; \n} \nThe string /* denotes a block comment, including line 1 and lines 6-9. The string //\ndenotes line 4 as comments. \nThe line by line output code is visualized as below: \nint main() \n{ \n\n  int a, b, c;\na = b + c;\n}"
+        },
+        {
+          "input": "source = [\"a/*comment\", \"line\", \"more_comment*/b\"]",
+          "output": "[\"ab\"]",
+          "explanation": "The original source string is \"a/*comment\nline\nmore_comment*/b\", where we have bolded the newline characters.  After deletion, the implicit newline characters are deleted, leaving the string \"ab\", which when delimited by newline characters becomes [\"ab\"]."
+        }
+      ],
+      "constraints": "1 <= source.length <= 100\n0 <= source[i].length <= 80\nsource[i] consists of printable ASCII characters.\nEvery open block comment is eventually closed.\nThere are no single-quote or double-quote in the input.",
+      "solution": "class Solution:\n    def removeComments(self, source):\n        res = []\n        in_block = False\n        new_line = []\n        \n        for line in source:\n            i = 0\n            if not in_block:\n                new_line = []\n            while i < len(line):\n                if not in_block and i+1 < len(line) and line[i] == '/' and line[i+1] == '*':\n                    in_block = True\n                    i += 1\n                elif in_block and i+1 < len(line) and line[i] == '*' and line[i+1] == '/':\n                    in_block = False\n                    i += 1\n                elif not in_block and i+1 < len(line) and line[i] == '/' and line[i+1] == '/':\n                    break\n                elif not in_block:\n                    new_line.append(line[i])\n                i += 1\n            if new_line and not in_block:\n                res.append(\"\".join(new_line))\n        return res",
+      "explanation": "1. 遍歷每一行源代碼。\\n2. 使用 in_block 標記是否在塊註解內。\\n3. 遇到 '/*' 開始塊註解，遇到 '*/' 結束塊註解。\\n4. 遇到 '//' 直接忽略當前行剩餘部分。\\n5. 非註解字符加入 new_line。\\n6. 如果一行完成且不在塊註解內，將 new_line 拼接成字符串加入結果。\\n7. 返回結果列表。",
+      "tag": "722",
+      "difficult": "medium"
+    }
+  ]
+}

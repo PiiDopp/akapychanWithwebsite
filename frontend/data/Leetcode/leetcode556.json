@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode556",
+  "coding_practice": [
+    {
+      "title": "Next Greater Element III",
+      "description": "Given a positive integer n, find the smallest integer which has exactly the same digits existing in the integer n and is greater in value than n. If no such positive integer exists, return -1.\n\nNote that the returned integer should fit in 32-bit integer, if there is a valid answer but it does not fit in 32-bit integer, return -1.",
+      "examples": [
+        {
+          "input": "n = 12",
+          "output": "21"
+        },
+        {
+          "input": "n = 21",
+          "output": "-1"
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def nextGreaterElement(self, n):\n        digits = list(str(n))\n        i = len(digits) - 2\n        while i >= 0 and digits[i] >= digits[i + 1]:\n            i -= 1\n        if i == -1:\n            return -1\n        j = len(digits) - 1\n        while digits[j] <= digits[i]:\n            j -= 1\n        digits[i], digits[j] = digits[j], digits[i]\n        digits[i + 1:] = reversed(digits[i + 1:])\n        result = int(\"\".join(digits))\n        return result if result < 2 ** 31 else -1",
+      "explanation": "1. 將整數轉換為字串以便處理各位數。\n2. 從右向左尋找第一個遞減點 i，使 digits[i] < digits[i+1]。\n3. 若未找到，表示整個序列為非遞增序列，無法找到更大的數，返回 -1。\n4. 再從右側尋找第一個比 digits[i] 大的數字 j，交換兩者位置。\n5. 將 i 之後的數字反轉以獲得最小的排列。\n6. 將結果轉為整數，若超出 32 位整數範圍則返回 -1。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

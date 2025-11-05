@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode859",
+  "coding_practice": [
+    {
+      "title": "Buddy Strings",
+      "description": "Given two strings s and goal, return true if you can swap two letters in s so the result is equal to goal, otherwise, return false.\n\nSwapping letters is defined as taking two indices i and j (0-indexed) such that i != j and swapping the characters at s[i] and s[j].\n\nFor example, swapping at indices 0 and 2 in \"abcd\" results in \"cbad\".",
+      "examples": [
+        {
+          "input": "s = \"ab\", goal = \"ba\"",
+          "output": "true",
+          "explanation": "You can swap s[0] = 'a' and s[1] = 'b' to get \"ba\", which is equal to goal."
+        },
+        {
+          "input": "s = \"ab\", goal = \"ab\"",
+          "output": "false",
+          "explanation": "The only letters you can swap are s[0] = 'a' and s[1] = 'b', which results in \"ba\" != goal."
+        },
+        {
+          "input": "s = \"aa\", goal = \"aa\"",
+          "output": "true",
+          "explanation": "You can swap s[0] = 'a' and s[1] = 'a' to get \"aa\", which is equal to goal."
+        }
+      ],
+      "constraints": "1 <= s.length, goal.length <= 2 * 10^4\ns and goal consist of lowercase letters.",
+      "solution": "class Solution(object):\n    def buddyStrings(self, s, goal):\n        if len(s) != len(goal):\n            return False\n\n        if s == goal:\n            return len(set(s)) < len(s)\n\n        diffs = [(a, b) for a, b in zip(s, goal) if a != b]\n        return len(diffs) == 2 and diffs[0] == diffs[1][::-1]",
+      "explanation": "1. 如果 s 與 goal 長度不同，直接返回 False。\n2. 如果 s 與 goal 相同，只有當 s 中有重複字元時才可進行交換，返回 True。\n3. 找出 s 與 goal 中不同的位置 diffs。\n4. 若 diffs 恰好有兩個元素且互換後相等，返回 True，否則 False。",
+      "tag": "711",
+      "difficult": "easy"
+    }
+  ]
+}
+

@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode557",
+  "coding_practice": [
+    {
+      "title": "Reverse Words in a String III",
+      "description": "Given a string s, reverse the order of characters in each word within a sentence while still preserving whitespace and initial word order.",
+      "examples": [
+        {
+          "input": "s = \"Let's take LeetCode contest\"",
+          "output": "\"s'teL ekat edoCteeL tsetnoc\""
+        },
+        {
+          "input": "s = \"Mr Ding\"",
+          "output": "\"rM gniD\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 5 * 10^4\ns contains printable ASCII characters.\ns does not contain any leading or trailing spaces.\nThere is at least one word in s.\nAll the words in s are separated by a single space.",
+      "solution": "class Solution:\n    def reverseWords(self, s):\n        return \" \".join(word[::-1] for word in s.split(\" \"))",
+      "explanation": "1. 使用 split(' ') 將字串以空白分隔成多個單字。\n2. 對每個單字 word 使用切片語法 word[::-1] 反轉字元順序。\n3. 使用 join 將反轉後的單字重新以空白連接成完整句子。\n4. 保留原本的空白間隔與單字順序。",
+      "tag": "722",
+      "difficult": "easy"
+    }
+  ]
+}
