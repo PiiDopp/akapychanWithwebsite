@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode611",
+  "coding_practice": [
+    {
+      "title": "Valid Triangle Number",
+      "description": "Given an integer array nums, return the number of triplets chosen from the array that can make triangles if we take them as side lengths of a triangle.",
+      "examples": [
+        {
+          "input": "nums = [2,2,3,4]",
+          "output": "3",
+          "explanation": "Valid combinations are:\n2,3,4 (using the first 2)\n2,3,4 (using the second 2)\n2,2,3"
+        },
+        {
+          "input": "nums = [4,2,3,4]",
+          "output": "4"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n0 <= nums[i] <= 1000",
+      "solution": "class Solution:\n    def triangleNumber(self, nums):\n        nums.sort()\n        count = 0\n        n = len(nums)\n        for k in range(n-1, 1, -1):\n            i, j = 0, k-1\n            while i < j:\n                if nums[i] + nums[j] > nums[k]:\n                    count += j - i\n                    j -= 1\n                else:\n                    i += 1\n        return count",
+      "explanation": "1. 先將 nums 排序。\n2. 對每個可能的最大邊 nums[k]，使用雙指針 i, j 檢查 nums[i] + nums[j] > nums[k]。\n3. 如果條件成立，代表從 i 到 j-1 的組合都可行，count 加 j-i。\n4. 遍歷所有 k 後返回 count。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

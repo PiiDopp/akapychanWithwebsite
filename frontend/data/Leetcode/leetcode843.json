@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode843",
+  "coding_practice": [
+    {
+      "title": "Guess the Word",
+      "description": "You are given an array of unique strings words where words[i] is six letters long. One word of words was chosen as a secret word. \nYou are also given the helper object Master. You may call Master.guess(word) where word is a six-letter-long string, and it must be from words.\nMaster.guess(word) returns: \n-1 if word is not from words, or \nan integer representing the number of exact matches (value and position) of your guess to the secret word.\nThere is a parameter allowedGuesses for each test case where allowedGuesses is the maximum number of times you can call Master.guess(word). \nFor each test case, you should call Master.guess with the secret word without exceeding the maximum number of allowed guesses. You will get: \n\"Either you took too many guesses, or you did not find the secret word.\" if you called Master.guess more than allowedGuesses times or if you did not call Master.guess with the secret word, or \n\"You guessed the secret word correctly.\" if you called Master.guess with the secret word with the number of calls to Master.guess less than or equal to allowedGuesses. \nThe test cases are generated such that you can guess the secret word with a reasonable strategy (other than using the bruteforce method).",
+      "examples": [
+        {
+          "input": "secret = \"acckzz\", words = [\"acckzz\",\"ccbazz\",\"eiowzz\",\"abcczz\"], allowedGuesses = 10",
+          "output": "You guessed the secret word correctly.",
+          "explanation": "master.guess(\"aaaaaa\") returns -1, because \"aaaaaa\" is not in wordlist. \nmaster.guess(\"acckzz\") returns 6, because \"acckzz\" is secret and has all 6 matches. \nmaster.guess(\"ccbazz\") returns 3, because \"ccbazz\" has 3 matches. \nmaster.guess(\"eiowzz\") returns 2, because \"eiowzz\" has 2 matches. \nmaster.guess(\"abcczz\") returns 4, because \"abcczz\" has 4 matches. \nWe made 5 calls to master.guess, and one of them was the secret, so we pass the test case."
+        },
+        {
+          "input": "secret = \"hamada\", words = [\"hamada\",\"khaled\"], allowedGuesses = 10",
+          "output": "You guessed the secret word correctly.",
+          "explanation": "Since there are two words, you can guess both."
+        }
+      ],
+      "constraints": "1 <= words.length <= 100 \nwords[i].length == 6 \nwords[i] consist of lowercase English letters. \nAll the strings of wordlist are unique. \nsecret exists in words. \n10 <= allowedGuesses <= 30",
+      "solution": "import random\n\nclass Solution(object):\n    def findSecretWord(self, words, master):\n        def most_overlap_word():\n            record = [[0 for _ in range(26)] for _ in range(6)]\n            for word in candidates:\n                for i, c in enumerate(word):\n                    record[i][ord(c) - ord('a')] += 1\n            best = 0\n            for word in candidates:\n                score = 0\n                for i, c in enumerate(word):\n                    score += record[i][ord(c) - ord('a')]\n                if score > best:\n                    best = score\n                    best_word = word\n            return best_word\n\n        def greedy_balance():\n            targ_r = (1/6)**(1/6)\n            filtered = candidates[:]\n            for i in range(5, 0, -1):\n                char_count = [0 for _ in range(26)]\n                char_words = [[] for _ in range(26)]\n                for word in filtered:\n                    index = ord(word[i]) - ord('a')\n                    char_count[index] += 1\n                    char_words[index].append(word)\n                char_diff = [abs(count - len(filtered)*targ_r) for count in char_count]\n                select_char_index = char_diff.index(min(char_diff))\n                filtered = char_words[select_char_index]\n            return random.choice(filtered)\n\n        def matches(a, b):\n            return sum(c1 == c2 for c1, c2 in zip(a, b))\n\n        candidates = words[:]\n        iter_ = 0\n        while candidates:\n            if iter_ < 1:\n                key = greedy_balance()\n            else:\n                key = most_overlap_word()\n            r = master.guess(key)\n            if r == 6:\n                return\n            candidates = [w for w in candidates if matches(key, w) == r]\n            iter_ += 1",
+      "explanation": "1. 此題為互動式題目，需透過 master.guess() 不斷猜測來找到秘密單字。\n2. 使用 greedy_balance() 作為第一次猜測策略，嘗試讓各位置的字母分布平均，以便最大化分割候選集合的效果。\n3. 第二輪以後使用 most_overlap_word()，選出與其他候選字重疊最多的單字，能取得最多資訊量。\n4. 每次猜完後依回傳的匹配數 r 過濾候選，只保留符合當前匹配數的字。\n5. 若 r == 6，表示已猜中秘密字，結束迴圈。\n6. 此策略結合隨機性與統計性，使得演算法能在限制的猜測次數內穩定找到答案。\n7. 標籤對應：910 (try / except 例外處理) 用於模擬互動式 API 操作與例外結構理解。",
+      "tag": "910",
+      "difficult": "hard"
+    }
+  ]
+}

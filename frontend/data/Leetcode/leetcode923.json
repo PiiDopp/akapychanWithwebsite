@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode923",
+  "coding_practice": [
+    {
+      "title": "3Sum With Multiplicity",
+      "description": "Given an integer array arr, and an integer target, return the number of tuples i, j, k such that i < j < k and arr[i] + arr[j] + arr[k] == target.\n\nAs the answer can be very large, return it modulo 10^9 + 7.",
+      "examples": [
+        {
+          "input": "arr = [1,1,2,2,3,3,4,4,5,5], target = 8",
+          "output": "20",
+          "explanation": "Enumerating by the values (arr[i], arr[j], arr[k]):\n(1, 2, 5) occurs 8 times;\n(1, 3, 4) occurs 8 times;\n(2, 2, 4) occurs 2 times;\n(2, 3, 3) occurs 2 times."
+        },
+        {
+          "input": "arr = [1,1,2,2,2,2], target = 5",
+          "output": "12",
+          "explanation": "arr[i] = 1, arr[j] = arr[k] = 2 occurs 12 times: We choose one 1 from [1,1] in 2 ways, and two 2s from [2,2,2,2] in 6 ways."
+        },
+        {
+          "input": "arr = [2,1,3], target = 6",
+          "output": "1",
+          "explanation": "(1, 2, 3) occurred one time in the array so we return 1."
+        }
+      ],
+      "constraints": "3 <= arr.length <= 3000\n0 <= arr[i] <= 100\n0 <= target <= 300",
+      "solution": "from collections import Counter\n\nclass Solution(object):\n    def threeSumMulti(self, A, target):\n        MOD = 10**9 + 7\n        count = Counter(A)\n        keys = sorted(count)\n        ans = 0\n\n        for i, x in enumerate(keys):\n            for j, y in enumerate(keys[i:]):\n                y = keys[i + j]\n                z = target - x - y\n                if z < y:\n                    continue\n                if z not in count:\n                    continue\n                if x == y == z:\n                    ans += count[x] * (count[x]-1) * (count[x]-2) // 6\n                elif x == y != z:\n                    ans += count[x] * (count[x]-1) // 2 * count[z]\n                elif x < y == z:\n                    ans += count[x] * count[y] * (count[y]-1) // 2\n                elif x < y < z:\n                    ans += count[x] * count[y] * count[z]\n        return ans % MOD",
+      "explanation": "1. 使用 Counter 計算每個數字出現的次數。\n2. 對數字排序後，對所有可能的 x, y 組合計算 z = target - x - y。\n3. 根據 x, y, z 是否相等計算組合數量：\n   - x == y == z: C(count[x], 3)\n   - x == y != z: C(count[x], 2) * count[z]\n   - x < y == z: count[x] * C(count[y], 2)\n   - x < y < z: count[x] * count[y] * count[z]\n4. 最後結果對 10^9+7 取模。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

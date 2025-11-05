@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode646",
+  "coding_practice": [
+    {
+      "title": "Maximum Length of Pair Chain",
+      "description": "You are given an array of n pairs pairs where pairs[i] = [lefti, righti] and lefti < righti.\n\nA pair p2 = [c, d] follows a pair p1 = [a, b] if b < c. A chain of pairs can be formed in this fashion.\n\nReturn the length longest chain which can be formed.\n\nYou do not need to use up all the given intervals. You can select pairs in any order.",
+      "examples": [
+        {
+          "input": "pairs = [[1,2],[2,3],[3,4]]",
+          "output": "2",
+          "explanation": "The longest chain is [1,2] -> [3,4]."
+        },
+        {
+          "input": "pairs = [[1,2],[7,8],[4,5]]",
+          "output": "3",
+          "explanation": "The longest chain is [1,2] -> [4,5] -> [7,8]."
+        }
+      ],
+      "constraints": "n == pairs.length\n1 <= n <= 1000\n-1000 <= lefti < righti <= 1000",
+      "solution": "class Solution:\n    def findLongestChain(self, pairs):\n        pairs.sort(key=lambda x: x[1])\n        curr = float('-inf')\n        count = 0\n        for a, b in pairs:\n            if a > curr:\n                curr = b\n                count += 1\n        return count",
+      "explanation": "1. 將所有 pair 依照右端點進行排序，使得可以以貪婪法選擇最早結束的區間。\\n2. 初始化 curr 為負無限大，count 為 0。\\n3. 遍歷排序後的 pairs，若當前 pair 的左值大於 curr，表示可接續成鏈，則更新 curr = 該 pair 的右值，並增加 count。\\n4. 最後回傳 count 即為最長鏈的長度。\\n5. 時間複雜度為 O(n log n)，主要來自排序步驟。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

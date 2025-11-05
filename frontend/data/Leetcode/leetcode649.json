@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode649",
+  "coding_practice": [
+    {
+      "title": "Dota2 Senate",
+      "description": "In the world of Dota2, there are two parties: the Radiant and the Dire.\n\nThe Dota2 senate consists of senators coming from two parties. Now the Senate wants to decide on a change in the Dota2 game. The voting for this change is a round-based procedure. In each round, each senator can exercise one of the two rights:\n\nBan one senator's right: A senator can make another senator lose all his rights in this and all the following rounds.\nAnnounce the victory: If this senator found the senators who still have rights to vote are all from the same party, he can announce the victory and decide on the change in the game.\nGiven a string senate representing each senator's party belonging. The character 'R' and 'D' represent the Radiant party and the Dire party. Then if there are n senators, the size of the given string will be n.\n\nThe round-based procedure starts from the first senator to the last senator in the given order. This procedure will last until the end of voting. All the senators who have lost their rights will be skipped during the procedure.\n\nSuppose every senator is smart enough and will play the best strategy for his own party. Predict which party will finally announce the victory and change the Dota2 game. The output should be \"Radiant\" or \"Dire\".",
+      "examples": [
+        {
+          "input": "senate = \"RD\"",
+          "output": "\"Radiant\"",
+          "explanation": "The first senator comes from Radiant and he can just ban the next senator's right in round 1.  \nAnd the second senator can't exercise any rights anymore since his right has been banned.  \nAnd in round 2, the first senator can just announce the victory since he is the only guy in the senate who can vote."
+        },
+        {
+          "input": "senate = \"RDD\"",
+          "output": "\"Dire\"",
+          "explanation": "The first senator comes from Radiant and he can just ban the next senator's right in round 1.  \nAnd the second senator can't exercise any rights anymore since his right has been banned.  \nAnd the third senator comes from Dire and he can ban the first senator's right in round 1.  \nAnd in round 2, the third senator can just announce the victory since he is the only guy in the senate who can vote."
+        }
+      ],
+      "constraints": "n == senate.length\n1 <= n <= 10^4\nsenate[i] is either 'R' or 'D'.",
+      "solution": "from collections import deque\n\nclass Solution:\n    def predictPartyVictory(self, senate):\n        n = len(senate)\n        radiant = deque()\n        dire = deque()\n        \n        for i, s in enumerate(senate):\n            if s == 'R':\n                radiant.append(i)\n            else:\n                dire.append(i)\n        \n        while radiant and dire:\n            r_index = radiant.popleft()\n            d_index = dire.popleft()\n            if r_index < d_index:\n                radiant.append(r_index + n)\n            else:\n                dire.append(d_index + n)\n        \n        return \"Radiant\" if radiant else \"Dire\"",
+      "explanation": "1. 使用兩個隊列分別存放 Radiant 和 Dire 的索引。\\n2. 遍歷隊列，依照索引大小決定哪一方先禁掉對方的權利。\\n3. 被禁掉的一方索引不再回到隊列中，勝利方將自己的索引加 n 回到隊列末端，以模擬下一輪。\\n4. 重複直到其中一方隊列為空，另一方勝利。\\n5. 時間複雜度為 O(n)，空間複雜度 O(n)。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

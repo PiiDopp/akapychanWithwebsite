@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode647",
+  "coding_practice": [
+    {
+      "title": "Palindromic Substrings",
+      "description": "Given a string s, return the number of palindromic substrings in it.\n\nA string is a palindrome when it reads the same backward as forward.\n\nA substring is a contiguous sequence of characters within the string.",
+      "examples": [
+        {
+          "input": "s = \"abc\"",
+          "output": "3",
+          "explanation": "Three palindromic strings: \"a\", \"b\", \"c\"."
+        },
+        {
+          "input": "s = \"aaa\"",
+          "output": "6",
+          "explanation": "Six palindromic strings: \"a\", \"a\", \"a\", \"aa\", \"aa\", \"aaa\"."
+        }
+      ],
+      "constraints": "1 <= s.length <= 1000\ns consists of lowercase English letters.",
+      "solution": "class Solution:\n    def countSubstrings(self, s):\n        n = len(s)\n        count = [0]  # 使用 list 避免 nonlocal\n\n        def expand(left, right):\n            while left >= 0 and right < n and s[left] == s[right]:\n                count[0] += 1\n                left -= 1\n                right += 1\n\n        for i in range(n):\n            expand(i, i)       # odd length\n            expand(i, i + 1)   # even length\n\n        return count[0]",
+      "explanation": "1. 遍歷每個字符，當作中心向兩側擴展檢查回文子串。\\n2. expand(i, i) 檢查奇數長度回文，expand(i, i+1) 檢查偶數長度回文。\\n3. 使用 list 包裝 count 以避免 nonlocal，累加回文子串數量。\\n4. 返回 count[0] 即為總回文子串數。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

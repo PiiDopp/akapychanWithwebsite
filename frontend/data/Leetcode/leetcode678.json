@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode678",
+  "coding_practice": [
+    {
+      "title": "Valid Parenthesis String",
+      "description": "Given a string s containing only three types of characters: '(', ')' and '*', return true if s is valid.\n\nThe following rules define a valid string:\n\nAny left parenthesis '(' must have a corresponding right parenthesis ')'.\nAny right parenthesis ')' must have a corresponding left parenthesis '('.\nLeft parenthesis '(' must go before the corresponding right parenthesis ')'.\n'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string \"\".",
+      "examples": [
+        {
+          "input": "s = \"()\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"(*)\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"(*))\"",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= s.length <= 100\ns[i] is '(', ')' or '*'.",
+      "solution": "class Solution:\n    def checkValidString(self, s):\n        low = 0  # 最少未匹配的 '(' 數\n        high = 0 # 最多未匹配的 '(' 數\n\n        for c in s:\n            if c == '(':\n                low += 1\n                high += 1\n            elif c == ')':\n                if low > 0:\n                    low -= 1\n                high -= 1\n            else:  # '*'\n                if low > 0:\n                    low -= 1\n                high += 1\n            if high < 0:\n                return False\n        return low == 0",
+      "explanation": "1. low 表示最少未匹配的 '('，high 表示最多未匹配的 '('。\\n2. 遍歷每個字符：\\n   - '(' 時，low 與 high 均加 1。\\n   - ')' 時，low 減 1（至少為 0），high 減 1。\\n   - '*' 時，low 減 1（至少為 0），high 加 1。\\n3. 遍歷中如果 high < 0，表示無法匹配，返回 False。\\n4. 最後 low == 0 表示所有 '(' 都能匹配，返回 True。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

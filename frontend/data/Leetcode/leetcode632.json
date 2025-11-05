@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode632",
+  "coding_practice": [
+    {
+      "title": "Smallest Range Covering Elements from K Lists",
+      "description": "You have k lists of sorted integers in non-decreasing order. Find the smallest range that includes at least one number from each of the k lists.\n\nWe define the range [a, b] is smaller than range [c, d] if b - a < d - c or a < c if b - a == d - c.",
+      "examples": [
+        {
+          "input": "nums = [[4,10,15,24,26],[0,9,12,20],[5,18,22,30]]",
+          "output": "[20,24]",
+          "explanation": "List 1: [4, 10, 15, 24,26], 24 is in range [20,24].\nList 2: [0, 9, 12, 20], 20 is in range [20,24].\nList 3: [5, 18, 22, 30], 22 is in range [20,24]."
+        },
+        {
+          "input": "nums = [[1,2,3],[1,2,3],[1,2,3]]",
+          "output": "[1,1]"
+        }
+      ],
+      "constraints": "nums.length == k\n1 <= k <= 3500\n1 <= nums[i].length <= 50\n-10^5 <= nums[i][j] <= 10^5\nnums[i] is sorted in non-decreasing order.",
+      "solution": "import heapq\n\nclass Solution:\n    def smallestRange(self, nums):\n        heap = []\n        max_val = float('-inf')\n        for i, lst in enumerate(nums):\n            heapq.heappush(heap, (lst[0], i, 0))  # (值, 第幾個列表, 列表內索引)\n            max_val = max(max_val, lst[0])\n        \n        min_range = float('inf')\n        start, end = -1, -1\n        \n        while True:\n            min_val, list_idx, elem_idx = heapq.heappop(heap)\n            if max_val - min_val < min_range:\n                min_range = max_val - min_val\n                start, end = min_val, max_val\n            if elem_idx + 1 < len(nums[list_idx]):\n                next_val = nums[list_idx][elem_idx + 1]\n                heapq.heappush(heap, (next_val, list_idx, elem_idx + 1))\n                max_val = max(max_val, next_val)\n            else:\n                break\n        \n        return [start, end]",
+      "explanation": "1. 使用最小堆(heap)存儲每個列表的當前元素，並記錄目前堆中最大值。\n2. 每次彈出最小元素(min_val)，計算當前範圍 [min_val, max_val]，更新最小範圍。\n3. 將該列表的下一個元素加入堆中，同時更新最大值max_val。\n4. 如果某列表走到末尾，停止迴圈，因為無法再覆蓋所有列表。\n5. 最後返回範圍 [start, end]，即覆蓋所有列表的最小範圍。",
+      "tag": "632",
+      "difficult": "hard"
+    }
+  ]
+}

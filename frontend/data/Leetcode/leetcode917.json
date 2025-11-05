@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode917",
+  "coding_practice": [
+    {
+      "title": "Reverse Only Letters",
+      "description": "Given a string s, reverse the string according to the following rules:\nAll the characters that are not English letters remain in the same position.\nAll the English letters (lowercase or uppercase) should be reversed.\nReturn s after reversing it.",
+      "examples": [
+        {
+          "input": "s = \"ab-cd\"",
+          "output": "\"dc-ba\""
+        },
+        {
+          "input": "s = \"a-bC-dEf-ghIj\"",
+          "output": "\"j-Ih-gfE-dCba\""
+        },
+        {
+          "input": "s = \"Test1ng-Leet=code-Q!\"",
+          "output": "\"Qedo1ct-eeLg=ntse-T!\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 100\ns consists of characters with ASCII values in the range [33, 122].\ns does not contain '\"' or '\\\\'.",
+      "solution": "class Solution(object):\n    def reverseOnlyLetters(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: str\n        \"\"\"\n        letters = [c for c in s if c.isalpha()]\n        res = []\n        for c in s:\n            if c.isalpha():\n                res.append(letters.pop())\n            else:\n                res.append(c)\n        return ''.join(res)",
+      "explanation": "1. 先將 s 中所有英文字母提取出來，存入列表 letters。\n2. 遍歷 s，若當前字符是字母，從 letters 尾部取出一個字符加入結果；若不是字母，直接加入結果。\n3. 最後將結果列表轉換為字符串返回。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

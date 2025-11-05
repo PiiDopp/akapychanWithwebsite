@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode704",
+  "coding_practice": [
+    {
+      "title": "Binary Search",
+      "description": "Given an array of integers nums which is sorted in ascending order, and an integer target, write a function to search target in nums. If target exists, then return its index. Otherwise, return -1.\n\nYou must write an algorithm with O(log n) runtime complexity.",
+      "examples": [
+        {
+          "input": "nums = [-1,0,3,5,9,12], target = 9",
+          "output": "4",
+          "explanation": "9 exists in nums and its index is 4"
+        },
+        {
+          "input": "nums = [-1,0,3,5,9,12], target = 2",
+          "output": "-1",
+          "explanation": "2 does not exist in nums so return -1"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-10^4 < nums[i], target < 10^4\nAll the integers in nums are unique.\nnums is sorted in ascending order.",
+      "solution": "class Solution:\n    def search(self, nums, target):\n        left, right = 0, len(nums) - 1\n        while left <= right:\n            mid = left + (right - left) // 2\n            if nums[mid] == target:\n                return mid\n            elif nums[mid] < target:\n                left = mid + 1\n            else:\n                right = mid - 1\n        return -1",
+      "explanation": "1. 設定左右邊界 left = 0, right = len(nums)-1。\\n2. 進入 while 循環，當 left <= right 時計算 mid = left + (right-left)//2。\\n3. 若 nums[mid] == target，返回 mid。\\n4. 若 nums[mid] < target，將 left 移到 mid+1。\\n5. 若 nums[mid] > target，將 right 移到 mid-1。\\n6. 循環結束仍未找到，返回 -1。\\n7. 時間複雜度 O(log n)，符合題目要求。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}
+

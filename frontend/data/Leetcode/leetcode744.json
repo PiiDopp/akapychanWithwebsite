@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode744",
+  "coding_practice": [
+    {
+      "title": "Find Smallest Letter Greater Than Target",
+      "description": "You are given an array of characters letters that is sorted in non-decreasing order, and a character target. There are at least two different characters in letters.\n\nReturn the smallest character in letters that is lexicographically greater than target. If such a character does not exist, return the first character in letters.",
+      "examples": [
+        {
+          "input": "letters = [\"c\",\"f\",\"j\"], target = \"a\"",
+          "output": "\"c\"",
+          "explanation": "The smallest character that is lexicographically greater than 'a' in letters is 'c'."
+        },
+        {
+          "input": "letters = [\"c\",\"f\",\"j\"], target = \"c\"",
+          "output": "\"f\"",
+          "explanation": "The smallest character that is lexicographically greater than 'c' in letters is 'f'."
+        },
+        {
+          "input": "letters = [\"x\",\"x\",\"y\",\"y\"], target = \"z\"",
+          "output": "\"x\"",
+          "explanation": "There are no characters in letters that is lexicographically greater than 'z' so we return letters[0]."
+        }
+      ],
+      "constraints": "2 <= letters.length <= 10^4\nletters[i] is a lowercase English letter.\nletters is sorted in non-decreasing order.\nletters contains at least two different characters.\ntarget is a lowercase English letter.",
+      "solution": "class Solution:\n    def nextGreatestLetter(self, letters, target):\n        left, right = 0, len(letters) - 1\n        while left <= right:\n            mid = (left + right) // 2\n            if letters[mid] <= target:\n                left = mid + 1\n            else:\n                right = mid - 1\n        return letters[left % len(letters)]",
+      "explanation": "1. 使用二分搜尋查找第一個大於 target 的字母。\n2. 初始化左右指標 left 和 right，逐步縮小範圍。\n3. 若中間字母 letters[mid] <= target，則向右查找；否則向左查找。\n4. 最終返回 letters[left % len(letters)]，處理 target 大於所有字母的情況。",
+      "tag": "912",
+      "difficult": "easy"
+    }
+  ]
+}

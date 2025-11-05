@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode648",
+  "coding_practice": [
+    {
+      "title": "Replace Words",
+      "description": "In English, we have a concept called root, which can be followed by some other word to form another longer word - let's call this word derivative. For example, when the root \"help\" is followed by the word \"ful\", we can form a derivative \"helpful\".\n\nGiven a dictionary consisting of many roots and a sentence consisting of words separated by spaces, replace all the derivatives in the sentence with the root forming it. If a derivative can be replaced by more than one root, replace it with the root that has the shortest length.\n\nReturn the sentence after the replacement.",
+      "examples": [
+        {
+          "input": "dictionary = [\"cat\",\"bat\",\"rat\"], sentence = \"the cattle was rattled by the battery\"",
+          "output": "\"the cat was rat by the bat\""
+        },
+        {
+          "input": "dictionary = [\"a\",\"b\",\"c\"], sentence = \"aadsfasf absbs bbab cadsfafs\"",
+          "output": "\"a a b c\""
+        }
+      ],
+      "constraints": "1 <= dictionary.length <= 1000\n1 <= dictionary[i].length <= 100\ndictionary[i] consists of only lower-case letters.\n1 <= sentence.length <= 10^6\nsentence consists of only lower-case letters and spaces.\nThe number of words in sentence is in the range [1, 1000]\nThe length of each word in sentence is in the range [1, 1000]\nEvery two consecutive words in sentence will be separated by exactly one space.\nsentence does not have leading or trailing spaces.",
+      "solution": "class Solution:\n    def replaceWords(self, dictionary, sentence):\n        trie = {}\n        END = True\n\n        # 建立 Trie\n        for root in dictionary:\n            node = trie\n            for char in root:\n                node = node.setdefault(char, {})\n            node[END] = root\n\n        def replace(word):\n            node = trie\n            for char in word:\n                if char not in node:\n                    break\n                node = node[char]\n                if END in node:\n                    return node[END]\n            return word\n\n        return ' '.join(map(replace, sentence.split()))",
+      "explanation": "1. 使用 Trie 儲存所有字根，每個字根的結尾標記為 END 並儲存對應字根。\\n2. 對 sentence 中每個單詞，從頭開始遍歷字元，在 Trie 中尋找最短匹配的字根。\\n3. 找到匹配的字根就替換，否則保留原單詞。\\n4. 使用 ' '.join 將替換後的單詞組成新的句子並返回。\\n5. 時間複雜度為 O(n * k)，其中 n 為 sentence 中單詞數量，k 為每個單詞平均長度。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

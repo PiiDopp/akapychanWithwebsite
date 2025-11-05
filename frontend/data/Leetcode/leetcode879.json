@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode879",
+  "coding_practice": [
+    {
+      "title": "Profitable Schemes",
+      "description": "There is a group of n members, and a list of various crimes they could commit. The ith crime generates a profit[i] and requires group[i] members to participate in it. If a member participates in one crime, that member can't participate in another crime.\n\nLet's call a profitable scheme any subset of these crimes that generates at least minProfit profit, and the total number of members participating in that subset of crimes is at most n.\n\nReturn the number of schemes that can be chosen. Since the answer may be very large, return it modulo 10^9 + 7.",
+      "examples": [
+        {
+          "input": "n = 5, minProfit = 3, group = [2,2], profit = [2,3]",
+          "output": "2",
+          "explanation": "To make a profit of at least 3, the group could either commit crimes 0 and 1, or just crime 1.\nIn total, there are 2 schemes."
+        },
+        {
+          "input": "n = 10, minProfit = 5, group = [2,3,5], profit = [6,7,8]",
+          "output": "7",
+          "explanation": "To make a profit of at least 5, the group could commit any crimes, as long as they commit one.\nThere are 7 possible schemes: (0), (1), (2), (0,1), (0,2), (1,2), and (0,1,2)."
+        }
+      ],
+      "constraints": "1 <= n <= 100\n0 <= minProfit <= 100\n1 <= group.length <= 100\n1 <= group[i] <= 100\nprofit.length == group.length\n0 <= profit[i] <= 100",
+      "solution": "class Solution(object):\n    def profitableSchemes(self, G, P, group, profit):\n        \"\"\"\n        :type G: int\n        :type P: int\n        :type group: List[int]\n        :type profit: List[int]\n        :rtype: int\n        \"\"\"\n        MOD = 10**9 + 7\n        n = len(group)\n        dp = [[0] * (P + 1) for _ in range(G + 1)]\n        dp[0][0] = 1\n\n        for i in range(n):\n            g_i, p_i = group[i], profit[i]\n            for g in range(G, g_i - 1, -1):\n                for p in range(P, -1, -1):\n                    new_profit = min(P, p + p_i)\n                    dp[g][new_profit] = (dp[g][new_profit] + dp[g - g_i][p]) % MOD\n\n        return sum(dp[g][P] for g in range(G + 1)) % MOD",
+      "explanation": "1. 使用二維 DP，dp[g][p] 代表用 g 名成員達到 profit p 的方案數。\n2. 初始 dp[0][0] = 1，表示不選任何犯罪時 profit 為 0。\n3. 遍歷每個 crime，倒序更新 DP 避免覆蓋之前計算。\n4. 最後累加 dp[g][P] 對所有 g <= G，即得到至少 minProfit 的方案數。",
+      "tag": "520",
+      "difficult": "hard"
+    }
+  ]
+}

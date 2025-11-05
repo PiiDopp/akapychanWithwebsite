@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode921",
+  "coding_practice": [
+    {
+      "title": "Minimum Add to Make Parentheses Valid",
+      "description": "A parentheses string is valid if and only if:\n\nIt is the empty string,\nIt can be written as AB (A concatenated with B), where A and B are valid strings, or\nIt can be written as (A), where A is a valid string.\nYou are given a parentheses string s. In one move, you can insert a parenthesis at any position of the string.\n\nReturn the minimum number of moves required to make s valid.",
+      "examples": [
+        {
+          "input": "s = \"())\"",
+          "output": "1"
+        },
+        {
+          "input": "s = \"(((\"",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= s.length <= 1000\ns[i] is either '(' or ')'",
+      "solution": "class Solution(object):\n    def minAddToMakeValid(self, S):\n        left = 0\n        res = 0\n        for c in S:\n            if c == '(':\n                left += 1\n            elif c == ')':\n                if left > 0:\n                    left -= 1\n                else:\n                    res += 1\n        return res + left",
+      "explanation": "1. 用變數 left 記錄目前未匹配的 '(' 數量。\n2. 遍歷每個字符，如果是 '('，left +1。\n3. 如果是 ')'，檢查 left 是否大於0，若大於0則匹配一個 '('，left -1，否則需要新增一個 '('，res +1。\n4. 最後返回 res + left，即缺少的 '(' 與 ')' 總數。",
+      "tag": "530",
+      "difficult": "medium"
+    }
+  ]
+}

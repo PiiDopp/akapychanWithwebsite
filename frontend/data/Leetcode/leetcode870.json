@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode870",
+  "coding_practice": [
+    {
+      "title": "Advantage Shuffle",
+      "description": "You are given two integer arrays nums1 and nums2 both of the same length. The advantage of nums1 with respect to nums2 is the number of indices i for which nums1[i] > nums2[i].\n\nReturn any permutation of nums1 that maximizes its advantage with respect to nums2.",
+      "examples": [
+        {
+          "input": "nums1 = [2,7,11,15], nums2 = [1,10,4,11]",
+          "output": "[2,11,7,15]"
+        },
+        {
+          "input": "nums1 = [12,24,8,32], nums2 = [13,25,32,11]",
+          "output": "[24,32,8,12]"
+        }
+      ],
+      "constraints": "1 <= nums1.length <= 10^5\nnums2.length == nums1.length\n0 <= nums1[i], nums2[i] <= 10^9",
+      "solution": "class Solution(object):\n    def advantageCount(self, A, B):\n        import collections\n        n = len(A)\n        A.sort()\n        B_sorted = sorted([(b, i) for i, b in enumerate(B)], reverse=True)\n        res = [0] * n\n        left, right = 0, n - 1\n\n        for b, i in B_sorted:\n            if A[right] > b:\n                res[i] = A[right]\n                right -= 1\n            else:\n                res[i] = A[left]\n                left += 1\n\n        return res",
+      "explanation": "1. 對 A 排序，對 B 保存索引排序為降序。\n2. 對每個 B 的元素，若 A 右端元素比 B 大，則用該元素對應位置賦值，否則用左端元素。\n3. 左右指針確保較小元素先消耗，較大元素盡量贏過 B 中元素。\n4. 返回結果 res。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

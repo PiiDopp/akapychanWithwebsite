@@ -1,0 +1,36 @@
+{
+  "ID": "leetcode735",
+  "coding_practice": [
+    {
+      "title": "Asteroid Collision",
+      "description": "We are given an array asteroids of integers representing asteroids in a row. The indices of the asteroid in the array represent their relative position in space.\n\nFor each asteroid, the absolute value represents its size, and the sign represents its direction (positive meaning right, negative meaning left). Each asteroid moves at the same speed.\n\nFind out the state of the asteroids after all collisions. If two asteroids meet, the smaller one will explode. If both are the same size, both will explode. Two asteroids moving in the same direction will never meet.",
+      "examples": [
+        {
+          "input": "asteroids = [5,10,-5]",
+          "output": "[5,10]",
+          "explanation": "The 10 and -5 collide resulting in 10. The 5 and 10 never collide."
+        },
+        {
+          "input": "asteroids = [8,-8]",
+          "output": "[]",
+          "explanation": "The 8 and -8 collide exploding each other."
+        },
+        {
+          "input": "asteroids = [10,2,-5]",
+          "output": "[10]",
+          "explanation": "The 2 and -5 collide resulting in -5. The 10 and -5 collide resulting in 10."
+        },
+        {
+          "input": "asteroids = [3,5,-6,2,-1,4]",
+          "output": "[-6,2,4]",
+          "explanation": "The asteroid -6 makes the asteroid 3 and 5 explode, and then continues going left. On the other side, the asteroid 2 makes the asteroid -1 explode and then continues going right, without reaching asteroid 4."
+        }
+      ],
+      "constraints": "2 <= asteroids.length <= 10^4\n-1000 <= asteroids[i] <= 1000\nasteroids[i] != 0",
+      "solution": "class Solution(object):\n    def asteroidCollision(self, asteroids):\n        stack = []\n        for a in asteroids:\n            while stack and a < 0 < stack[-1]:\n                if stack[-1] < -a:\n                    stack.pop()\n                    continue\n                elif stack[-1] == -a:\n                    stack.pop()\n                break\n            else:\n                stack.append(a)\n        return stack",
+      "explanation": "1. 建立一個 stack 來儲存未爆炸的行星。\n2. 遍歷 asteroids，若當前行星 a 向左且 stack 最上方行星向右，則發生碰撞。\n3. 若 stack[-1] < -a，則上方行星爆炸，繼續檢查下一個碰撞。\n4. 若 stack[-1] == -a，兩者爆炸。\n5. 若沒有碰撞發生，將行星加入 stack。\n6. 最後返回 stack 中的行星即為最終狀態。",
+      "tag": "530",
+      "difficult": "medium"
+    }
+  ]
+}

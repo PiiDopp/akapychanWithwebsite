@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode862",
+  "coding_practice": [
+    {
+      "title": "Shortest Subarray with Sum at Least K",
+      "description": "Given an integer array nums and an integer k, return the length of the shortest non-empty subarray of nums with a sum of at least k. If there is no such subarray, return -1.\n\nA subarray is a contiguous part of an array.",
+      "examples": [
+        {
+          "input": "nums = [1], k = 1",
+          "output": "1"
+        },
+        {
+          "input": "nums = [1,2], k = 4",
+          "output": "-1"
+        },
+        {
+          "input": "nums = [2,-1,2], k = 3",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-10^5 <= nums[i] <= 10^5\n1 <= k <= 10^9",
+      "solution": "from collections import deque\n\nclass Solution(object):\n    def shortestSubarray(self, A, K):\n        n = len(A)\n        prefix = [0] * (n + 1)\n        for i in range(n):\n            prefix[i + 1] = prefix[i] + A[i]\n\n        res = n + 1\n        dq = deque()\n        for i in range(n + 1):\n            while dq and prefix[i] - prefix[dq[0]] >= K:\n                res = min(res, i - dq.popleft())\n            while dq and prefix[i] <= prefix[dq[-1]]:\n                dq.pop()\n            dq.append(i)\n\n        return res if res <= n else -1",
+      "explanation": "1. 計算前綴和 prefix[i+1] = sum(nums[0:i+1])。\n2. 使用單調遞增雙端隊列 dq，保存前綴和的索引。\n3. 遍歷 prefix，如果當前 prefix[i] - prefix[dq[0]] >= K，更新最短長度 res 並彈出 dq[0]。\n4. 保持 dq 單調遞增，若 prefix[i] <= prefix[dq[-1]]，彈出 dq[-1]。\n5. 最後返回 res，如果 res > n，返回 -1。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode832",
+  "coding_practice": [
+    {
+      "title": "Flipping an Image",
+      "description": "Given an n x n binary matrix image, flip the image horizontally, then invert it, and return the resulting image.\n\nTo flip an image horizontally means that each row of the image is reversed.\n\nFor example, flipping [1,1,0] horizontally results in [0,1,1].\nTo invert an image means that each 0 is replaced by 1, and each 1 is replaced by 0.\n\nFor example, inverting [0,1,1] results in [1,0,0].",
+      "examples": [
+        {
+          "input": "image = [[1,1,0],[1,0,1],[0,0,0]]",
+          "output": "[[1,0,0],[0,1,0],[1,1,1]]",
+          "explanation": "First reverse each row: [[0,1,1],[1,0,1],[0,0,0]].\nThen, invert the image: [[1,0,0],[0,1,0],[1,1,1]]"
+        },
+        {
+          "input": "image = [[1,1,0,0],[1,0,0,1],[0,1,1,1],[1,0,1,0]]",
+          "output": "[[1,1,0,0],[0,1,1,0],[0,0,0,1],[1,0,1,0]]",
+          "explanation": "First reverse each row: [[0,0,1,1],[1,0,0,1],[1,1,1,0],[0,1,0,1]].\nThen invert the image: [[1,1,0,0],[0,1,1,0],[0,0,0,1],[1,0,1,0]]"
+        }
+      ],
+      "constraints": "n == image.length\nn == image[i].length\n1 <= n <= 20\nimage[i][j] is either 0 or 1",
+      "solution": "class Solution(object):\n    def flipAndInvertImage(self, image):\n        \"\"\":type image: List[List[int]]\n           :rtype: List[List[int]]\"\"\"\n        for row in image:\n            row.reverse()\n            for i in range(len(row)):\n                row[i] ^= 1\n        return image",
+      "explanation": "1. 對每一行使用 reverse() 反轉元素順序。\n2. 遍歷每個元素，使用 XOR 1 將 0 變 1，1 變 0。\n3. 返回修改後的 image。",
+      "tag": "1030",
+      "difficult": "easy"
+    }
+  ]
+}

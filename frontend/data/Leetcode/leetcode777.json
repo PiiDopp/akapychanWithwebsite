@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode777",
+  "coding_practice": [
+    {
+      "title": "Swap Adjacent in LR String",
+      "description": "In a string composed of 'L', 'R', and 'X' characters, like \"RXXLRXRXL\", a move consists of either replacing one occurrence of \"XL\" with \"LX\", or replacing one occurrence of \"RX\" with \"XR\". Given the starting string start and the ending string result, return True if and only if there exists a sequence of moves to transform start to result.",
+      "examples": [
+        {
+          "input": "start = \"RXXLRXRXL\", result = \"XRLXXRRLX\"",
+          "output": "true",
+          "explanation": "We can transform start to result following these steps:\nRXXLRXRXL ->\nXRXLRXRXL ->\nXRLXRXRXL ->\nXRLXXRRXL ->\nXRLXXRRLX"
+        },
+        {
+          "input": "start = \"X\", result = \"L\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= start.length <= 10^4\nstart.length == result.length\nBoth start and result will only consist of characters in 'L', 'R', and 'X'.",
+      "solution": "class Solution:\n    def canTransform(self, start, end):\n        start_filtered = start.replace('X', '')\n        end_filtered = end.replace('X', '')\n        if start_filtered != end_filtered:\n            return False\n        i = j = 0\n        n = len(start)\n        while i < n and j < n:\n            while i < n and start[i] == 'X':\n                i += 1\n            while j < n and end[j] == 'X':\n                j += 1\n            if i == n and j == n:\n                return True\n            if i == n or j == n:\n                return False\n            if start[i] != end[j]:\n                return False\n            if start[i] == 'L' and i < j:\n                return False\n            if start[i] == 'R' and i > j:\n                return False\n            i += 1\n            j += 1\n        return True",
+      "explanation": "1. 移除 start 與 end 中的 'X' 字符，檢查 L 和 R 的順序是否一致。\n2. 使用雙指針 i, j 遍歷 start 與 end。\n3. 當 start[i] == 'L' 時，i 必須 >= j，否則無法向左移動。\n4. 當 start[i] == 'R' 時，i 必須 <= j，否則無法向右移動。\n5. 若遍歷過程符合條件，返回 True，否則 False。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

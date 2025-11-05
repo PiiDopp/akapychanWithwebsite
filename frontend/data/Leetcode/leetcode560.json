@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode560",
+  "coding_practice": [
+    {
+      "title": "Subarray Sum Equals K",
+      "description": "Given an array of integers nums and an integer k, return the total number of subarrays whose sum equals to k.\n\nA subarray is a contiguous non-empty sequence of elements within an array.",
+      "examples": [
+        {
+          "input": "[1,1,1], k = 2",
+          "output": "2"
+        },
+        {
+          "input": "[1,2,3], k = 3",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 2 * 10^4\n-1000 <= nums[i] <= 1000\n-10^7 <= k <= 10^7",
+      "solution": "class Solution:\n    def subarraySum(self, nums, k):\n        count = 0\n        prefix_sum = 0\n        sum_map = {0: 1}\n\n        for num in nums:\n            prefix_sum += num\n            if prefix_sum - k in sum_map:\n                count += sum_map[prefix_sum - k]\n            sum_map[prefix_sum] = sum_map.get(prefix_sum, 0) + 1\n\n        return count",
+      "explanation": "1. 使用前綴和加哈希表 sum_map 紀錄每個前綴和出現的次數。\n2. 初始化 sum_map[0] = 1，處理從頭開始的子陣列。\n3. 遍歷 nums，累加 prefix_sum。\n4. 若 prefix_sum - k 存在於 sum_map，表示存在子陣列和為 k，累加計數。\n5. 更新 sum_map[prefix_sum] 次數。\n6. 遍歷完成返回 count。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

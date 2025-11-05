@@ -210,11 +210,11 @@ def load_problem_cases(
 ) -> Dict[str, Any]:
     """
     固定讀取以下兩個絕對路徑：
-    - 單元題目: /home/omm0102/AkaPyChan/frontend/data
-    - LeetCode 題目: /home/omm0102/AkaPyChan/frontend/data/Leetcode
+    - 單元題目: ../frontend/data
+    - LeetCode 題目:../frontend/data/Leetcode
     """
-    UNIT_BASE = "/home/hcilab/webflow/frontend/data"
-    LEETCODE_BASE = "/home/hcilab/webflow/frontend/data/Leetcode"
+    UNIT_BASE = "../frontend/data"
+    LEETCODE_BASE = "../frontend/data/Leetcode"
 
     candidates: List[str] = []
 

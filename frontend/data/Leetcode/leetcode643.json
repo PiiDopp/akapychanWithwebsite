@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode643",
+  "coding_practice": [
+    {
+      "title": "Maximum Average Subarray I",
+      "description": "You are given an integer array nums consisting of n elements, and an integer k.\n\nFind a contiguous subarray whose length is equal to k that has the maximum average value and return this value. Any answer with a calculation error less than 10^-5 will be accepted.",
+      "examples": [
+        {
+          "input": "nums = [1,12,-5,-6,50,3], k = 4",
+          "output": "12.75000",
+          "explanation": "Maximum average is (12 - 5 - 6 + 50) / 4 = 51 / 4 = 12.75"
+        },
+        {
+          "input": "nums = [5], k = 1",
+          "output": "5.00000"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= k <= n <= 10^5\n-10^4 <= nums[i] <= 10^4",
+      "solution": "class Solution:\n    def findMaxAverage(self, nums, k):\n        window_sum = sum(nums[:k])\n        max_sum = window_sum\n        for i in range(k, len(nums)):\n            window_sum += nums[i] - nums[i - k]\n            max_sum = max(max_sum, window_sum)\n        return max_sum / k",
+      "explanation": "1. 使用滑動視窗法，先計算前 k 個元素的總和作為初始視窗。\\n2. 從第 k 個元素開始，每次將新元素加入，同時移除最舊的元素，更新當前視窗總和。\\n3. 持續追蹤最大總和，最後以最大總和除以 k 即得最大平均值。\\n4. 時間複雜度為 O(n)，僅需一次遍歷。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

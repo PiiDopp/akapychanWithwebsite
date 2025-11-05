@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode796",
+  "coding_practice": [
+    {
+      "title": "Rotate String",
+      "description": "Given two strings s and goal, return true if and only if s can become goal after some number of shifts on s.\n\nA shift on s consists of moving the leftmost character of s to the rightmost position.\n\nFor example, if s = \"abcde\", then it will be \"bcdea\" after one shift.",
+      "examples": [
+        {
+          "input": "s = \"abcde\", goal = \"cdeab\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"abcde\", goal = \"abced\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s.length, goal.length <= 100\ns and goal consist of lowercase English letters.",
+      "solution": "class Solution:\n    def rotateString(self, s, goal):\n        return len(s) == len(goal) and goal in (s + s)",
+      "explanation": "1. 將 s 與自身相連得到 s + s。\n2. 若 goal 是 s + s 的子串，且 s 與 goal 長度相等，表示可以通過旋轉得到 goal。\n3. 否則返回 False。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

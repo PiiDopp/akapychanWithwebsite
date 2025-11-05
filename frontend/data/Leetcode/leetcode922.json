@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode922",
+  "coding_practice": [
+    {
+      "title": "Sort Array By Parity II",
+      "description": "Given an array of integers nums, half of the integers in nums are odd, and the other half are even.\n\nSort the array so that whenever nums[i] is odd, i is odd, and whenever nums[i] is even, i is even.\n\nReturn any answer array that satisfies this condition.",
+      "examples": [
+        {
+          "input": "nums = [4,2,5,7]",
+          "output": "[4,5,2,7]",
+          "explanation": "[4,7,2,5], [2,5,4,7], [2,7,4,5] would also have been accepted."
+        },
+        {
+          "input": "nums = [2,3]",
+          "output": "[2,3]"
+        }
+      ],
+      "constraints": "2 <= nums.length <= 2 * 10^4\nnums.length is even.\nHalf of the integers in nums are even.\n0 <= nums[i] <= 1000",
+      "solution": "class Solution(object):\n    def sortArrayByParityII(self, A):\n        n = len(A)\n        res = [0] * n\n        even_index, odd_index = 0, 1\n        for num in A:\n            if num % 2 == 0:\n                res[even_index] = num\n                even_index += 2\n            else:\n                res[odd_index] = num\n                odd_index += 2\n        return res",
+      "explanation": "1. 初始化結果列表 res，長度與 A 相同。\n2. 用 even_index 和 odd_index 追蹤下一個偶數和奇數應放的位置。\n3. 遍歷 A，如果數字是偶數，放到 res[even_index] 並 even_index +2；如果是奇數，放到 res[odd_index] 並 odd_index +2。\n4. 返回 res，即符合奇偶索引排序的結果。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

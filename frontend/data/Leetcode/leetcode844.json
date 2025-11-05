@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode844",
+  "coding_practice": [
+    {
+      "title": "Backspace String Compare",
+      "description": "Given two strings s and t, return true if they are equal when both are typed into empty text editors. '#' means a backspace character.\n\nNote that after backspacing an empty text, the text will continue empty.",
+      "examples": [
+        {
+          "input": "s = \"ab#c\", t = \"ad#c\"",
+          "output": "true",
+          "explanation": "Both s and t become \"ac\"."
+        },
+        {
+          "input": "s = \"ab##\", t = \"c#d#\"",
+          "output": "true",
+          "explanation": "Both s and t become \"\"."
+        },
+        {
+          "input": "s = \"a#c\", t = \"b\"",
+          "output": "false",
+          "explanation": "s becomes \"c\" while t becomes \"b\"."
+        }
+      ],
+      "constraints": "1 <= s.length, t.length <= 200\ns and t only contain lowercase letters and '#' characters.",
+      "follow up": " Can you solve it in O(n) time and O(1) space?",
+      "solution": "class Solution(object):\n    def backspaceCompare(self, s, t):\n        \"\"\"\n        :type s: str\n        :type t: str\n        :rtype: bool\n        \"\"\"\n        def build(string):\n            stack = []\n            for ch in string:\n                if ch == '#':\n                    if stack:\n                        stack.pop()\n                else:\n                    stack.append(ch)\n            return \"\".join(stack)\n        \n        return build(s) == build(t)",
+      "explanation": "1. 定義內部函式 build，用來模擬字串輸入過程。\n2. 使用堆疊（stack）依序處理字元，遇到一般字元就加入堆疊，遇到 '#' 則刪除最後一個字元（若堆疊不為空）。\n3. 將最終的堆疊內容合併成字串，表示最終輸入結果。\n4. 比較兩個字串 s 與 t 經過 build() 後的結果是否相同，相同則回傳 True。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

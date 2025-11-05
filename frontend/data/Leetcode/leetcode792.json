@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode792",
+  "coding_practice": [
+    {
+      "title": "Number of Matching Subsequences",
+      "description": "\"Given a string s and an array of strings words, return the number of words[i] that is a subsequence of s.\\n\\nA subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.\n\nFor example, \"ace\" is a subsequence of \"abcde\".",
+      "examples": [
+        {
+          "input": "s = \"abcde\", words = [\"a\",\"bb\",\"acd\",\"ace\"]",
+          "output": "3",
+          "explanation": "There are three strings in words that are a subsequence of s: \"a\", \"acd\", \"ace\"."
+        },
+        {
+          "input": "s = \"dsahjpjauf\", words = [\"ahjpjau\",\"ja\",\"ahbwzgqnuk\",\"tnmlanowax\"]",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= s.length <= 5 * 10^4\n1 <= words.length <= 5000\n1 <= words[i].length <= 50\ns and words[i] consist of only lowercase English letters.",
+      "solution": "from collections import defaultdict, deque\n\nclass Solution:\n    def numMatchingSubseq(self, s, words):\n        waiting = defaultdict(deque)\n        for w in words:\n            waiting[w[0]].append(iter(w[1:]))\n        count = 0\n        for c in s:\n            for it in list(waiting[c]):\n                waiting[c].popleft()\n                nxt = next(it, None)\n                if nxt:\n                    waiting[nxt].append(it)\n                else:\n                    count += 1\n        return count",
+      "explanation": "1. 建立 defaultdict(deque) 用來存放每個字母開頭的單詞迭代器。\n2. 對於 s 的每個字符 c，取出 waiting[c] 中所有迭代器，取下一個字符 nxt。\n3. 若 nxt 不為 None，則將迭代器加入 waiting[nxt]；若為 None，表示單詞匹配完成，計數加 1。\n4. 遍歷完 s 後返回總計數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

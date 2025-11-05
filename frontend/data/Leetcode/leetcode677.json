@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode677",
+  "coding_practice": [
+    {
+      "title": "Map Sum Pairs",
+      "description": "Design a map that allows you to do the following:\n\nMaps a string key to a given value.\nReturns the sum of the values that have a key with a prefix equal to a given string.\nImplement the MapSum class:\n\nMapSum() Initializes the MapSum object.\nvoid insert(String key, int val) Inserts the key-val pair into the map. If the key already existed, the original key-value pair will be overridden to the new one.\nint sum(string prefix) Returns the sum of all the pairs' value whose key starts with the prefix.",
+      "examples": [
+        {
+          "input": "[\"MapSum\", \"insert\", \"sum\", \"insert\", \"sum\"], [[], [\"apple\", 3], [\"ap\"], [\"app\", 2], [\"ap\"]]",
+          "output": "[null, null, 3, null, 5]",
+          "explanation": "MapSum mapSum = new MapSum();\nmapSum.insert(\"apple\", 3);  \nmapSum.sum(\"ap\");           // return 3 (apple = 3)\nmapSum.insert(\"app\", 2);    \nmapSum.sum(\"ap\");           // return 5 (apple + app = 3 + 2 = 5)"
+        }
+      ],
+      "constraints": "1 <= key.length, prefix.length <= 50\nkey and prefix consist of only lowercase English letters.\n1 <= val <= 1000\nAt most 50 calls will be made to insert and sum.",
+      "solution": "class MapSum:\n\n    def __init__(self):\n        self.dic = {}\n\n    def insert(self, key, val):\n        self.dic[key] = val\n\n    def sum(self, prefix):\n        return sum(v for k, v in self.dic.items() if k.startswith(prefix))",
+      "explanation": "1. 使用字典 dic 儲存 key-value 對。\\n2. insert 時直接更新或新增 key 的值。\\n3. sum 時遍歷 dic 的所有 key，累加以 prefix 開頭的 value。\\n4. 返回累加值。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

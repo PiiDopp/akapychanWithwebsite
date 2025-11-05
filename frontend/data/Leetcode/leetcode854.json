@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode854",
+  "coding_practice": [
+    {
+      "title": "K-Similar Strings",
+      "description": "Strings s1 and s2 are k-similar (for some non-negative integer k) if we can swap the positions of two letters in s1 exactly k times so that the resulting string equals s2.\n\nGiven two anagrams s1 and s2, return the smallest k for which s1 and s2 are k-similar.",
+      "examples": [
+        {
+          "input": "s1 = \"ab\", s2 = \"ba\"",
+          "output": "1",
+          "explanation": "The two string are 1-similar because we can use one swap to change s1 to s2: \"ab\" --> \"ba\"."
+        },
+        {
+          "input": "s1 = \"abc\", s2 = \"bca\"",
+          "output": "2",
+          "explanation": "The two strings are 2-similar because we can use two swaps to change s1 to s2: \"abc\" --> \"bac\" --> \"bca\"."
+        }
+      ],
+      "constraints": "1 <= s1.length <= 20\ns2.length == s1.length\ns1 and s2 contain only lowercase letters from the set {'a','b','c','d','e','f'}\ns2 is an anagram of s1.",
+      "solution": "from collections import deque\n\nclass Solution(object):\n    def kSimilarity(self, s1, s2):\n        \"\"\"\n        :type s1: str\n        :type s2: str\n        :rtype: int\n        \"\"\"\n        if s1 == s2:\n            return 0\n        \n        queue = deque([(s1, 0)])\n        visited = set([s1])\n        \n        while queue:\n            curr, steps = queue.popleft()\n            if curr == s2:\n                return steps\n            \n            i = 0\n            while curr[i] == s2[i]:\n                i += 1\n            \n            for j in range(i + 1, len(curr)):\n                if curr[j] == s2[i] and curr[j] != s2[j]:\n                    lst = list(curr)\n                    lst[i], lst[j] = lst[j], lst[i]\n                    nxt = ''.join(lst)\n                    if nxt not in visited:\n                        visited.add(nxt)\n                        queue.append((nxt, steps + 1))",
+      "explanation": "1. 使用 BFS 遍歷所有可能的字串狀態，每個狀態記錄已使用的 swap 次數 steps。\n2. 找出第一個與 s2 相等的字串，返回 steps 即為最小 k。\n3. 對每個不匹配位置 i，尋找能匹配 s2[i] 的 j，交換 i 和 j 的字元生成新狀態。\n4. 使用 visited 集合避免重複遍歷。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

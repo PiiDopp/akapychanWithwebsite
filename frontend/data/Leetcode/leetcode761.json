@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode761",
+  "coding_practice": [
+    {
+      "title": "Special Binary String",
+      "description": "Special binary strings are binary strings with the following two properties:\n\nThe number of 0's is equal to the number of 1's.\nEvery prefix of the binary string has at least as many 1's as 0's.\nYou are given a special binary string s.\n\nA move consists of choosing two consecutive, non-empty, special substrings of s, and swapping them. Two strings are consecutive if the last character of the first string is exactly one index before the first character of the second string.\n\nReturn the lexicographically largest resulting string possible after applying the mentioned operations on the string.",
+      "examples": [
+        {
+          "input": "s = \"11011000\"",
+          "output": "\"11100100\"",
+          "explanation": "The strings \"10\" [occurring at s[1]] and \"1100\" [at s[3]] are swapped.\nThis is the lexicographically largest string possible after some number of swaps."
+        },
+        {
+          "input": "s = \"10\"",
+          "output": "\"10\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 50\ns[i] is either '0' or '1'\ns is a special binary string.",
+      "solution": "class Solution:\n    def makeLargestSpecial(self, s):\n        count = 0\n        i = 0\n        res = []\n        for j, c in enumerate(s):\n            if c == '1':\n                count += 1\n            else:\n                count -= 1\n            if count == 0:\n                inner = self.makeLargestSpecial(s[i+1:j])\n                res.append('1' + inner + '0')\n                i = j + 1\n        res.sort(reverse=True)\n        return ''.join(res)",
+      "explanation": "1. 遍歷字串，用 count 記錄 1 與 0 的平衡，當 count 為 0 時，找到一個特殊字串。\n2. 對這個特殊字串的中間部分遞迴呼叫，使其內部也排列為字典序最大。\n3. 將所有特殊字串加入列表，並降序排序以獲得字典序最大。\n4. 將列表合併成最終字串返回。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

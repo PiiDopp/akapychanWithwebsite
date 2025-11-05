@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode886",
+  "coding_practice": [
+    {
+      "title": "Possible Bipartition",
+      "description": "We want to split a group of n people (labeled from 1 to n) into two groups of any size. Each person may dislike some other people, and they should not go into the same group.\n\nGiven the integer n and the array dislikes where dislikes[i] = [ai, bi] indicates that the person labeled ai does not like the person labeled bi, return true if it is possible to split everyone into two groups in this way.",
+      "examples": [
+        {
+          "input": "n = 4, dislikes = [[1,2],[1,3],[2,4]]",
+          "output": "true",
+          "explanation": "The first group has [1,4], and the second group has [2,3]."
+        },
+        {
+          "input": "n = 3, dislikes = [[1,2],[1,3],[2,3]]",
+          "output": "false",
+          "explanation": "We need at least 3 groups to divide them. We cannot put them in two groups."
+        }
+      ],
+      "constraints": "1 <= n <= 2000\n0 <= dislikes.length <= 10^4\ndislikes[i].length == 2\n1 <= ai < bi <= n\nAll the pairs of dislikes are unique.",
+      "solution": "class Solution(object):\n    def possibleBipartition(self, N, dislikes):\n        \"\"\"\n        :type N: int\n        :type dislikes: List[List[int]]\n        :rtype: bool\n        \"\"\"\n        from collections import defaultdict, deque\n\n        # 建立圖\n        graph = defaultdict(list)\n        for u, v in dislikes:\n            graph[u].append(v)\n            graph[v].append(u)\n\n        color = {}\n\n        for node in range(1, N + 1):\n            if node not in color:\n                queue = deque([node])\n                color[node] = 0\n                while queue:\n                    curr = queue.popleft()\n                    for nei in graph[curr]:\n                        if nei in color:\n                            if color[nei] == color[curr]:\n                                return False\n                        else:\n                            color[nei] = 1 - color[curr]\n                            queue.append(nei)\n        return True",
+      "explanation": "1. 使用鄰接表建立圖，graph[u] 存放與 u 不合的人。\n2. 建立 color 字典來標記每個人的組別，0 或 1。\n3. 對於未被標記的節點，使用 BFS 將其和相鄰節點分配不同顏色。\n4. 若發現相鄰節點顏色相同，則無法分成兩組，返回 False。\n5. 遍歷完所有節點後，如果未出現衝突，返回 True。",
+      "tag": "631",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode848",
+  "coding_practice": [
+    {
+      "title": "Shifting Letters",
+      "description": "You are given a string s of lowercase English letters and an integer array shifts of the same length.\n\nCall the shift() of a letter, the next letter in the alphabet, (wrapping around so that 'z' becomes 'a').\n\nFor example, shift('a') = 'b', shift('t') = 'u', and shift('z') = 'a'.\nNow for each shifts[i] = x, we want to shift the first i + 1 letters of s, x times.\n\nReturn the final string after all such shifts to s are applied.",
+      "examples": [
+        {
+          "input": "s = \"abc\", shifts = [3,5,9]",
+          "output": "\"rpl\"",
+          "explanation": "We start with \"abc\".\nAfter shifting the first 1 letters of s by 3, we have \"dbc\".\nAfter shifting the first 2 letters of s by 5, we have \"igc\".\nAfter shifting the first 3 letters of s by 9, we have \"rpl\", the answer."
+        },
+        {
+          "input": "s = \"aaa\", shifts = [1,2,3]",
+          "output": "\"gfd\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of lowercase English letters.\nshifts.length == s.length\n0 <= shifts[i] <= 10^9",
+      "solution": "class Solution(object):\n    def shiftingLetters(self, s, shifts):\n        \"\"\"\n        :type s: str\n        :type shifts: List[int]\n        :rtype: str\n        \"\"\"\n        n = len(s)\n        total_shift = 0\n        res = [''] * n\n        \n        for i in range(n-1, -1, -1):\n            total_shift = (total_shift + shifts[i]) % 26\n            res[i] = chr((ord(s[i]) - ord('a') + total_shift) % 26 + ord('a'))\n        \n        return ''.join(res)",
+      "explanation": "1. 從字串末尾開始，計算每個位置累計的總位移 total_shift。\n2. 對每個字元，將其 ASCII 編碼減去 'a' 再加上 total_shift，模 26 以循環回到 'a'。\n3. 將處理後的字元存入結果陣列 res。\n4. 最後將陣列 res 合併成字串返回。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

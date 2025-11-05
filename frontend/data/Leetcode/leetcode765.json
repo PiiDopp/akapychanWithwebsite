@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode765",
+  "coding_practice": [
+    {
+      "title": "Couples Holding Hands",
+      "description": "There are n couples sitting in 2n seats arranged in a row and want to hold hands.\n\nThe people and seats are represented by an integer array row where row[i] is the ID of the person sitting in the ith seat. The couples are numbered in order, the first couple being (0, 1), the second couple being (2, 3), and so on with the last couple being (2n - 2, 2n - 1).\n\nReturn the minimum number of swaps so that every couple is sitting side by side. A swap consists of choosing any two people, then they stand up and switch seats.",
+      "examples": [
+        {
+          "input": "row = [0,2,1,3]",
+          "output": "1",
+          "explanation": "We only need to swap the second (row[1]) and third (row[2]) person."
+        },
+        {
+          "input": "row = [3,2,0,1]",
+          "output": "0",
+          "explanation": "All couples are already seated side by side."
+        }
+      ],
+      "constraints": "2n == row.length\n2 <= n <= 30\n0 <= row[i] < 2n\nAll the elements of row are unique.",
+      "solution": "class Solution:\n    def minSwapsCouples(self, row):\n        n = len(row)\n        pos = [0] * n\n        for i, x in enumerate(row):\n            pos[x] = i\n        swaps = 0\n        for i in range(0, n, 2):\n            x = row[i]\n            y = x ^ 1  # partner\n            if row[i+1] != y:\n                partner_idx = pos[y]\n                row[i+1], row[partner_idx] = row[partner_idx], row[i+1]\n                pos[row[partner_idx]] = partner_idx\n                pos[row[i+1]] = i+1\n                swaps += 1\n        return swaps",
+      "explanation": "1. 建立一個 pos 陣列記錄每個人的當前座位。\n2. 每次檢查兩個相鄰座位 i 和 i+1，若不是一對夫妻，則將 i+1 的人與其配偶交換座位。\n3. 更新 pos 陣列，增加交換次數。\n4. 遍歷完成後返回總交換次數。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

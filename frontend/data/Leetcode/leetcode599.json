@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode599",
+  "coding_practice": [
+    {
+      "title": "Minimum Index Sum of Two Lists",
+      "description": "Given two arrays of strings list1 and list2, find the common strings with the least index sum.\n\nA common string is a string that appeared in both list1 and list2.\n\nA common string with the least index sum is a common string such that if it appeared at list1[i] and list2[j] then i + j should be the minimum value among all the other common strings.\n\nReturn all the common strings with the least index sum. Return the answer in any order.",
+      "examples": [
+        {
+          "input": "list1 = [\"Shogun\",\"Tapioca Express\",\"Burger King\",\"KFC\"], list2 = [\"Piatti\",\"The Grill at Torrey Pines\",\"Hungry Hunter Steakhouse\",\"Shogun\"]",
+          "output": "[\"Shogun\"]",
+          "explanation": "The only common string is \"Shogun\"."
+        },
+        {
+          "input": "list1 = [\"Shogun\",\"Tapioca Express\",\"Burger King\",\"KFC\"], list2 = [\"KFC\",\"Shogun\",\"Burger King\"]",
+          "output": "[\"Shogun\"]",
+          "explanation": "The common string with the least index sum is \"Shogun\" with index sum = (0 + 1) = 1."
+        },
+        {
+          "input": "list1 = [\"happy\",\"sad\",\"good\"], list2 = [\"sad\",\"happy\",\"good\"]",
+          "output": "[\"sad\",\"happy\"]",
+          "explanation": "There are three common strings: \n\"happy\" with index sum = (0 + 1) = 1, \n\"sad\" with index sum = (1 + 0) = 1, \n\"good\" with index sum = (2 + 2) = 4. \nThe strings with the least index sum are \"sad\" and \"happy\"."
+        }
+      ],
+      "constraints": "1 <= list1.length, list2.length <= 1000\n1 <= list1[i].length, list2[i].length <= 30\nlist1[i] and list2[i] consist of spaces ' ' and English letters.\nAll the strings of list1 are unique.\nAll the strings of list2 are unique.\nThere is at least a common string between list1 and list2.",
+      "solution": "class Solution:\n    def findRestaurant(self, list1, list2):\n        index_map = {name: i for i, name in enumerate(list1)}\n        min_sum = float('inf')\n        res = []\n\n        for j, name in enumerate(list2):\n            if name in index_map:\n                total_index = j + index_map[name]\n                if total_index < min_sum:\n                    min_sum = total_index\n                    res = [name]\n                elif total_index == min_sum:\n                    res.append(name)\n\n        return res",
+      "explanation": "1. 建立 list1 的索引映射 index_map。\n2. 遍歷 list2，若元素在 index_map 中，計算 index sum。\n3. 若 index sum 小於當前最小值 min_sum，更新 min_sum 並重置結果列表。\n4. 若 index sum 等於 min_sum，將該元素加入結果列表。\n5. 返回結果列表。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode911",
+  "coding_practice": [
+    {
+      "title": "Online Election",
+      "description": "You are given two integer arrays persons and times. In an election, the ith vote was cast for persons[i] at time times[i].\n\nFor each query at a time t, find the person that was leading the election at time t. Votes cast at time t will count towards our query. In the case of a tie, the most recent vote (among tied candidates) wins.\n\nImplement the TopVotedCandidate class:\n\nTopVotedCandidate(int[] persons, int[] times) Initializes the object with the persons and times arrays.\nint q(int t) Returns the number of the person that was leading the election at time t according to the mentioned rules.",
+      "examples": [
+        {
+          "input": "[\"TopVotedCandidate\", \"q\", \"q\", \"q\", \"q\", \"q\", \"q\"]\n[[[0, 1, 1, 0, 0, 1, 0], [0, 5, 10, 15, 20, 25, 30]], [3], [12], [25], [15], [24], [8]]",
+          "output": "[null, 0, 1, 1, 0, 0, 1]",
+          "explanation": "TopVotedCandidate topVotedCandidate = new TopVotedCandidate([0, 1, 1, 0, 0, 1, 0], [0, 5, 10, 15, 20, 25, 30]);\ntopVotedCandidate.q(3); // return 0, At time 3, the votes are [0], and 0 is leading.\ntopVotedCandidate.q(12); // return 1, At time 12, the votes are [0,1,1], and 1 is leading.\ntopVotedCandidate.q(25); // return 1, At time 25, the votes are [0,1,1,0,0,1], and 1 is leading (as ties go to the most recent vote.)\ntopVotedCandidate.q(15); // return 0\ntopVotedCandidate.q(24); // return 0\ntopVotedCandidate.q(8); // return 1"
+        }
+      ],
+      "constraints": "1 <= persons.length <= 5000\ntimes.length == persons.length\n0 <= persons[i] < persons.length\n0 <= times[i] <= 10^9\ntimes is sorted in a strictly increasing order.\ntimes[0] <= t <= 10^9\nAt most 10^4 calls will be made to q.",
+      "solution": "class TopVotedCandidate(object):\n\n    def __init__(self, persons, times):\n        from collections import defaultdict\n        self.times = times\n        self.leaders = []\n        count = defaultdict(int)\n        leader = -1\n        max_count = 0\n        for p in persons:\n            count[p] += 1\n            if count[p] >= max_count:\n                leader = p\n                max_count = count[p]\n            self.leaders.append(leader)\n\n    def q(self, t):\n        left, right = 0, len(self.times)-1\n        while left <= right:\n            mid = (left + right) // 2\n            if self.times[mid] <= t:\n                left = mid + 1\n            else:\n                right = mid - 1\n        return self.leaders[right]",
+      "explanation": "1. 使用 defaultdict 記錄每個候選人的票數。\n2. 遍歷 persons，對每個候選人更新票數，並在票數大於或等於當前最大票數時更新 leader。\n3. 將每個時刻的 leader 記錄在 self.leaders 中。\n4. q(t) 使用二分搜尋找出最後一個小於等於 t 的時間索引 right，返回 self.leaders[right]。這樣可以 O(log n) 查詢任意時間的領先候選人。",
+      "tag": "811",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode839",
+  "coding_practice": [
+    {
+      "title": "Similar String Groups",
+      "description": "Two strings, X and Y, are considered similar if either they are identical or we can make them equivalent by swapping at most two letters (in distinct positions) within the string X.\n\nFor example, \"tars\" and \"rats\" are similar (swapping at positions 0 and 2), and \"rats\" and \"arts\" are similar, but \"star\" is not similar to \"tars\", \"rats\", or \"arts\".\n\nTogether, these form two connected groups by similarity: {\"tars\", \"rats\", \"arts\"} and {\"star\"}.  Notice that \"tars\" and \"arts\" are in the same group even though they are not similar. Formally, each group is such that a word is in the group if and only if it is similar to at least one other word in the group.\n\nWe are given a list strs of strings where every string in strs is an anagram of every other string in strs. How many groups are there?",
+      "examples": [
+        {
+          "input": "strs = [\"tars\",\"rats\",\"arts\",\"star\"]",
+          "output": "2"
+        },
+        {
+          "input": "strs = [\"omv\",\"ovm\"]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= strs.length <= 300\n1 <= strs[i].length <= 300\nstrs[i] consists of lowercase letters only\nAll words in strs have the same length and are anagrams of each other",
+      "solution": "class Solution:\n    def numSimilarGroups(self, strs):\n        from collections import defaultdict, deque\n        \n        def is_similar(s1, s2):\n            diff = 0\n            for a, b in zip(s1, s2):\n                if a != b:\n                    diff += 1\n                    if diff > 2:\n                        return False\n            return True\n        \n        n = len(strs)\n        visited = [False] * n\n        graph = defaultdict(list)\n        \n        for i in range(n):\n            for j in range(i + 1, n):\n                if is_similar(strs[i], strs[j]):\n                    graph[i].append(j)\n                    graph[j].append(i)\n        \n        groups = 0\n        for i in range(n):\n            if not visited[i]:\n                groups += 1\n                queue = deque([i])\n                visited[i] = True\n                while queue:\n                    node = queue.popleft()\n                    for neighbor in graph[node]:\n                        if not visited[neighbor]:\n                            visited[neighbor] = True\n                            queue.append(neighbor)\n        return groups",
+      "explanation": "1. 定義 is_similar 函數，檢查兩個單詞是否最多只有兩個位置的字母不同。\n2. 構建一個圖，若 strs[i] 與 strs[j] 相似，則將它們在圖中相連。\n3. 初始化 visited 數組追蹤每個單詞是否已被訪問。\n4. 遍歷所有單詞，對未訪問的單詞使用 BFS 計算連通分量，每個 BFS 對應一個相似組。\n5. 返回組的數量。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

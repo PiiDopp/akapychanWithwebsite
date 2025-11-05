@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode907",
+  "coding_practice": [
+    {
+      "title": "Sum of Subarray Minimums",
+      "description": "Given an array of integers arr, find the sum of min(b), where b ranges over every (contiguous) subarray of arr. Since the answer may be large, return the answer modulo 10^9 + 7.",
+      "examples": [
+        {
+          "input": "arr = [3,1,2,4]",
+          "output": "17",
+          "explanation": "Subarrays are [3], [1], [2], [4], [3,1], [1,2], [2,4], [3,1,2], [1,2,4], [3,1,2,4]. Minimums are 3, 1, 2, 4, 1, 1, 2, 1, 1, 1. Sum is 17."
+        },
+        {
+          "input": "arr = [11,81,94,43,3]",
+          "output": "444"
+        }
+      ],
+      "constraints": "1 <= arr.length <= 3 * 10^4\n1 <= arr[i] <= 3 * 10^4",
+      "solution": "class Solution(object):\n    def sumSubarrayMins(self, A):\n        stack, res, A = [], 0, [0] + A + [0]\n        \n        for i, x in enumerate(A):\n            while stack and A[stack[-1]] > x:\n                j = stack.pop()\n                k = stack[-1]\n                res += A[j] * (i - j) * (j - k)\n            stack.append(i)\n        \n        return res % (10**9 + 7)",
+      "explanation": "1. 在數組前後加入 0 作為邊界。\n2. 使用單調遞增棧來追蹤元素，確定每個元素作為最小值能貢獻的子數組範圍。\n3. 每當當前元素比棧頂大，將棧頂元素出棧，計算其貢獻值 res += A[j] * (i - j) * (j - k)，其中 k 為棧頂的下一個元素索引。\n4. 將當前元素入棧。\n5. 最終返回 res 對 10^9 + 7 取模。",
+      "tag": "722",
+      "difficult": "medium"
+    }
+  ]
+}

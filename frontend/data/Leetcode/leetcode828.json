@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode828",
+  "coding_practice": [
+    {
+      "title": "Count Unique Characters of All Substrings of a Given String",
+      "description": "Let's define a function countUniqueChars(s) that returns the number of unique characters in s.\n\nFor example, calling countUniqueChars(s) if s = \"LEETCODE\" then \"L\", \"T\", \"C\", \"O\", \"D\" are the unique characters since they appear only once in s, therefore countUniqueChars(s) = 5.\nGiven a string s, return the sum of countUniqueChars(t) where t is a substring of s. The test cases are generated such that the answer fits in a 32-bit integer.\n\nNotice that some substrings can be repeated so in this case you have to count the repeated ones too.",
+      "examples": [
+        {
+          "input": "s = \"ABC\"",
+          "output": "10",
+          "explanation": "All possible substrings are: \"A\",\"B\",\"C\",\"AB\",\"BC\" and \"ABC\". Every substring is composed with only unique letters. Sum of lengths of all substring is 1 + 1 + 1 + 2 + 2 + 3 = 10"
+        },
+        {
+          "input": "s = \"ABA\"",
+          "output": "8",
+          "explanation": "The same as example 1, except countUniqueChars(\"ABA\") = 1."
+        },
+        {
+          "input": "s = \"LEETCODE\"",
+          "output": "92"
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of uppercase English letters only.",
+      "solution": "class Solution(object):\n    def uniqueLetterString(self, s):\n        last = {}\n        prev = {}\n        res = 0\n        for i, c in enumerate(s):\n            if c not in prev:\n                prev[c] = -1\n            if c not in last:\n                last[c] = -1\n            res += (i - prev[c]) * (prev[c] - last[c])\n            last[c], prev[c] = prev[c], i\n        n = len(s)\n        for c in prev:\n            res += (n - prev[c]) * (prev[c] - last[c])\n        return res",
+      "explanation": "1. 使用兩個字典 last 和 prev 來追蹤每個字符的前兩次出現位置。\n2. 遍歷字符串，每遇到一個字符，計算該字符在所有包含它的子串中對唯一字符數的貢獻，累加到結果中。\n3. 遍歷結束後，再將每個字符從最後一次出現到字符串末尾的貢獻加到結果中。\n4. 返回累加結果，即所有子串唯一字符數的總和。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

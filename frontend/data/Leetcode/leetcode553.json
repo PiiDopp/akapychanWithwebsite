@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode553",
+  "coding_practice": [
+    {
+      "title": "Optimal Division",
+      "description": "You are given an integer array nums. The adjacent integers in nums will perform the float division.\n\nFor example, for nums = [2,3,4], we will evaluate the expression \"2/3/4\".\nHowever, you can add any number of parenthesis at any position to change the priority of operations. You want to add these parentheses such the value of the expression after the evaluation is maximum.\n\nReturn the corresponding expression that has the maximum value in string format.\n\nNote: your expression should not contain redundant parenthesis.",
+      "examples": [
+        {
+          "input": "[1000,100,10,2]",
+          "output": "\"1000/(100/10/2)\"",
+          "explanation": "1000/(100/10/2) = 1000/((100/10)/2) = 200 \nHowever, the bold parenthesis in \"1000/((100/10)/2)\" are redundant since they do not influence the operation priority. \nSo you should return \"1000/(100/10/2)\". \nOther cases: \n1000/(100/10)/2 = 50 \n1000/(100/(10/2)) = 50 \n1000/100/10/2 = 0.5 \n1000/100/(10/2) = 2"
+        },
+        {
+          "input": "[2,3,4]",
+          "output": "\"2/(3/4)\"",
+          "explanation": "(2/(3/4)) = 8/3 = 2.667 \nIt can be shown that after trying all possibilities, we cannot get an expression with evaluation greater than 2.667"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10\n2 <= nums[i] <= 1000\nThere is only one optimal division for the given input.",
+      "solution": "class Solution:\n    def optimalDivision(self, nums):\n        if len(nums) == 1:\n            return str(nums[0])\n        if len(nums) == 2:\n            return str(nums[0]) + \"/\" + str(nums[1])\n        return str(nums[0]) + \"/(\" + \"/\".join(map(str, nums[1:])) + \")\"",
+      "explanation": "1. 若 nums 只有一個元素，直接回傳該數字。\n2. 若 nums 有兩個元素，則最大值即為 a/b，無需括號。\n3. 若 nums 長度大於 2，最佳策略為：將首個數字除以其他所有數字的連除形式 (a/(b/c/d...))，以最大化結果。\n4. 將剩餘元素以 '/' 串接後用括號包起來，確保除法順序正確。\n5. 最終輸出為最大化結果的表達式字串。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

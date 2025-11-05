@@ -16,7 +16,7 @@ from core import (
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
-    build_stdin_code_prompt, build_fix_code_prompt, build_hint_prompt,
+    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt,
     #omm
     interactive_chat_api, normalize_tests
 )
@@ -119,8 +119,7 @@ async def chat(request: Request):
     messages: List[Dict[str, str]] = data.get("messages", [])
     last_user = next((m.get("content", "") for m in reversed(messages) if m.get("role") == "user"), "").strip()
 
-    # *** 新增 4 ***
-    m = re.match(r"^進入\s*模式\s*([1234])", last_user)
+    m = re.match(r"^進入\s*模式\s*([123])", last_user)
     if m:
         last_user = m.group(1)
 
@@ -131,8 +130,7 @@ async def chat(request: Request):
         "已返回主選單。\n\n請選擇模式：\n"
         "模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）\n"
         "模式 2｜程式驗證（貼上你的 Python 程式碼）\n"
-        "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n"
-        "模式 4｜一般聊天\n\n" # *** 新增 4 ***
+        "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n\n"
         "**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。"
     )
 
@@ -142,8 +140,7 @@ async def chat(request: Request):
         return {"text": MENU_TEXT}
 
     if not mode:
-        # *** 新增 4 ***
-        if last_user in {"1", "2", "3", "4"}:
+        if last_user in {"1", "2", "3"}:
             session["mode"] = last_user
             session["awaiting"] = True
             session["step"] = None
@@ -155,12 +152,7 @@ async def chat(request: Request):
                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
             if last_user == "3":
                 return {"text": "**模式 3｜程式解釋**\n\n請貼上要解釋的 Python 程式碼："}
-            # *** 新增 4 的進入點 ***
-            if last_user == "4":
-                session["step"] = "chat_loop"
-                return {"text": "**模式 4｜一般聊天**\n\n請輸入您想聊天的內容（輸入 'q' 可返回主選單）："}
 
-        # (保留) 預設行為：如果不在任何模式中，且輸入的不是模式指令，則視為一次性一般聊天
         if last_user:
             reply = interactive_chat_api(last_user)
             if not isinstance(reply, str):
@@ -461,25 +453,6 @@ async def chat(request: Request):
         session["step"] = "need"
         return {"text": "請描述你的需求："}
 
-    # *** 新增模式 4 處理邏輯 ***
-    # === 模式 4：一般聊天 ===
-    if mode == "4":
-        msg = last_user
-        
-        if not msg:
-             return {"text": "請輸入您想聊天的內容（輸入 'q' 可返回主選單）："}
-        
-        try:
-            reply = interactive_chat_api(msg)
-            if not isinstance(reply, str):
-                reply = str(reply)
-        except Exception as e:
-            reply = f"[一般聊天時發生錯誤] {e}"
-
-        # 保持在模式 4
-        session["step"] = "chat_loop" 
-        return {"text": reply + "\n\n(可繼續聊天，輸入 'q' 可返回主選單)"}
-
     # === 模式 2/3：一次性回應 ===
     try:
         if mode == "2":
@@ -487,14 +460,13 @@ async def chat(request: Request):
         elif mode == "3":
             output = run_mode_3(last_user)
         else:
-            # 這邊理論上不會被觸發，因為 mode 1 和 4 已經在前面處理
             output = "[錯誤] 未知模式"
     except Exception as e:
         output = f"[例外錯誤] {e}"
 
-    # 模式 2/3 執行完畢後自動退回主選單
     session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
     return {"text": output}
+
 
 # ====== 判題 API（整合 judge_core）(omm)======
 _here = os.path.dirname(os.path.abspath(__file__))
@@ -673,55 +645,68 @@ async def get_hint(request: Request):
     """
     try:
         data = await request.json()
-        problem_id = data.get("problem_id") or data.get("data_id")  # 相容舊版欄位
-        user_code = data.get("code") or data.get("user_code")       # 改用 code
+        problem_id = data.get("problem_id") or data.get("data_id") 
+        user_code = data.get("code") or data.get("user_code")
         practice_idx = int(data.get("practice_idx") or 0)
         data_path = data.get("data_path")
-        # 'mode' and 'source' are not used by the hint logic, but are part of the request
 
         if not problem_id or not user_code:
             raise HTTPException(status_code=400, detail="缺少 problem_id 或 code")
 
-        # 1. 載入題目描述
-        problem_description = "（無法載入題目描述）"
-        try:
-            prob = load_problem_cases(
-                data_id=problem_id or "",
-                practice_idx=practice_idx,
-                data_path=data_path,
-                allowed_bases=ALLOWED_BASES,
-                lessons_dir_env=os.getenv("LESSONS_DIR"),
-            )
-            problem_description = prob.get("description", "無題目描述")
-            
-            # 嘗試獲取更詳細的描述或標題
-            if problem_description == "無題目描述":
-                problem_description = prob.get("title", "無題目描述")
-            
-            # 獲取範例測資作為額外上下文
-            tests = prob.get("tests", [])
-            if tests:
-                examples = "\n".join([
-                    f"範例 {i+1}:\n  輸入: {t.get('input')}\n  輸出: {t.get('expected')}" 
-                    for i, t in enumerate(tests[:2]) # 最多取 2 個範例
-                ])
-                problem_description += f"\n\n--- 範例 ---\n{examples}"
+        # 🔹 先直接嘗試讀題目 JSON（依你要求的方式）
+        possible_paths = [
+            f"../frontend/data/{problem_id}.json",
+            f"../frontend/data/Leetcode/{problem_id}.json",
+        ]
+        filepath = next((p for p in possible_paths if os.path.exists(p)), None)
+        if not filepath:
+            raise HTTPException(status_code=404, detail=f"找不到 {problem_id}.json")
 
-        except Exception as e:
-            print(f"[警告] /hint 路由無法載入題目 ({problem_id}): {e}")
-            # 即使載入失敗，還是繼續，只是描述會比較少
-            pass
+        # 讀取 JSON
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = json.load(f)
 
-        # 2. 建立提示 Prompt (目前不執行程式碼，未來可擴充)
+        # 嘗試取得題目內容（支援 LeetCode 結構）
+        if "coding_practice" in content:
+            items = content.get("coding_practice", [])
+            if items:
+                item = items[practice_idx] if 0 <= practice_idx < len(items) else items[0]
+                problem_description = item.get("description", "無題目描述")
+                examples = item.get("examples", [])
+                if examples:
+                    example_text = "\n".join([
+                        f"範例 {i+1}:\n  輸入: {ex.get('input')}\n  輸出: {ex.get('output')}"
+                        for i, ex in enumerate(examples[:2])
+                    ])
+                    problem_description += f"\n\n--- 範例 ---\n{example_text}"
+            else:
+                problem_description = "（無法載入題目描述）"
+        else:
+            # 備援一般題型
+            problem_description = content.get("description") or content.get("title") or "（無法載入題目描述）"
+
+        # 🔹 額外：若 JSON 含有 explanation、follow up 也一起加進提示上下文
+        explanation = None
+        follow_up = None
+        if "coding_practice" in content:
+            item = content["coding_practice"][practice_idx]
+            explanation = item.get("explanation")
+            follow_up = item.get("follow up")
+
+        if explanation:
+            problem_description += f"\n\n--- 題目說明 ---\n{explanation}"
+        if follow_up:
+            problem_description += f"\n\n--- 進階提示 ---\n{follow_up}"
+
+        # 2️⃣ 組合提示 prompt
         error_message = None 
-        
         hint_prompt = build_hint_prompt(
             problem_description=problem_description,
             user_code=user_code,
             error_message=error_message
         )
 
-        # 3. 呼叫模型 (run_model 已在 main.py 中定義)
+        # 3️⃣ 呼叫模型（run_model）
         hint_text = run_model(hint_prompt)
 
         print(f"[INFO] /hint 路由被呼叫, problem_id: {problem_id}")
@@ -729,28 +714,55 @@ async def get_hint(request: Request):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取提示失敗：{e}")
-
 # ====== 新增 /answer 路由 (STUB) ======
 @app.post("/answer")
 async def get_answer(request: Request):
-    """
-    獲取解答 API (尚未實作)
-    入參(JSON):
-      { "problem_id": "..." }
-    回傳(JSON):
-      { "ok": true, "answer": "..." }
-    """
     try:
         data = await request.json()
         problem_id = data.get("problem_id")
-        
-        # TODO: 在此處加入根據 problem_id 獲取標準解答的邏輯
-        # answer_code = get_solution_logic(problem_id)
-        
-        answer_code = f"# 這是 {problem_id} 的標準解答 (此為存根回應)\n\ndef solution():\n    pass"
-        
-        print(f"[STUB] /answer 路由被呼叫, problem_id: {problem_id}")
-        return {"ok": True, "answer": answer_code}
-        
+        practice_idx = data.get("practice_idx", 0)
+
+        # 讀取對應題目的 JSON 檔案
+        possible_paths = [
+            f"../frontend/data/{problem_id}.json",
+            f"../frontend/data/Leetcode/{problem_id}.json",
+        ]
+        filepath = next((p for p in possible_paths if os.path.exists(p)), None)
+        if not filepath:
+            raise HTTPException(status_code=404, detail=f"找不到 {problem_id}.json")
+
+        # 讀取 JSON
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = json.load(f)
+
+        # 取出題目陣列
+        practices = content.get("coding_practice")
+        if not practices:
+            raise HTTPException(status_code=400, detail=f"檔案中沒有 coding_practice 資料")
+
+        # 防止 practice_idx 超出範圍
+        if not (0 <= practice_idx < len(practices)):
+            raise HTTPException(
+                status_code=400,
+                detail=f"practice_idx {practice_idx} 超出範圍 (共有 {len(practices)} 題)"
+            )
+
+        # 抓出對應題目
+        practice = practices[practice_idx]
+        solution = practice.get("solution", "(無解答)")
+        explanation = practice.get("explanation", "(無說明)")
+
+        print(f"[INFO] /answer 讀取成功: {filepath}")
+        return {
+            "ok": True,
+            "answer": solution,
+            "explanation": explanation,
+            "source_path": filepath  # 可用於除錯
+        }
+
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=f"題目 {problem_id} 的資料不存在")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail=f"JSON 格式錯誤：{problem_id}.json")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取解答失敗：{e}")

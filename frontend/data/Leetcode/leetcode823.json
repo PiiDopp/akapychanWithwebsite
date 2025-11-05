@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode823",
+  "coding_practice": [
+    {
+      "title": "Binary Trees With Factors",
+      "description": "Given an array of unique integers, arr, where each integer arr[i] is strictly greater than 1.\n\nWe make a binary tree using these integers, and each number may be used for any number of times. Each non-leaf node's value should be equal to the product of the values of its children.\n\nReturn the number of binary trees we can make. The answer may be too large so return the answer modulo 10^9 + 7.",
+      "examples": [
+        {
+          "input": "arr = [2,4]",
+          "output": "3",
+          "explanation": "We can make these trees: [2], [4], [4, 2, 2]"
+        },
+        {
+          "input": "arr = [2,4,5,10]",
+          "output": "7",
+          "explanation": "We can make these trees: [2], [4], [5], [10], [4, 2, 2], [10, 2, 5], [10, 5, 2]"
+        }
+      ],
+      "constraints": "1 <= arr.length <= 1000\n2 <= arr[i] <= 10^9\nAll the values of arr are unique",
+      "solution": "class Solution:\n    def numFactoredBinaryTrees(self, arr):\n        MOD = 10**9 + 7\n        arr.sort()\n        dp = {}\n        for x in arr:\n            dp[x] = 1\n        index = {x: i for i, x in enumerate(arr)}\n        for i, x in enumerate(arr):\n            for j in range(i):\n                if x % arr[j] == 0:\n                    right = x // arr[j]\n                    if right in dp:\n                        dp[x] += dp[arr[j]] * dp[right]\n                        dp[x] %= MOD\n        return sum(dp.values()) % MOD",
+      "explanation": "1. 將 arr 排序並初始化 dp[x] = 1，每個數字至少可以形成一個單節點樹。\n2. 遍歷 arr 中每個 x，對於每個比 x 小的 arr[j]，如果 x 可以被 arr[j] 整除，則 right = x / arr[j]。\n3. 如果 right 在 dp 中，更新 dp[x] += dp[arr[j]] * dp[right]。\n4. 最後返回 dp 所有值的和 mod 10^9+7。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode842",
+  "coding_practice": [
+    {
+      "title": "Split Array into Fibonacci Sequence",
+      "description": "You are given a string of digits num, such as \"123456579\". We can split it into a Fibonacci-like sequence [123, 456, 579].\n\nFormally, a Fibonacci-like sequence is a list f of non-negative integers such that:\n\n0 <= f[i] < 2^31, (that is, each integer fits in a 32-bit signed integer type),\nf.length >= 3, and\nf[i] + f[i + 1] == f[i + 2] for all 0 <= i < f.length - 2.\nNote that when splitting the string into pieces, each piece must not have extra leading zeroes, except if the piece is the number 0 itself.\n\nReturn any Fibonacci-like sequence split from num, or return [] if it cannot be done.",
+      "examples": [
+        {
+          "input": "num = \"1101111\"",
+          "output": "[11,0,11,11]",
+          "explanation": "The output [110, 1, 111] would also be accepted."
+        },
+        {
+          "input": "num = \"112358130\"",
+          "output": "[]",
+          "explanation": "The task is impossible."
+        },
+        {
+          "input": "num = \"0123\"",
+          "output": "[]",
+          "explanation": "Leading zeroes are not allowed, so \"01\", \"2\", \"3\" is not valid."
+        }
+      ],
+      "constraints": "1 <= num.length <= 200\nnum contains only digits.",
+      "solution": "class Solution(object):\n    def splitIntoFibonacci(self, num):\n        res = []\n        \n        def backtrack(index):\n            if index == len(num) and len(res) >= 3:\n                return True\n            curr_num = 0\n            for i in range(index, len(num)):\n                if i > index and num[index] == '0':\n                    break\n                curr_num = curr_num * 10 + int(num[i])\n                if curr_num > 2**31 - 1:\n                    break\n                if len(res) >= 2 and curr_num != res[-1] + res[-2]:\n                    if curr_num > res[-1] + res[-2]:\n                        break\n                    else:\n                        continue\n                res.append(curr_num)\n                if backtrack(i + 1):\n                    return True\n                res.pop()\n            return False\n        \n        if backtrack(0):\n            return res\n        return []",
+      "explanation": "1. 使用 backtracking 遍歷 num，從 index 開始切出下一個數字。\n2. 避免前導零和超出 32-bit 整數限制。\n3. 若已有兩個以上數字，則檢查下一個數字是否等於前兩個數字之和，不符合則剪枝。\n4. 成功切完整個字串且 res 長度 >= 3，則返回結果；否則返回空陣列。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

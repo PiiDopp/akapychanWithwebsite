@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode241",
+  "coding_practice": [
+    {
+      "title": "Different Ways to Add Parentheses",
+      "description": "Given a string expression of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. You may return the answer in any order.\nThe test cases are generated such that the output values fit in a 32-bit integer and the number of different results does not exceed 10^4.",
+      "examples": [
+        {
+          "input": "expression = \"2-1-1\"",
+          "output": "[0,2]",
+          "explanation": "((2-1)-1) = 0 \n(2-(1-1)) = 2"
+        },
+        {
+          "input": "expression = \"2*3-4*5\"",
+          "output": "[-34,-14,-10,-10,10]",
+          "explanation": "(2*(3-(4*5))) = -34 \n((2*3)-(4*5)) = -14 \n((2*(3-4))*5) = -10 \n(2*((3-4)*5)) = -10 \n(((2*3)-4)*5) = 10"
+        }
+      ],
+      "constraints": "1 <= expression.length <= 20\nexpression consists of digits and the operator '+', '-', and '*'.\nAll the integer values in the input expression are in the range [0, 99].\nThe integer values in the input expression do not have a leading '-' or '+' denoting the sign.",
+      "solution": "class Solution:\n    def diffWaysToCompute(self, expression):\n        memo = {}\n        \n        def ways(expr):\n            if expr in memo:\n                return memo[expr]\n            \n            res = []\n            for i, ch in enumerate(expr):\n                if ch in '+-*':\n                    left = ways(expr[:i])\n                    right = ways(expr[i+1:])\n                    for l in left:\n                        for r in right:\n                            if ch == '+':\n                                res.append(l + r)\n                            elif ch == '-':\n                                res.append(l - r)\n                            else:\n                                res.append(l * r)\n            if not res:\n                res.append(int(expr))\n            memo[expr] = res\n            return res\n        \n        return ways(expression)",
+      "explanation": "1. 使用遞迴將表達式在每個操作符處切分為左右兩部分。\n2. 對左右部分分別計算所有可能的結果。\n3. 將左右結果使用當前操作符合併，得到所有組合結果。\n4. 使用 memo 儲存已計算過的子表達式結果以優化性能。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

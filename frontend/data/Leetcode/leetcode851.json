@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode851",
+  "coding_practice": [
+    {
+      "title": "Loud and Rich",
+      "description": "There is a group of n people labeled from 0 to n - 1 where each person has a different amount of money and a different level of quietness.\n\nYou are given an array richer where richer[i] = [ai, bi] indicates that ai has more money than bi and an integer array quiet where quiet[i] is the quietness of the ith person. All the given data in richer are logically correct (i.e., the data will not lead you to a situation where x is richer than y and y is richer than x at the same time).\n\nReturn an integer array answer where answer[x] = y if y is the least quiet person (that is, the person y with the smallest value of quiet[y]) among all people who definitely have equal to or more money than the person x.",
+      "examples": [
+        {
+          "input": "richer = [[1,0],[2,1],[3,1],[3,7],[4,3],[5,3],[6,3]], quiet = [3,2,5,4,6,1,7,0]",
+          "output": "[5,5,2,5,4,5,6,7]",
+          "explanation": "answer[0] = 5.\nPerson 5 has more money than 3, which has more money than 1, which has more money than 0.\nThe only person who is quieter (has lower quiet[x]) is person 7, but it is not clear if they have more money than person 0.\nanswer[7] = 7.\nAmong all people that definitely have equal to or more money than person 7 (which could be persons 3, 4, 5, 6, or 7), the person who is the quietest (has lower quiet[x]) is person 7.\nThe other answers can be filled out with similar reasoning."
+        },
+        {
+          "input": "richer = [], quiet = [0]",
+          "output": "[0]"
+        }
+      ],
+      "constraints": "n == quiet.length\n1 <= n <= 500\n0 <= quiet[i] < n\nAll the values of quiet are unique.\n0 <= richer.length <= n * (n - 1) / 2\n0 <= ai, bi < n\nai != bi\nAll the pairs of richer are unique.\nThe observations in richer are all logically consistent.",
+      "solution": "class Solution(object):\n    def loudAndRich(self, richer, quiet):\n        \"\"\"\n        :type richer: List[List[int]]\n        :type quiet: List[int]\n        :rtype: List[int]\n        \"\"\"\n        from collections import defaultdict\n\n        n = len(quiet)\n        graph = defaultdict(list)\n        for u, v in richer:\n            graph[v].append(u)\n\n        ans = [-1] * n\n\n        def dfs(node):\n            if ans[node] != -1:\n                return ans[node]\n            min_person = node\n            for nei in graph[node]:\n                cand = dfs(nei)\n                if quiet[cand] < quiet[min_person]:\n                    min_person = cand\n            ans[node] = min_person\n            return min_person\n\n        for i in range(n):\n            dfs(i)\n\n        return ans",
+      "explanation": "1. 將 richer 資訊建立成圖 graph，其中 graph[v] 表示比 v 富的人。\n2. 定義 dfs(node) 找出在 node 和所有比 node 富的人中，quiet 最小的人。\n3. 使用記憶化 ans[node] 避免重複計算。\n4. 對每個人 i 呼叫 dfs(i) 得到答案。\n5. 最終返回 ans 陣列。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

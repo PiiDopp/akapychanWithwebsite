@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode837",
+  "coding_practice": [
+    {
+      "title": "New 21 Game",
+      "description": "Alice plays the following game, loosely based on the card game \"21\".\n\nAlice starts with 0 points and draws numbers while she has less than k points. During each draw, she gains an integer number of points randomly from the range [1, maxPts], where maxPts is an integer. Each draw is independent and the outcomes have equal probabilities.\n\nAlice stops drawing numbers when she gets k or more points.\n\nReturn the probability that Alice has n or fewer points.\n\nAnswers within 10^-5 of the actual answer are considered accepted.",
+      "examples": [
+        {
+          "input": "n = 10, k = 1, maxPts = 10",
+          "output": "1.00000",
+          "explanation": "Alice gets a single card, then stops."
+        },
+        {
+          "input": "n = 6, k = 1, maxPts = 10",
+          "output": "0.60000",
+          "explanation": "Alice gets a single card, then stops. \nIn 6 out of 10 possibilities, she is at or below 6 points."
+        },
+        {
+          "input": "n = 21, k = 17, maxPts = 10",
+          "output": "0.73278"
+        }
+      ],
+      "constraints": "0 <= k <= n <= 10^4\n1 <= maxPts <= 10^4",
+      "solution": "class Solution(object):\n    def new21Game(self, N, K, W):\n        \"\"\"\n        :type N: int\n        :type K: int\n        :type W: int\n        :rtype: float\n        \"\"\"\n        if K == 0 or N >= K + W:\n            return 1.0\n\n        dp = [0.0] * (N + 1)\n        for i in range(K, N + 1):\n            dp[i] = 1.0\n\n        window_sum = min(N - K + 1, W)\n        for i in range(K - 1, -1, -1):\n            dp[i] = window_sum / float(W)\n            window_sum = dp[i] + window_sum\n            if i + W <= N:\n                window_sum -= dp[i + W]\n\n        return dp[0]",
+      "explanation": "1. 當 K == 0 或 N >= K + W 時，Alice 不會超過 N，因此概率為 1.0。\n2. 建立一個長度為 N+1 的 dp 陣列，dp[i] 表示當分數為 i 時最終分數 <= N 的概率。\n3. 初始化 dp[i] = 1.0 對於 K <= i <= N，因為一旦分數 >= K，遊戲結束。\n4. 使用滑動窗口技巧計算 dp[i]，從 K-1 反向到 0，每個 dp[i] = 窗口和 / W。\n5. 更新窗口和時，如果 i + W <= N，減去窗口最右端的 dp[i + W]。\n6. 最後返回 dp[0] 作為初始分數 0 的最終概率。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

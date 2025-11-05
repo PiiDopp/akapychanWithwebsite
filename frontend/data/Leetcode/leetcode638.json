@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode638",
+  "coding_practice": [
+    {
+      "title": "Shopping Offers",
+      "description": "In LeetCode Store, there are n items to sell. Each item has a price. However, there are some special offers, and a special offer consists of one or more different kinds of items with a sale price.\n\nYou are given an integer array price where price[i] is the price of the ith item, and an integer array needs where needs[i] is the number of pieces of the ith item you want to buy.\n\nYou are also given an array special where special[i] is of size n + 1 where special[i][j] is the number of pieces of the jth item in the ith offer and special[i][n] (i.e., the last integer in the array) is the price of the ith offer.\n\nReturn the lowest price you have to pay for exactly certain items as given, where you could make optimal use of the special offers. You are not allowed to buy more items than you want, even if that would lower the overall price. You could use any of the special offers as many times as you want.",
+      "examples": [
+        {
+          "input": "price = [2,5], special = [[3,0,5],[1,2,10]], needs = [3,2]",
+          "output": "14",
+          "explanation": "There are two kinds of items, A and B. Their prices are $2 and $5 respectively.\nIn special offer 1, you can pay $5 for 3A and 0B\nIn special offer 2, you can pay $10 for 1A and 2B.\nYou need to buy 3A and 2B, so you may pay $10 for 1A and 2B (special offer #2), and $4 for 2A."
+        },
+        {
+          "input": "price = [2,3,4], special = [[1,1,0,4],[2,2,1,9]], needs = [1,2,1]",
+          "output": "11",
+          "explanation": "The price of A is $2, and $3 for B, $4 for C.\nYou may pay $4 for 1A and 1B, and $9 for 2A,2B and 1C.\nYou need to buy 1A,2B and 1C, so you may pay $4 for 1A and 1B (special offer #1), and $3 for 1B, $4 for 1C.\nYou cannot add more items, though only $9 for 2A,2B and 1C."
+        }
+      ],
+      "constraints": "n == price.length == needs.length\n1 <= n <= 6\n0 <= price[i], needs[i] <= 10\n1 <= special.length <= 100\nspecial[i].length == n + 1\n0 <= special[i][j] <= 50\nAt least one of special[i][j] is non-zero for 0 <= j <= n - 1",
+      "solution": "class Solution(object):\n    def shoppingOffers(self, price, special, needs):\n        n = len(price)\n        memo = {}\n\n        def dfs(curr_needs):\n            key = tuple(curr_needs)\n            if key in memo:\n                return memo[key]\n            res = sum(curr_needs[i] * price[i] for i in range(n))\n            for offer in special:\n                temp = []\n                for i in range(n):\n                    if offer[i] > curr_needs[i]:\n                        break\n                    temp.append(curr_needs[i] - offer[i])\n                else:\n                    res = min(res, offer[-1] + dfs(temp))\n            memo[key] = res\n            return res\n\n        return dfs(needs)",
+      "explanation": "1. 使用 DFS + memoization 遞迴搜索每個需求組合。\n2. 對每個需求，計算不使用任何特惠組合的直接購買價格。\n3. 嘗試每個特惠組合，如果可行，遞迴減少對應數量的需求並更新最小價格。\n4. 使用 memo 儲存已計算的需求組合結果，避免重複計算。\n5. 返回最小價格。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

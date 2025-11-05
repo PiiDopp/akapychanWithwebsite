@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode672",
+  "coding_practice": [
+    {
+      "title": "Bulb Switcher II",
+      "description": "There is a room with n bulbs labeled from 1 to n that all are turned on initially, and four buttons on the wall. Each of the four buttons has a different functionality where:\n\nButton 1: Flips the status of all the bulbs.\nButton 2: Flips the status of all the bulbs with even labels (i.e., 2, 4, ...).\nButton 3: Flips the status of all the bulbs with odd labels (i.e., 1, 3, ...).\nButton 4: Flips the status of all the bulbs with a label j = 3k + 1 where k = 0, 1, 2, ... (i.e., 1, 4, 7, 10, ...).\nYou must make exactly presses button presses in total. For each press, you may pick any of the four buttons to press.\n\nGiven the two integers n and presses, return the number of different possible statuses after performing all presses button presses.",
+      "examples": [
+        {
+          "input": "n = 1, presses = 1",
+          "output": "2",
+          "explanation": "Status can be:\n- [off] by pressing button 1\n- [on] by pressing button 2"
+        },
+        {
+          "input": "n = 2, presses = 1",
+          "output": "3",
+          "explanation": "Status can be:\n- [off, off] by pressing button 1\n- [on, off] by pressing button 2\n- [off, on] by pressing button 3"
+        },
+        {
+          "input": "n = 3, presses = 1",
+          "output": "4",
+          "explanation": "Status can be:\n- [off, off, off] by pressing button 1\n- [off, on, off] by pressing button 2\n- [on, off, on] by pressing button 3\n- [off, on, on] by pressing button 4"
+        }
+      ],
+      "constraints": "1 <= n <= 1000\n0 <= presses <= 1000",
+      "solution": "class Solution:\n    def flipLights(self, n, m):\n        if m == 0:\n            return 1\n        if n == 1:\n            return 2\n        if n == 2:\n            return 4 if m > 1 else 3\n        if m == 1:\n            return 4\n        if m == 2:\n            return 7\n        return 8",
+      "explanation": "1. 當 presses=0，燈泡狀態不變，返回 1。\\n2. n=1：只有一個燈泡，可按任何按鈕會有兩種狀態。\\n3. n=2：m=1 時可形成 3 種不同狀態，m>1 時最多 4 種。\\n4. n>=3：m=1 時有 4 種狀態，m=2 時 7 種狀態，m>2 時 8 種狀態。\\n5. 利用數學分析和按鈕組合去重來計算可能狀態數。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

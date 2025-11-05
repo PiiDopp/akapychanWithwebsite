@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode630",
+  "coding_practice": [
+    {
+      "title": "Course Schedule III",
+      "description": "There are n different online courses numbered from 1 to n. You are given an array courses where courses[i] = [durationi, lastDayi] indicate that the ith course should be taken continuously for durationi days and must be finished before or on lastDayi.\nYou will start on the 1st day and you cannot take two or more courses simultaneously.\nReturn the maximum number of courses that you can take.",
+      "examples": [
+        {
+          "input": "courses = [[100,200],[200,1300],[1000,1250],[2000,3200]]",
+          "output": "3",
+          "explanation": "Explanation: There are totally 4 courses, but you can take 3 courses at most:\nFirst, take the 1st course, it costs 100 days so you will finish it on the 100th day, and ready to take the next course on the 101st day.\nSecond, take the 3rd course, it costs 1000 days so you will finish it on the 1100th day, and ready to take the next course on the 1101st day.\nThird, take the 2nd course, it costs 200 days so you will finish it on the 1300th day.\nThe 4th course cannot be taken now, since you will finish it on the 3300th day, which exceeds the closed date."
+        },
+        {
+          "input": "courses = [[1,2]]",
+          "output": "1"
+        },
+        {
+          "input": "courses = [[3,2],[4,3]]",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= courses.length <= 10^4\n1 <= durationi, lastDayi <= 10^4",
+      "solution": "import heapq\n\nclass Solution:\n    def scheduleCourse(self, courses):\n        # 按結束時間排序\n        courses.sort(key=lambda x: x[1])\n        total_time = 0\n        max_heap = []\n        \n        for duration, last_day in courses:\n            if total_time + duration <= last_day:\n                heapq.heappush(max_heap, -duration)\n                total_time += duration\n            elif max_heap and -max_heap[0] > duration:\n                total_time += duration + heapq.heappop(max_heap)\n                heapq.heappush(max_heap, -duration)\n        \n        return len(max_heap)",
+      "explanation": "1. 將課程依截止日期 lastDayi 排序，優先考慮先截止的課程。\n2. 使用 max_heap 記錄已選擇課程的時間長度，heap 取負值以模擬最大堆。\n3. 遍歷每個課程：\n   3.1 若 total_time + duration <= last_day，則直接加入課程並更新 total_time。\n   3.2 若不能直接加入，但 max_heap 中的最大課程時間比當前課程長，則替換掉最大課程以縮短總時間。\n4. 最終返回 max_heap 的長度，即最多能選擇的課程數。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

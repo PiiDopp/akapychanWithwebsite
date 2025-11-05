@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode820",
+  "coding_practice": [
+    {
+      "title": "Short Encoding of Words",
+      "description": "A valid encoding of an array of words is any reference string s and array of indices indices such that:\n\nwords.length == indices.length\nThe reference string s ends with the '#' character.\nFor each index indices[i], the substring of s starting from indices[i] and up to (but not including) the next '#' character is equal to words[i].\nGiven an array of words, return the length of the shortest reference string s possible of any valid encoding of words.",
+      "examples": [
+        {
+          "input": "words = [\"time\", \"me\", \"bell\"]",
+          "output": "10",
+          "explanation": "A valid encoding would be s = \"time#bell#\" and indices = [0, 2, 5].\nwords[0] = \"time\", the substring of s starting from indices[0] = 0 to the next '#' is underlined in \"time#bell#\"\nwords[1] = \"me\", the substring of s starting from indices[1] = 2 to the next '#' is underlined in \"time#bell#\"\nwords[2] = \"bell\", the substring of s starting from indices[2] = 5 to the next '#' is underlined in \"time#bell#\""
+        },
+        {
+          "input": "words = [\"t\"]",
+          "output": "2",
+          "explanation": "A valid encoding would be s = \"t#\" and indices = [0]."
+        }
+      ],
+      "constraints": "1 <= words.length <= 2000\n1 <= words[i].length <= 7\nwords[i] consists of only lowercase letters.",
+      "solution": "class Solution(object):\n    def minimumLengthEncoding(self, words):\n        \"\"\"\n        :type words: List[str]\n        :rtype: int\n        \"\"\"\n        words = set(words)\n        for word in list(words):\n            for k in range(1, len(word)):\n                words.discard(word[k:])\n        return sum(len(word) + 1 for word in words)",
+      "explanation": "1. 將 words 轉為集合以去除重複。\n2. 遍歷每個 word，把 word 的所有後綴刪除（不含自身）從集合中移除。\n3. 剩下的集合中每個單詞都是最短編碼必須出現的單詞。\n4. 計算所有剩餘單詞長度 + 1('#') 的總和即為最短編碼長度。",
+      "tag": "612",
+      "difficult": "medium"
+    }
+  ]
+}

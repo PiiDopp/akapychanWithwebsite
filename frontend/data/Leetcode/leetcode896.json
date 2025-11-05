@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode896",
+  "coding_practice": [
+    {
+      "title": "Monotonic Array",
+      "description": "An array is monotonic if it is either monotone increasing or monotone decreasing.\n\nAn array nums is monotone increasing if for all i <= j, nums[i] <= nums[j]. An array nums is monotone decreasing if for all i <= j, nums[i] >= nums[j].\n\nGiven an integer array nums, return true if the given array is monotonic, or false otherwise.",
+      "examples": [
+        {
+          "input": "nums = [1,2,2,3]",
+          "output": "true"
+        },
+        {
+          "input": "nums = [6,5,4,4]",
+          "output": "true"
+        },
+        {
+          "input": "nums = [1,3,2]",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-10^5 <= nums[i] <= 10^5",
+      "solution": "class Solution(object):\n    def isMonotonic(self, A):\n        increasing = decreasing = True\n        for i in range(1, len(A)):\n            if A[i] > A[i-1]:\n                decreasing = False\n            if A[i] < A[i-1]:\n                increasing = False\n        return increasing or decreasing",
+      "explanation": "1. 設定兩個標記 increasing 與 decreasing，初始為 True。\n2. 遍歷數組，若 A[i] > A[i-1]，則 decreasing = False。\n3. 若 A[i] < A[i-1]，則 increasing = False。\n4. 最後返回 increasing 或 decreasing 的結果。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

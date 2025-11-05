@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode691",
+  "coding_practice": [
+    {
+      "title": "Stickers to Spell Word",
+      "description": "We are given n different types of stickers. Each sticker has a lowercase English word on it.\nYou would like to spell out the given string target by cutting individual letters from your collection of stickers and rearranging them. You can use each sticker more than once if you want, and you have infinite quantities of each sticker.\nReturn the minimum number of stickers that you need to spell out target. If the task is impossible, return -1.\n\nNote: In all test cases, all words were chosen randomly from the 1000 most common US English words, and target was chosen as a concatenation of two random words.",
+      "examples": [
+        {
+          "input": "stickers = [\"with\",\"example\",\"science\"], target = \"thehat\"",
+          "output": "3",
+          "explanation": "We can use 2 \"with\" stickers, and 1 \"example\" sticker. \nAfter cutting and rearrange the letters of those stickers, we can form the target \"thehat\". \nAlso, this is the minimum number of stickers necessary to form the target string."
+        },
+        {
+          "input": "stickers = [\"notice\",\"possible\"], target = \"basicbasic\"",
+          "output": "-1",
+          "explanation": "We cannot form the target \"basicbasic\" from cutting letters from the given stickers."
+        }
+      ],
+      "constraints": "n == stickers.length\n1 <= n <= 50\n1 <= stickers[i].length <= 10\n1 <= target.length <= 15\nstickers[i] and target consist of lowercase English letters.",
+      "solution": "class Solution(object):\n    def minStickers(self, stickers, target):\n        from collections import Counter\n\n        m = len(stickers)\n        sticker_count = [Counter(s) for s in stickers]\n        memo = {}\n\n        def dp(t):\n            if t == \"\":\n                return 0\n            if t in memo:\n                return memo[t]\n\n            t_count = Counter(t)\n            ans = float('inf')\n            for s in sticker_count:\n                if t[0] not in s:\n                    continue\n                new_t = ''.join([c * max(0, t_count[c] - s.get(c, 0)) for c in t_count])\n                tmp = dp(new_t)\n                if tmp != -1:\n                    ans = min(ans, 1 + tmp)\n            memo[t] = -1 if ans == float('inf') else ans\n            return memo[t]\n\n        return dp(target)",
+      "explanation": "1. 將每張貼紙轉換成字母計數 Counter。\n2. 使用遞迴函數 dp(t) 計算拼出 t 所需的最少貼紙數。\n3. 用字典 memo 儲存已計算的子問題，避免重複計算。\n4. 對於目標字串 t，每次選擇一張貼紙 s，如果 s 中沒有 t[0] 則跳過。\n5. 用貼紙 s 減去對應字母計數後得到新子目標 new_t，遞迴求解 dp(new_t) 並更新最小值。\n6. 如果找不到任何組合可以拼出 t，則返回 -1，否則返回最少貼紙數。",
+      "tag": "1022",
+      "difficult": "hard"
+    }
+  ]
+}

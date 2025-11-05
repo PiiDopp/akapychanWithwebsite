@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode769",
+  "coding_practice": [
+    {
+      "title": "Max Chunks To Make Sorted",
+      "description": "You are given an integer array arr of length n that represents a permutation of the integers in the range [0, n - 1].\n\nWe split arr into some number of chunks (i.e., partitions), and individually sort each chunk. After concatenating them, the result should equal the sorted array.\n\nReturn the largest number of chunks we can make to sort the array.",
+      "examples": [
+        {
+          "input": "arr = [4,3,2,1,0]",
+          "output": "1",
+          "explanation": "Splitting into two or more chunks will not return the required result.\nFor example, splitting into [4, 3], [2, 1, 0] will result in [3, 4, 0, 1, 2], which isn't sorted."
+        },
+        {
+          "input": "arr = [1,0,2,3,4]",
+          "output": "4",
+          "explanation": "We can split into two chunks, such as [1, 0], [2, 3, 4].\nHowever, splitting into [1, 0], [2], [3], [4] is the highest number of chunks possible."
+        }
+      ],
+      "constraints": "n == arr.length\n1 <= n <= 10\n0 <= arr[i] < n\nAll the elements of arr are unique.",
+      "solution": "class Solution:\n    def maxChunksToSorted(self, arr):\n        chunks = 0\n        left_max = -1\n        for i, val in enumerate(arr):\n            left_max = max(left_max, val)\n            if left_max == i:\n                chunks += 1\n        return chunks",
+      "explanation": "1. 初始化 chunks = 0, left_max = -1。\n2. 遍歷陣列，每次更新 left_max 為當前已遍歷元素的最大值。\n3. 若 left_max == i，代表到 i 為止的元素可以形成一個 chunk，chunks += 1。\n4. 返回 chunks 作為最大切塊數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

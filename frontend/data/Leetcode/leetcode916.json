@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode916",
+  "coding_practice": [
+    {
+      "title": "Word Subsets",
+      "description": "You are given two string arrays words1 and words2.\nA string b is a subset of string a if every letter in b occurs in a including multiplicity.\nFor example, \"wrr\" is a subset of \"warrior\" but is not a subset of \"world\".\nA string a from words1 is universal if for every string b in words2, b is a subset of a.\nReturn an array of all the universal strings in words1. You may return the answer in any order.",
+      "examples": [
+        {
+          "input": "words1 = [\"amazon\",\"apple\",\"facebook\",\"google\",\"leetcode\"], words2 = [\"e\",\"o\"]",
+          "output": "[\"facebook\",\"google\",\"leetcode\"]"
+        },
+        {
+          "input": "words1 = [\"amazon\",\"apple\",\"facebook\",\"google\",\"leetcode\"], words2 = [\"lc\",\"eo\"]",
+          "output": "[\"leetcode\"]"
+        },
+        {
+          "input": "words1 = [\"acaac\",\"cccbb\",\"aacbb\",\"caacc\",\"bcbbb\"], words2 = [\"c\",\"cc\",\"b\"]",
+          "output": "[\"cccbb\"]"
+        }
+      ],
+      "constraints": "1 <= words1.length, words2.length <= 10^4\n1 <= words1[i].length, words2[i].length <= 10\nwords1[i] and words2[i] consist only of lowercase English letters.\nAll the strings of words1 are unique.",
+      "solution": "from collections import Counter\n\nclass Solution(object):\n    def wordSubsets(self, words1, words2):\n        max_b = Counter()\n        for b in words2:\n            max_b |= Counter(b)\n        res = []\n        for a in words1:\n            if not max_b - Counter(a):\n                res.append(a)\n        return res",
+      "explanation": "1. 使用 Counter 計算 words2 中每個字母的最大需求次數，合併成 max_b。\n2. 遍歷 words1，對每個單詞 a 計算其 Counter。\n3. 若 max_b - Counter(a) 結果為空，代表 a 滿足所有 words2 的需求，加入結果 res。\n4. 返回 res。",
+      "tag": "722",
+      "difficult": "medium"
+    }
+  ]
+}

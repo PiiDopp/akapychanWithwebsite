@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode680",
+  "coding_practice": [
+    {
+      "title": "Valid Palindrome II",
+      "description": "Given a string s, return true if the s can be palindrome after deleting at most one character from it.",
+      "examples": [
+        {
+          "input": "s = \"aba\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"abca\"",
+          "output": "true",
+          "explanation": "You could delete the character 'c'."
+        },
+        {
+          "input": "s = \"abc\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of lowercase English letters.",
+      "solution": "class Solution:\n    def validPalindrome(self, s):\n        def is_palindrome_range(i, j):\n            while i < j:\n                if s[i] != s[j]:\n                    return False\n                i += 1\n                j -= 1\n            return True\n\n        i, j = 0, len(s) - 1\n        while i < j:\n            if s[i] != s[j]:\n                return is_palindrome_range(i+1, j) or is_palindrome_range(i, j-1)\n            i += 1\n            j -= 1\n        return True",
+      "explanation": "1. 使用雙指針 i, j 從字符串兩端向中間遍歷。\\n2. 如果遇到不相等的字符，嘗試刪除左邊或右邊字符，檢查剩下的子串是否為回文。\\n3. 若整個遍歷過程沒有遇到違反回文的情況，返回 True。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

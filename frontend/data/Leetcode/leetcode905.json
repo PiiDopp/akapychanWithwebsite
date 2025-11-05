@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode905",
+  "coding_practice": [
+    {
+      "title": "Sort Array By Parity",
+      "description": "Given an integer array nums, move all the even integers at the beginning of the array followed by all the odd integers.\n\nReturn any array that satisfies this condition.",
+      "examples": [
+        {
+          "input": "nums = [3,1,2,4]",
+          "output": "[2,4,3,1]",
+          "explanation": "The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted."
+        },
+        {
+          "input": "nums = [0]",
+          "output": "[0]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5000\n0 <= nums[i] <= 5000",
+      "solution": "class Solution(object):\n    def sortArrayByParity(self, A):\n        return [x for x in A if x % 2 == 0] + [x for x in A if x % 2 == 1]",
+      "explanation": "1. 使用列表生成式，先將所有偶數加入結果列表。\n2. 再將所有奇數加入結果列表。\n3. 返回合併後的列表，即偶數在前，奇數在後。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

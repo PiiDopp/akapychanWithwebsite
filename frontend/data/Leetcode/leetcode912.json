@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode912",
+  "coding_practice": [
+    {
+      "title": "Sort an Array",
+      "description": "Given an array of integers nums, sort the array in ascending order and return it.\nYou must solve the problem without using any built-in functions in O(nlog(n)) time complexity and with the smallest space complexity possible.",
+      "examples": [
+        {
+          "input": "nums = [5,2,3,1]",
+          "output": "[1,2,3,5]",
+          "explanation": "After sorting the array, the positions of some numbers are not changed (for example, 2 and 3), while the positions of other numbers are changed (for example, 1 and 5)."
+        },
+        {
+          "input": "nums = [5,1,1,2,0,0]",
+          "output": "[0,0,1,1,2,5]",
+          "explanation": "The values of nums are not necessarily unique."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5 * 10^4\n-5 * 10^4 <= nums[i] <= 5 * 10^4",
+      "solution": "class Solution(object):\n    def sortArray(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: List[int]\n        \"\"\"\n        def merge_sort(arr):\n            if len(arr) <= 1:\n                return arr\n            mid = len(arr) // 2\n            left = merge_sort(arr[:mid])\n            right = merge_sort(arr[mid:])\n            \n            res = []\n            i = j = 0\n            while i < len(left) and j < len(right):\n                if left[i] < right[j]:\n                    res.append(left[i])\n                    i += 1\n                else:\n                    res.append(right[j])\n                    j += 1\n            res.extend(left[i:])\n            res.extend(right[j:])\n            return res\n        \n        return merge_sort(nums)",
+      "explanation": "1. 使用分治法實現合併排序（Merge Sort）。\n2. 將數組分為左右兩部分，對每部分遞歸排序。\n3. 合併排序好的左右部分，利用兩個指針比較元素大小，依次加入結果數組。\n4. 返回最終排序後的數組。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

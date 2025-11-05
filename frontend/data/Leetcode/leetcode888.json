@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode888",
+  "coding_practice": [
+    {
+      "title": "Fair Candy Swap",
+      "description": "Alice and Bob have a different total number of candies. You are given two integer arrays aliceSizes and bobSizes where aliceSizes[i] is the number of candies of the ith box of candy that Alice has and bobSizes[j] is the number of candies of the jth box of candy that Bob has.\n\nSince they are friends, they would like to exchange one candy box each so that after the exchange, they both have the same total amount of candy. The total amount of candy a person has is the sum of the number of candies in each box they have.\n\nReturn an integer array answer where answer[0] is the number of candies in the box that Alice must exchange, and answer[1] is the number of candies in the box that Bob must exchange. If there are multiple answers, you may return any one of them. It is guaranteed that at least one answer exists.",
+      "examples": [
+        {
+          "input": "aliceSizes = [1,1], bobSizes = [2,2]",
+          "output": "[1,2]"
+        },
+        {
+          "input": "aliceSizes = [1,2], bobSizes = [2,3]",
+          "output": "[1,2]"
+        },
+        {
+          "input": "aliceSizes = [2], bobSizes = [1,3]",
+          "output": "[2,3]"
+        }
+      ],
+      "constraints": "1 <= aliceSizes.length, bobSizes.length <= 10^4\n1 <= aliceSizes[i], bobSizes[j] <= 10^5\nAlice and Bob have a different total number of candies.\nThere will be at least one valid answer for the given input.",
+      "solution": "class Solution(object):\n    def fairCandySwap(self, A, B):\n        \"\"\"\n        :type A: List[int]\n        :type B: List[int]\n        :rtype: List[int]\n        \"\"\"\n        sumA, sumB = sum(A), sum(B)\n        setB = set(B)\n        delta = (sumA - sumB) // 2\n        for a in A:\n            if a - delta in setB:\n                return [a, a - delta]",
+      "explanation": "1. 計算 Alice 與 Bob 目前糖果總數 sumA 與 sumB。\n2. 計算兩者糖果總數差的一半 delta = (sumA - sumB) // 2。\n3. 將 Bob 的糖果數量放入集合 setB 方便快速查找。\n4. 遍歷 Alice 的每個糖果盒 a，若 a - delta 存在於 setB 中，表示交換後兩人糖果總數相等。\n5. 回傳 [a, a - delta] 作為答案。",
+      "tag": "712",
+      "difficult": "easy"
+    }
+  ]
+}

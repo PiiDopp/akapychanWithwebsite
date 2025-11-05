@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode628",
+  "coding_practice": [
+    {
+      "title": "Maximum Product of Three Numbers",
+      "description": "Given an integer array nums, find three numbers whose product is maximum and return the maximum product.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "6"
+        },
+        {
+          "input": "nums = [1,2,3,4]",
+          "output": "24"
+        },
+        {
+          "input": "nums = [-1,-2,-3]",
+          "output": "-6"
+        }
+      ],
+      "constraints": "3 <= nums.length <= 10^4\n-1000 <= nums[i] <= 1000",
+      "solution": "class Solution:\n    def maximumProduct(self, nums):\n        nums.sort()\n        return max(nums[-1]*nums[-2]*nums[-3], nums[0]*nums[1]*nums[-1])",
+      "explanation": "1. 將陣列排序。\n2. 最大乘積可能是最後三個最大的數字的乘積，或者是最小的兩個負數與最大的正數的乘積。\n3. 返回這兩種乘積的最大值。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

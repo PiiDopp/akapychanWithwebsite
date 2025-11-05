@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode866",
+  "coding_practice": [
+    {
+      "title": "Prime Palindrome",
+      "description": "Given an integer n, return the smallest prime palindrome greater than or equal to n.\n\nAn integer is prime if it has exactly two divisors: 1 and itself. Note that 1 is not a prime number.\n\nFor example, 2, 3, 5, 7, 11, and 13 are all primes.\nAn integer is a palindrome if it reads the same from left to right as it does from right to left.\n\nFor example, 101 and 12321 are palindromes.\nThe test cases are generated so that the answer always exists and is in the range [2, 2 * 10^8].",
+      "examples": [
+        {
+          "input": "n = 6",
+          "output": "7"
+        },
+        {
+          "input": "n = 8",
+          "output": "11"
+        },
+        {
+          "input": "n = 13",
+          "output": "101"
+        }
+      ],
+      "constraints": "1 <= n <= 10^8",
+      "solution": "import math\n\nclass Solution(object):\n    def primePalindrome(self, N):\n        if 8 <= N <= 11:\n            return 11\n\n        for length in range(1, 6):\n            for half in range(10**(length-1), 10**length):\n                s = str(half)\n                pal = int(s + s[-2::-1])\n                if pal >= N and self.isPrime(pal):\n                    return pal\n\n        for pal in [100030001, 100050001, 100080001, 100110001]:\n            if pal >= N and self.isPrime(pal):\n                return pal\n\n    def isPrime(self, n):\n        if n < 2:\n            return False\n        if n == 2:\n            return True\n        if n % 2 == 0:\n            return False\n        for i in range(3, int(math.sqrt(n)) + 1, 2):\n            if n % i == 0:\n                return False\n        return True",
+      "explanation": "1. 特別處理 N 在 8 到 11 的範圍，直接返回 11。\n2. 生成奇數長度的回文數，從最小長度開始，檢查是否大於等於 N 且為質數。\n3. 對於大於 100000000 的特殊回文數進行檢查。\n4. 使用 isPrime 函數判斷數字是否為質數。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode724",
+  "coding_practice": [
+    {
+      "title": "Find Pivot Index",
+      "description": "Given an array of integers nums, calculate the pivot index of this array.\n\nThe pivot index is the index where the sum of all the numbers strictly to the left of the index is equal to the sum of all the numbers strictly to the index's right.\n\nIf the index is on the left edge of the array, then the left sum is 0 because there are no elements to the left. This also applies to the right edge of the array.\n\nReturn the leftmost pivot index. If no such index exists, return -1.",
+      "examples": [
+        {
+          "input": "nums = [1,7,3,6,5,6]",
+          "output": "3",
+          "explanation": "Left sum = nums[0] + nums[1] + nums[2] = 1 + 7 + 3 = 11\\nRight sum = nums[4] + nums[5] = 5 + 6 = 11"
+        },
+        {
+          "input": "nums = [1,2,3]",
+          "output": "-1",
+          "explanation": "There is no index that satisfies the conditions in the problem statement."
+        },
+        {
+          "input": "nums = [2,1,-1]",
+          "output": "0",
+          "explanation": "Left sum = 0 (no elements to the left of index 0)\\nRight sum = nums[1] + nums[2] = 1 + -1 = 0"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-1000 <= nums[i] <= 1000",
+      "note": "This question is the same as 1991.Find the Middle Index in Array",
+      "solution": "class Solution:\n    def pivotIndex(self, nums):\n        total = sum(nums)\n        left_sum = 0\n        \n        for i, num in enumerate(nums):\n            if left_sum == total - left_sum - num:\n                return i\n            left_sum += num\n        return -1",
+      "explanation": "1. 計算數組總和 total。\\n2. 遍歷每個元素，維護左側和 left_sum。\\n3. 若 left_sum 等於 total - left_sum - nums[i]，則該索引為 pivot index，返回它。\\n4. 遍歷完成後若無符合條件索引，返回 -1。\\n5. 時間複雜度 O(n)，空間複雜度 O(1)。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

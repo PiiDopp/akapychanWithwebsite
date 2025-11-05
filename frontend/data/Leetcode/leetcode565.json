@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode565",
+  "coding_practice": [
+    {
+      "title": "Array Nesting",
+      "description": "You are given an integer array nums of length n where nums is a permutation of the numbers in the range [0, n - 1].\n\nYou should build a set s[k] = {nums[k], nums[nums[k]], nums[nums[nums[k]]], ... } subjected to the following rule:\n\nThe first element in s[k] starts with the selection of the element nums[k] of index = k.\nThe next element in s[k] should be nums[nums[k]], and then nums[nums[nums[k]]], and so on.\nWe stop adding right before a duplicate element occurs in s[k].\nReturn the longest length of a set s[k].",
+      "examples": [
+        {
+          "input": "nums = [5,4,0,3,1,6,2]",
+          "output": "4",
+          "explanation": "nums[0] = 5, nums[1] = 4, nums[2] = 0, nums[3] = 3, nums[4] = 1, nums[5] = 6, nums[6] = 2.\nOne of the longest sets s[k]:\ns[0] = {nums[0], nums[5], nums[6], nums[2]} = {5, 6, 2, 0}"
+        },
+        {
+          "input": "nums = [0,1,2]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n0 <= nums[i] < nums.length\nAll the values of nums are unique.",
+      "solution": "class Solution:\n    def arrayNesting(self, nums):\n        visited = [False] * len(nums)\n        res = 0\n\n        for i in range(len(nums)):\n            if not visited[i]:\n                start = i\n                count = 0\n                while not visited[start]:\n                    visited[start] = True\n                    start = nums[start]\n                    count += 1\n                res = max(res, count)\n\n        return res",
+      "explanation": "1. 使用 visited 陣列標記已訪問的索引，避免重複計算。\n2. 遍歷每個索引 i，若未訪問，從 i 開始建立 set s[k]。\n3. 每次移動到 nums[start]，計數 count 並標記 visited。\n4. 更新最大長度 res。\n5. 返回 res 即為答案。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

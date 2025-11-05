@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode745",
+  "coding_practice": [
+    {
+      "title": "Prefix and Suffix Search",
+      "description": "Design a special dictionary that searches the words in it by a prefix and a suffix.\n\nImplement the WordFilter class:\n\nWordFilter(string[] words) Initializes the object with the words in the dictionary.\nf(string pref, string suff) Returns the index of the word in the dictionary, which has the prefix pref and the suffix suff. If there is more than one valid index, return the largest of them. If there is no such word in the dictionary, return -1.",
+      "examples": [
+        {
+          "input": "[[\"apple\"]], [\"a\", \"e\"]",
+          "output": "0",
+          "explanation": "WordFilter wordFilter = new WordFilter([\"apple\"]);\nwordFilter.f(\"a\", \"e\"); // return 0, because the word at index 0 has prefix = \"a\" and suffix = \"e\"."
+        }
+      ],
+      "constraints": "1 <= words.length <= 10^4\n1 <= words[i].length <= 7\n1 <= pref.length, suff.length <= 7\nwords[i], pref and suff consist of lowercase English letters only.\nAt most 10^4 calls will be made to the function f.",
+      "solution": "class WordFilter:\n\n    def __init__(self, words):\n        self.lookup = {}\n        for weight, word in enumerate(words):\n            L = len(word)\n            for i in range(L + 1):\n                for j in range(L + 1):\n                    self.lookup[(word[:i], word[j:])] = weight\n\n    def f(self, prefix, suffix):\n        return self.lookup.get((prefix, suffix), -1)",
+      "explanation": "1. 建立一個字典 lookup，將所有可能的前綴和後綴組合映射到單詞索引。\n2. 遍歷 words，對每個 word 的前綴長度 i 和後綴長度 j，將 (word[:i], word[j:]) 對應到索引 weight。\n3. f(pref, suff) 時，直接查 lookup 中是否有對應鍵，若無則回傳 -1。",
+      "tag": "712",
+      "difficult": "hard"
+    }
+  ]
+}

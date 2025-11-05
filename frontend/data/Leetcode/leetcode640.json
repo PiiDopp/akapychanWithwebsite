@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode640",
+  "coding_practice": [
+    {
+      "title": "Solve the Equation",
+      "description": "Solve a given equation and return the value of 'x' in the form of a string \"x=#value\". The equation contains only '+', '-' operation, the variable 'x' and its coefficient. You should return \"No solution\" if there is no solution for the equation, or \"Infinite solutions\" if there are infinite solutions for the equation.\nIf there is exactly one solution for the equation, we ensure that the value of 'x' is an integer.",
+      "examples": [
+        {
+          "input": "equation = \"x+5-3+x=6+x-2\"",
+          "output": "x=2"
+        },
+        {
+          "input": "equation = \"x=x\"",
+          "output": "Infinite solutions"
+        },
+        {
+          "input": "equation = \"2x=x\"",
+          "output": "x=0"
+        }
+      ],
+      "constraints": "3 <= equation.length <= 1000\nequation has exactly one '='.\nequation consists of integers with an absolute value in the range [0, 100] without any leading zeros, and the variable 'x'.\nThe input is generated that if there is a single solution, it will be an integer.",
+      "solution": "class Solution(object):\n    def solveEquation(self, equation):\n        \"\"\"\n        :type equation: str\n        :rtype: str\n        \"\"\"\n        def parse_side(s):\n            x_coeff, const = 0, 0\n            i, n, sign = 0, len(s), 1\n            while i < n:\n                if s[i] == '+':\n                    sign = 1\n                    i += 1\n                elif s[i] == '-':\n                    sign = -1\n                    i += 1\n                else:\n                    j = i\n                    while j < n and s[j] not in '+-':\n                        j += 1\n                    token = s[i:j]\n                    if 'x' in token:\n                        coeff = token[:-1]\n                        if coeff == '' or coeff == '+':\n                            coeff = 1\n                        elif coeff == '-':\n                            coeff = -1\n                        else:\n                            coeff = int(coeff)\n                        x_coeff += sign * coeff\n                    else:\n                        const += sign * int(token)\n                    i = j\n            return x_coeff, const\n        \n        left, right = equation.split('=')\n        left_x, left_const = parse_side(left)\n        right_x, right_const = parse_side(right)\n        \n        x_total = left_x - right_x\n        const_total = right_const - left_const\n        \n        if x_total == 0:\n            if const_total == 0:\n                return \"Infinite solutions\"\n            else:\n                return \"No solution\"\n        else:\n            return \"x=\" + str(const_total // x_total)",
+      "explanation": "1. 將方程式左右兩邊分開，使用 parse_side 函數計算每邊的 x 系數和常數和。\n2. 遍歷每個項目，遇到 x 變量則更新 x_coeff，其他更新 const。\n3. 計算總 x 系數 x_total = left_x - right_x，以及總常數 const_total = right_const - left_const。\n4. 若 x_total 為 0，則檢查 const_total 是否為 0，決定 \"Infinite solutions\" 或 \"No solution\"。\n5. 否則，唯一解為 const_total // x_total，回傳結果字串。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

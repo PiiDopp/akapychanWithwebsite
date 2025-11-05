@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode676",
+  "coding_practice": [
+    {
+      "title": "Implement Magic Dictionary",
+      "description": "Design a data structure that is initialized with a list of different words. Provided a string, you should determine if you can change exactly one character in this string to match any word in the data structure.\n\nImplement the MagicDictionary class:\n\nMagicDictionary() Initializes the object.\nvoid buildDict(String[] dictionary) Sets the data structure with an array of distinct strings dictionary.\nbool search(String searchWord) Returns true if you can change exactly one character in searchWord to match any string in the data structure, otherwise returns false.",
+      "examples": [
+        {
+          "input": "[\"MagicDictionary\", \"buildDict\", \"search\", \"search\", \"search\", \"search\"], [[], [[\"hello\", \"leetcode\"]], [\"hello\"], [\"hhllo\"], [\"hell\"], [\"leetcoded\"]]",
+          "output": "[null, null, false, true, false, false]",
+          "explanation": "MagicDictionary magicDictionary = new MagicDictionary();\nmagicDictionary.buildDict([\"hello\", \"leetcode\"]);\nmagicDictionary.search(\"hello\"); // return False\nmagicDictionary.search(\"hhllo\"); // We can change the second 'h' to 'e' to match \"hello\" so we return True\nmagicDictionary.search(\"hell\"); // return False\nmagicDictionary.search(\"leetcoded\"); // return False"
+        }
+      ],
+      "constraints": "1 <= dictionary.length <= 100\n1 <= dictionary[i].length <= 100\ndictionary[i] consists of only lower-case English letters.\nAll the strings in dictionary are distinct.\n1 <= searchWord.length <= 100\nsearchWord consists of only lower-case English letters.\nbuildDict will be called only once before search.\nAt most 100 calls will be made to search.",
+      "solution": "class MagicDictionary:\n\n    def __init__(self):\n        self.words = set()\n\n    def buildDict(self, dictionary):\n        self.words = set(dictionary)\n\n    def search(self, searchWord):\n        for word in self.words:\n            if len(word) != len(searchWord):\n                continue\n            diff = sum(1 for a, b in zip(word, searchWord) if a != b)\n            if diff == 1:\n                return True\n        return False",
+      "explanation": "1. 使用 set 儲存字典中的單詞。\\n2. 搜尋時，檢查長度相同的每個字，計算不同字符數量 diff。\\n3. 若 diff 恰好為 1，返回 True，否則繼續遍歷。\\n4. 遍歷完成未找到符合條件的單詞則返回 False。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

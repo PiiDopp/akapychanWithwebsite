@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode811",
+  "coding_practice": [
+    {
+      "title": "Subdomain Visit Count",
+      "description": "A website domain \"discuss.leetcode.com\" consists of various subdomains. At the top level, we have \"com\", at the next level, we have \"leetcode.com\" and at the lowest level, \"discuss.leetcode.com\". When we visit a domain like \"discuss.leetcode.com\", we will also visit the parent domains \"leetcode.com\" and \"com\" implicitly.\n\nA count-paired domain is a domain that has one of the two formats \"rep d1.d2.d3\" or \"rep d1.d2\" where rep is the number of visits to the domain and d1.d2.d3 is the domain itself.\n\nFor example, \"9001 discuss.leetcode.com\" is a count-paired domain that indicates that discuss.leetcode.com was visited 9001 times.\nGiven an array of count-paired domains cpdomains, return an array of the count-paired domains of each subdomain in the input. You may return the answer in any order.",
+      "examples": [
+        {
+          "input": "cpdomains = [\"9001 discuss.leetcode.com\"]",
+          "output": "[\"9001 leetcode.com\",\"9001 discuss.leetcode.com\",\"9001 com\"]",
+          "explanation": "We only have one website domain: \"discuss.leetcode.com\". \nAs discussed above, the subdomain \"leetcode.com\" and \"com\" will also be visited. So they will all be visited 9001 times."
+        },
+        {
+          "input": "cpdomains = [\"900 google.mail.com\", \"50 yahoo.com\", \"1 intel.mail.com\", \"5 wiki.org\"]",
+          "output": "[\"901 mail.com\",\"50 yahoo.com\",\"900 google.mail.com\",\"5 wiki.org\",\"5 org\",\"1 intel.mail.com\",\"951 com\"]",
+          "explanation": "We will visit \"google.mail.com\" 900 times, \"yahoo.com\" 50 times, \"intel.mail.com\" once and \"wiki.org\" 5 times. \nFor the subdomains, we will visit \"mail.com\" 900 + 1 = 901 times, \"com\" 900 + 50 + 1 = 951 times, and \"org\" 5 times."
+        }
+      ],
+      "constraints": "1 <= cpdomain.length <= 100\n1 <= cpdomain[i].length <= 100\ncpdomain[i] follows either the \"repi d1i.d2i.d3i\" format or the \"repi d1i.d2i\" format.\nrepi is an integer in the range [1, 10^4].\nd1i, d2i, and d3i consist of lowercase English letters.",
+      "solution": "class Solution(object):\n    def subdomainVisits(self, cpdomains):\n        from collections import defaultdict\n        count = defaultdict(int)\n        for domain in cpdomains:\n            num, full_domain = domain.split()\n            num = int(num)\n            fragments = full_domain.split('.')\n            for i in range(len(fragments)):\n                sub = '.'.join(fragments[i:])\n                count[sub] += num\n        return [\"{} {}\".format(v, k) for k, v in count.items()]",
+      "explanation": "1. 建立一個 defaultdict count 來儲存每個子網域的訪問次數。\n2. 遍歷每個 cpdomain，分割為訪問數 num 與完整網域 full_domain。\n3. 將 full_domain 按 '.' 分割成 fragments。\n4. 對 fragments 的每個子串從 i 到結尾組成子網域，並將 num 累加到 count。\n5. 遍歷 count，將結果組合為 \"數字 網域\" 的格式，回傳結果列表。",
+      "tag": "1030",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -218,31 +218,11 @@ body.sidebar-collapsed .changeBtn {
 body.sidebar-collapsed .leftsideBtn img {
   transform: rotate(0);
 }
-.testBtn {
-  display: flex;
-  bottom: 0;
-  width: 50%;
-  max-width: 200px;
-  height: 10vh;
-  max-height: 80px;
-  line-height: 6vh;
-  font-size: 20px;
-  color: #fff;
-  border: solid 2px #2a2e45;
-  border-radius: 20px;
-  margin-top: 8px;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-}
-.testBtn:hover {
-  background-color: #404668;
-}
 .changeBtn {
   display: flex;
   bottom: 0;
-  width: 50%;
-  max-width: 200px;
+  width: 100%;
+  max-width: 400px;
   height: 10vh;
   max-height: 80px;
   line-height: 6vh;

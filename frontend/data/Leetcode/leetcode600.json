@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode600",
+  "coding_practice": [
+    {
+      "title": "Non-negative Integers without Consecutive Ones",
+      "description": "Given a positive integer n, return the number of the integers in the range [0, n] whose binary representations do not contain consecutive ones.",
+      "examples": [
+        {
+          "input": "n = 5",
+          "output": "5",
+          "explanation": "Here are the non-negative integers <= 5 with their corresponding binary representations:\n0 : 0\n1 : 1\n2 : 10\n3 : 11\n4 : 100\n5 : 101\nAmong them, only integer 3 disobeys the rule (two consecutive ones) and the other 5 satisfy the rule."
+        },
+        {
+          "input": "n = 1",
+          "output": "2"
+        },
+        {
+          "input": "n = 2",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= n <= 10^9",
+      "solution": "class Solution:\n    def findIntegers(self, n):\n        # dp[i] 表示長度為 i 的二進制不含連續1的數量\n        dp = [0] * 32\n        dp[0] = 1\n        dp[1] = 2\n        for i in range(2, 32):\n            dp[i] = dp[i-1] + dp[i-2]\n        \n        ans = 0\n        prev_bit = 0\n        for i in reversed(range(31)):\n            if n & (1 << i):\n                ans += dp[i]\n                if prev_bit:\n                    return ans\n                prev_bit = 1\n            else:\n                prev_bit = 0\n        return ans + 1",
+      "explanation": "1. 使用動態規劃 dp[i] 表示長度為 i 的二進制不含連續 1 的數量。\n2. 遍歷 n 的每個二進制位，若為 1，則加上長度為 i 的 dp[i] 值。\n3. 若連續出現 1，則立即返回當前計數。\n4. 若遍歷完成且未出現連續 1，返回 ans + 1（包含 n 本身）。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

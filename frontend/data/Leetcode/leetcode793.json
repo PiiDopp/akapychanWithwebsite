@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode793",
+  "coding_practice": [
+    {
+      "title": "Preimage Size of Factorial Zeroes Function",
+      "description": "Let f(x) be the number of zeroes at the end of x!. Recall that x! = 1 * 2 * 3 * ... * x and by convention, 0! = 1.\n\nFor example, f(3) = 0 because 3! = 6 has no zeroes at the end, while f(11) = 2 because 11! = 39916800 has two zeroes at the end.\nGiven an integer k, return the number of non-negative integers x have the property that f(x) = k.",
+      "examples": [
+        {
+          "input": "k = 0",
+          "output": "5",
+          "explanation": "0!, 1!, 2!, 3!, and 4! end with k = 0 zeroes."
+        },
+        {
+          "input": "k = 5",
+          "output": "0",
+          "explanation": "There is no x such that x! ends in k = 5 zeroes."
+        },
+        {
+          "input": "k = 3",
+          "output": "5"
+        }
+      ],
+      "constraints": "0 <= k <= 10^9",
+      "solution": "class Solution:\n    def preimageSizeFZF(self, K):\n        def trailingZeroes(n):\n            count = 0\n            while n:\n                n //= 5\n                count += n\n            return count\n\n        left, right = 0, 5 * K\n        while left <= right:\n            mid = (left + right) // 2\n            z = trailingZeroes(mid)\n            if z < K:\n                left = mid + 1\n            else:\n                right = mid - 1\n\n        return 5 if trailingZeroes(left) == K else 0",
+      "explanation": "1. 定義函數 trailingZeroes(n) 計算 n! 結尾有多少個零。\n2. 使用二分搜尋找到最小的 x 使得 trailingZeroes(x) >= K。\n3. 若 trailingZeroes(left) == K，表示有 5 個連續的 x 滿足條件，返回 5。\n4. 否則返回 0，表示沒有 x 滿足條件。",
+      "tag": "1030",
+      "difficult": "hard"
+    }
+  ]
+}

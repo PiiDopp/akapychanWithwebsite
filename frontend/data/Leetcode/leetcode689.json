@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode689",
+  "coding_practice": [
+    {
+      "title": "Maximum Sum of 3 Non-Overlapping Subarrays",
+      "description": "Given an integer array nums and an integer k, find three non-overlapping subarrays of length k with maximum sum and return them.\nReturn the result as a list of indices representing the starting position of each interval (0-indexed). If there are multiple answers, return the lexicographically smallest one.",
+      "examples": [
+        {
+          "input": "nums = [1,2,1,2,6,7,5,1], k = 2",
+          "output": "[0,3,5]",
+          "explanation": "Subarrays [1, 2], [2, 6], [7, 5] correspond to the starting indices [0, 3, 5].\nWe could have also taken [2, 1], but an answer of [1, 3, 5] would be lexicographically larger."
+        },
+        {
+          "input": "nums = [1,2,1,2,1,2,1,2,1], k = 2",
+          "output": "[0,2,4]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 2 * 10^4\n1 <= nums[i] < 2^16\n1 <= k <= floor(nums.length / 3)",
+      "solution": "class Solution:\n    def maxSumOfThreeSubarrays(self, nums, k):\n        n = len(nums)\n        w = [0] * (n - k + 1)\n        s = sum(nums[:k])\n        w[0] = s\n        for i in range(1, n - k + 1):\n            s += nums[i + k - 1] - nums[i - 1]\n            w[i] = s\n\n        left = [0] * len(w)\n        best = 0\n        for i in range(len(w)):\n            if w[i] > w[best]:\n                best = i\n            left[i] = best\n\n        right = [0] * len(w)\n        best = len(w) - 1\n        for i in range(len(w) - 1, -1, -1):\n            if w[i] >= w[best]:\n                best = i\n            right[i] = best\n\n        res = None\n        for j in range(k, len(w) - k):\n            i = left[j - k]\n            l = right[j + k]\n            total = w[i] + w[j] + w[l]\n            if res is None or total > res[0]:\n                res = (total, [i, j, l])\n        return res[1]",
+      "explanation": "1. 預先計算所有長度為 k 的子陣列的總和，存入 w。\n2. left[i] 保存從開始到 i 為止總和最大的子陣列索引。\n3. right[i] 保存從 i 到結尾總和最大的子陣列索引。\n4. 對每個可能的中間子陣列 j，計算總和 w[left[j-k]] + w[j] + w[right[j+k]]。\n5. 選擇總和最大的組合，返回對應的索引列表。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}
