@@ -658,25 +658,35 @@ async def translate_api(req: Request):
 @app.post("/hint")
 async def get_hint(request: Request):
     """
-    獲取提示 API (尚未實作)
+    獲取提示 API
     入參(JSON):
-      { "problem_id": "...", "user_code": "..." }
+      {
+        "problem_id": "...",
+        "practice_idx": 1,
+        "code": "...",
+        "data_path": "...",
+        "mode": "stdin",
+        "source": "builtin"
+      }
     回傳(JSON):
       { "ok": true, "hint": "..." }
     """
     try:
         data = await request.json()
-        problem_id = data.get("problem_id")
-        user_code = data.get("user_code")
-        
-        # TODO: 在此處加入根據 problem_id 和 user_code 生成提示的邏輯
+        problem_id = data.get("problem_id") or data.get("data_id")  # 相容舊版欄位
+        user_code = data.get("code") or data.get("user_code")       # 改用 code
+
+        if not problem_id or not user_code:
+            raise HTTPException(status_code=400, detail="缺少 problem_id 或 code")
+
+        # TODO: 在此加入根據 problem_id 和 code 生成提示的邏輯
         # hint_text = generate_hint_logic(problem_id, user_code)
-        
+
         hint_text = f"這是有關於 {problem_id} 的提示 (此為存根回應)"
-        
+
         print(f"[STUB] /hint 路由被呼叫, problem_id: {problem_id}")
         return {"ok": True, "hint": hint_text}
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取提示失敗：{e}")
 
