@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode132",
+  "coding_practice": [
+    {
+      "title": "Palindrome Partitioning II",
+      "description": "Given a string s, partition s such that every substring of the partition is a palindrome. Return the minimum cuts needed for a palindrome partitioning of s.",
+      "examples": [
+        {
+          "input": "s = \"aab\"",
+          "output": "1",
+          "explanation": "The palindrome partitioning [\"aa\",\"b\"] could be produced using 1 cut."
+        },
+        {
+          "input": "s = \"a\"",
+          "output": "0"
+        },
+        {
+          "input": "s = \"ab\"",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= s.length <= 2000\ns consists of lowercase English letters only.",
+      "solution": "class Solution:\n    def minCut(self, s: str) -> int:\n        n = len(s)\n        dp = [0] * n\n        pal = [[False] * n for _ in range(n)]\n\n        for i in range(n):\n            min_cut = i\n            for j in range(i + 1):\n                if s[j] == s[i] and (i - j <= 1 or pal[j + 1][i - 1]):\n                    pal[j][i] = True\n                    if j == 0:\n                        min_cut = 0\n                    else:\n                        min_cut = min(min_cut, dp[j - 1] + 1)\n            dp[i] = min_cut\n\n        return dp[-1]",
+      "explanation": "1. 使用 dp[i] 表示前 i+1 個字元的最小切割數。\n2. 建立 pal[j][i] 來記錄 s[j:i+1] 是否為回文。\n3. 外層迴圈 i 從 0 到 n-1，內層迴圈 j 從 0 到 i，判斷 s[j:i+1] 是否回文。\n4. 若 s[j:i+1] 為回文，更新最小切割數：若 j==0，表示整段為回文，不需切割；否則 min_cut = min(min_cut, dp[j-1] + 1)。\n5. 最終 dp[-1] 為整個字串的最少切割次數。",
+      "tag": "512",
+      "difficult": "hard"
+    }
+  ]
+}

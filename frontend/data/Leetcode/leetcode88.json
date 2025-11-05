@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode88",
+  "coding_practice": [
+    {
+      "title": "Merge Sorted Array",
+      "description": "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively.\n\nMerge nums1 and nums2 into a single array sorted in non-decreasing order.\n\nThe final sorted array should not be returned by the function, but instead be stored inside the array nums1. To accommodate this, nums1 has a length of m + n, where the first m elements denote the elements that should be merged, and the last n elements are set to 0 and should be ignored. nums2 has a length of n.",
+      "examples": [
+        {
+          "input": "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
+          "output": "[1,2,2,3,5,6]",
+          "explanation": "The arrays we are merging are [1,2,3] and [2,5,6]. The result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1."
+        },
+        {
+          "input": "nums1 = [1], m = 1, nums2 = [], n = 0",
+          "output": "[1]",
+          "explanation": "The arrays we are merging are [1] and []. The result of the merge is [1]."
+        },
+        {
+          "input": "nums1 = [0], m = 0, nums2 = [1], n = 1",
+          "output": "[1]",
+          "explanation": "The arrays we are merging are [] and [1]. The result of the merge is [1]. Note that because m = 0, there are no elements in nums1. The 0 is only there to ensure the merge result can fit in nums1."
+        }
+      ],
+      "constraints": "nums1.length == m + n\nnums2.length == n\n0 <= m, n <= 200\n1 <= m + n <= 200\n-10^9 <= nums1[i], nums2[j] <= 10^9",
+      "follow up": "Can you come up with an algorithm that runs in O(m + n) time?",
+      "solution": "class Solution(object):\n    def merge(self, nums1, m, nums2, n):\n        i = m - 1\n        j = n - 1\n        k = m + n - 1\n        while i >= 0 and j >= 0:\n            if nums1[i] > nums2[j]:\n                nums1[k] = nums1[i]\n                i -= 1\n            else:\n                nums1[k] = nums2[j]\n                j -= 1\n            k -= 1\n        while j >= 0:\n            nums1[k] = nums2[j]\n            j -= 1\n            k -= 1",
+      "explanation": "使用三個指標 i, j, k 從尾部開始填寫 nums1，避免覆蓋未處理元素。比較 nums1[i] 和 nums2[j]，將較大值放到 nums1[k]。若 nums2 有剩餘元素，直接拷貝到 nums1 前面即可。",
+      "tag": "632",
+      "difficult": "medium"
+    }
+  ]
+}

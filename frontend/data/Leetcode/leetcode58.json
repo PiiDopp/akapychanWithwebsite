@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode58",
+  "coding_practice": [
+    {
+      "title": "Length of Last Word",
+      "description": "Given a string s consisting of words and spaces, return the length of the last word in the string.\n\nA word is a maximal substring consisting of non-space characters only.",
+      "examples": [
+        {
+          "input": "s = \"Hello World\"",
+          "output": "5",
+          "explanation": "The last word is \"World\" with length 5."
+        },
+        {
+          "input": "s = \"   fly me   to   the moon  \"",
+          "output": "4",
+          "explanation": "The last word is \"moon\" with length 4."
+        },
+        {
+          "input": "s = \"luffy is still joyboy\"",
+          "output": "6",
+          "explanation": "The last word is \"joyboy\" with length 6."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of only English letters and spaces ' '.\nThere will be at least one word in s.",
+      "solution": "class Solution(object):\n    def lengthOfLastWord(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        s = s.strip()\n        words = s.split(' ')\n        return len(words[-1]) if words else 0",
+      "explanation": "1. 使用 strip() 去除字串前後空白。\n2. 使用 split(' ') 將字串按空格分割成單詞列表。\n3. 返回列表中最後一個單詞的長度。\n4. 若字串為空，返回 0。\n5. 複雜度分析：\n   5.1 時間複雜度：O(n)\n   5.2 空間複雜度：O(n)",
+      "tag": "722",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode541",
+  "coding_practice": [
+    {
+      "title": "Reverse String II",
+      "description": "Given a string s and an integer k, reverse the first k characters for every 2k characters counting from the start of the string.\n\nIf there are fewer than k characters left, reverse all of them. If there are less than 2k but greater than or equal to k characters, then reverse the first k characters and leave the other as original.",
+      "examples": [
+        {
+          "input": "\"abcdefg\", 2",
+          "output": "\"bacdfeg\""
+        },
+        {
+          "input": "\"abcd\", 2",
+          "output": "\"bacd\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of only lowercase English letters.\n1 <= k <= 10^4",
+      "solution": "class Solution:\n    def reverseStr(self, s, k):\n        s = list(s)\n        for i in range(0, len(s), 2 * k):\n            s[i:i + k] = reversed(s[i:i + k])\n        return \"\".join(s)",
+      "explanation": "1. 將字串轉成列表以便原地修改。\n2. 每 2k 個字符作為一個區間，反轉前 k 個字符。\n3. 若剩餘字符少於 k，直接反轉所有剩餘字符。\n4. 使用切片和 reversed 來反轉區段。\n5. 最後將列表轉回字串並返回。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

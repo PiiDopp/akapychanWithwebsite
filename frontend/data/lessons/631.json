@@ -1,0 +1,51 @@
+{
+  "ID": 631,
+  "Title": "字典介紹",
+  "Intro": "\t字典（dict）是 dictionary 的縮寫，字典的元素放在 {} 內，由「鍵 (key)」與「值 (value)」成對組成。與串列 (list)、元組 (tuple) 等序列型別不同，字典的鍵沒有順序，因此不支援索引或切片運算。鍵必須是不可變物件 (如字串、數字、元組)，值則可以是任何資料型態。",
+  "exp": {
+    "cor_exp": [
+      "# 建立字典\nstudent = {'name': 'Alice', 'age': 20, 'major': 'CS'}\n\n# 透過 key 取值\nprint(student['name'])   # 輸出: Alice\n\n# 新增鍵值對\nstudent['grade'] = 'A'\nprint(student)\n\n# 修改已存在的值\nstudent['age'] = 21\nprint(student)\n\n# 使用 get() 取值 (避免 key 不存在錯誤)\nprint(student.get('school', '未知'))"
+    ],
+    "mis_exp": [
+      "dup = {'a': 1, 'a': 2}  # 只有 'a': 2 會保留\n#錯誤：字典 key 不可重複，後面會覆蓋前面",
+      "bad_key = {[1, 2]: 'list as key'}  # TypeError\n# 錯誤：list 不能當作 key (因為 list 可變)",
+      "print(student[0])  # KeyError: 0\n# 錯誤：字典不支援索引",
+      "print(student[0:2])  # TypeError\n# 錯誤：字典不支援切片"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個可以正確建立字典？",
+      "options": [
+        "A. student = {['name']: 'Alice'}",
+        "B. student = {'name': 'Alice', 'age': 20}",
+        "C. student = ('name': 'Alice', 'age': 20)",
+        "D. student = {'Alice', 20}"
+      ],
+      "answer": "B",
+      "explanation": "字典使用 { } 包含鍵值對，鍵與值之間用冒號分隔，正確寫法是 {'name': 'Alice', 'age': 20}。"
+    },
+    {
+      "question": "若有 student = {'name': 'Alice', 'age': 20}，執行 print(student.get('school', '未知')) 的結果為？",
+      "options": [
+        "A. school",
+        "B. Alice",
+        "C. 未知",
+        "D. KeyError"
+      ],
+      "answer": "C",
+      "explanation": "使用 get() 時，若 key 不存在會回傳預設值 '未知'，因此輸出結果為 '未知'。"
+    },
+    {
+      "question": "下列哪個敘述是正確的？",
+      "options": [
+        "A. 字典的 key 可以是 list",
+        "B. 字典支援使用索引取值，如 student[0]",
+        "C. 字典的 key 必須是不可變物件",
+        "D. 字典的元素是有順序的"
+      ],
+      "answer": "C",
+      "explanation": "字典的 key 必須是不可變物件（如字串、數字、元組），值則可以是任何資料型態。"
+    }
+  ]
+}

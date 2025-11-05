@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode202",
+  "coding_practice": [
+    {
+      "title": "Happy Number",
+      "description": "Write an algorithm to determine if a number n is happy.\n\nA happy number is a number defined by the following process:\n\nStarting with any positive integer, replace the number by the sum of the squares of its digits.\nRepeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.\nThose numbers for which this process ends in 1 are happy.\nReturn true if n is a happy number, and false if not.",
+      "examples": [
+        {
+          "input": "n = 19",
+          "output": "true",
+          "explanation": "12 + 92 = 82\n82 + 22 = 68\n62 + 82 = 100\n12 + 02 + 02 = 1"
+        },
+        {
+          "input": "n = 2",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution(object):\n    def isHappy(self, n):\n        \"\"\"\n        :type n: int\n        :rtype: bool\n        \"\"\"\n        def get_next(number):\n            total_sum = 0\n            while number > 0:\n                digit = number % 10\n                total_sum += digit * digit\n                number //= 10\n            return total_sum\n        \n        seen = set()\n        while n != 1 and n not in seen:\n            seen.add(n)\n            n = get_next(n)\n        return n == 1",
+      "explanation": "1. 定義一個函數 get_next，用來計算數字各位平方和。\n2. 建立一個集合 seen，儲存已出現的數字以檢測循環。\n3. 使用 while 循環，直到 n 等於 1 或出現循環。\n4. 每次循環中將 n 加入 seen 並更新 n 為 get_next(n) 的值。\n5. 若最後 n 等於 1，返回 True；否則返回 False。",
+      "tag": "632",
+      "difficult": "easy"
+    }
+  ]
+}

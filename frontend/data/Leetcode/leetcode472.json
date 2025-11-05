@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode472",
+  "coding_practice": [
+    {
+      "title": "Concatenated Words",
+      "description": "Given an array of strings words (without duplicates), return all the concatenated words in the given list of words.\n\nA concatenated word is defined as a string that is comprised entirely of at least two shorter words (not necessarily distinct) in the given array.",
+      "examples": [
+        {
+          "input": "words = [\"cat\",\"cats\",\"catsdogcats\",\"dog\",\"dogcatsdog\",\"hippopotamuses\",\"rat\",\"ratcatdogcat\"]",
+          "output": "[\"catsdogcats\",\"dogcatsdog\",\"ratcatdogcat\"]",
+          "explanation": "\"catsdogcats\" can be concatenated by \"cats\", \"dog\" and \"cats\";\n\"dogcatsdog\" can be concatenated by \"dog\", \"cats\" and \"dog\";\n\"ratcatdogcat\" can be concatenated by \"rat\", \"cat\", \"dog\" and \"cat\"."
+        },
+        {
+          "input": "words = [\"cat\",\"dog\",\"catdog\"]",
+          "output": "[\"catdog\"]"
+        }
+      ],
+      "constraints": "1 <= words.length <= 10^4\n1 <= words[i].length <= 30\nwords[i] consists of only lowercase English letters.\nAll the strings of words are unique.\n1 <= sum(words[i].length) <= 10^5",
+      "solution": "class Solution:\n    def findAllConcatenatedWordsInADict(self, words):\n        word_set = set(words)\n        memo = {}\n\n        def canForm(word):\n            if word in memo:\n                return memo[word]\n            for i in range(1, len(word)):\n                prefix = word[:i]\n                suffix = word[i:]\n                if prefix in word_set:\n                    if suffix in word_set or canForm(suffix):\n                        memo[word] = True\n                        return True\n            memo[word] = False\n            return False\n\n        res = []\n        for word in words:\n            if word == \"\":\n                continue\n            word_set.remove(word)\n            if canForm(word):\n                res.append(word)\n            word_set.add(word)\n        return res",
+      "explanation": "1. 將所有 words 放入一個集合 word_set 以便快速查找。\n2. 定義 canForm 函數，用來判斷一個單詞是否可以由集合中的其他單詞組成，使用備忘錄 memo 儲存已計算結果。\n3. 對於每個單詞，先從集合中移除自身，避免將單詞本身當作其組成部分。\n4. 若 canForm 返回 True，將該單詞加入結果列表。\n5. 最後返回所有符合條件的 concatenated words。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

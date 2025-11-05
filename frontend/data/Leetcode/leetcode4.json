@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode4",
+  "coding_practice": [
+    {
+      "title": "Median of Two Sorted Arrays",
+      "description": "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays. \nThe overall run time complexity should be O(log (m+n)).",
+      "examples": [
+        {
+          "input": "nums1 = [1,3], nums2 = [2]",
+          "output": "2.00000",
+          "explanation": "merged array = [1,2,3] and median is 2."
+        },
+        {
+          "input": "nums1 = [1,2], nums2 = [3,4]",
+          "output": "2.50000",
+          "explanation": "merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5."
+        }
+      ],
+      "constraints": "nums1.length == m\nnums2.length == n\n0 <= m <= 1000\n0 <= n <= 1000\n1 <= m + n <= 2000\n-10^6 <= nums1[i], nums2[i] <= 10^6",
+      "solution": "class Solution(object):\n    def findMedianSortedArrays(self, nums1, nums2):\n        \"\"\"\n        :type nums1: List[int]\n        :type nums2: List[int]\n        :rtype: float\n        \"\"\"\n        if len(nums1) > len(nums2):\n            nums1, nums2 = nums2, nums1\n\n        m, n = len(nums1), len(nums2)\n        total = m + n\n        half = total // 2\n\n        left, right = 0, m - 1\n        while True:\n            i = (left + right) // 2\n            j = half - i - 2\n\n            Aleft = nums1[i] if i >= 0 else float('-inf')\n            Aright = nums1[i + 1] if (i + 1) < m else float('inf')\n            Bleft = nums2[j] if j >= 0 else float('-inf')\n            Bright = nums2[j + 1] if (j + 1) < n else float('inf')\n\n            if Aleft <= Bright and Bleft <= Aright:\n                if total % 2:\n                    return min(Aright, Bright)\n                return (max(Aleft, Bleft) + min(Aright, Bright)) / 2.0\n            elif Aleft > Bright:\n                right = i - 1\n            else:\n                left = i + 1",
+      "explanation": "1. 透過二分搜尋 (Binary Search) 在較短的陣列上尋找分割點。\n2. 分割點須滿足左半部分所有元素都小於右半部分。\n3. 依據總長度的奇偶，分別計算中位數：若為奇數取右半最小值；若為偶數則取左半最大與右半最小的平均。\n4. 透過調整分割位置確保條件成立，以達 O(log(min(m,n))) 的效率。",
+      "tag": "530",
+      "difficult": "hard"
+    }
+  ]
+}

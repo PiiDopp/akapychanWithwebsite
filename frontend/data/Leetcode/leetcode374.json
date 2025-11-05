@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode374",
+  "coding_practice": [
+    {
+      "title": "Guess Number Higher or Lower",
+      "description": "We are playing the Guess Game. The game is as follows: \n\nI pick a number from 1 to n. You have to guess which number I picked (the number I picked stays the same throughout the game).\n\nEvery time you guess wrong, I will tell you whether the number I picked is higher or lower than your guess.\n\nYou call a pre-defined API int guess(int num), which returns three possible results:\n\n-1: Your guess is higher than the number I picked (i.e. num > pick).\n1: Your guess is lower than the number I picked (i.e. num < pick).\n0: your guess is equal to the number I picked (i.e. num == pick).\nReturn the number that I picked.",
+      "examples": [
+        {
+          "input": "n = 10, pick = 6",
+          "output": "6"
+        },
+        {
+          "input": "n = 1, pick = 1",
+          "output": "1"
+        },
+        {
+          "input": "n = 2, pick = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1\n1 <= pick <= n",
+      "solution": "class Solution:\n    def guessNumber(self, n):\n        left, right = 1, n\n        while left <= right:\n            mid = left + (right - left) // 2\n            res = guess(mid)\n            if res == 0:\n                return mid\n            elif res < 0:\n                right = mid - 1\n            else:\n                left = mid + 1\n        return -1",
+      "explanation": "使用二分法搜索從 1 到 n 的範圍：\n1. 設定 left = 1, right = n。\n2. 計算中間值 mid = left + (right - left) // 2。\n3. 呼叫 API guess(mid)。\n   - 若返回 0，mid 即為答案。\n   - 若返回 -1，表示 pick 比 mid 小，將 right 移到 mid - 1。\n   - 若返回 1，表示 pick 比 mid 大，將 left 移到 mid + 1。\n4. 迴圈直到找到答案。這是一個典型的二分搜尋應用。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode423",
+  "coding_practice": [
+    {
+      "title": "Reconstruct Original Digits from English",
+      "description": "Given a string s containing an out-of-order English representation of digits 0-9, return the digits in ascending order.",
+      "examples": [
+        {
+          "input": "s = \"owoztneoer\"",
+          "output": "\"012\""
+        },
+        {
+          "input": "s = \"fviefuro\"",
+          "output": "\"45\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns[i] is one of the characters [\"e\",\"g\",\"f\",\"i\",\"h\",\"o\",\"n\",\"s\",\"r\",\"u\",\"t\",\"w\",\"v\",\"x\",\"z\"].\ns is guaranteed to be valid.",
+      "solution": "class Solution:\n    def originalDigits(self, s):\n        from collections import Counter\n        count = Counter(s)\n        out = {}\n        \n        out['0'] = count['z']\n        out['2'] = count['w']\n        out['4'] = count['u']\n        out['6'] = count['x']\n        out['8'] = count['g']\n        \n        out['3'] = count['h'] - out['8']\n        out['5'] = count['f'] - out['4']\n        out['7'] = count['s'] - out['6']\n        \n        out['1'] = count['o'] - out['0'] - out['2'] - out['4']\n        out['9'] = count['i'] - out['5'] - out['6'] - out['8']\n        \n        res = [k * out[k] for k in sorted(out.keys())]\n        return ''.join(res)",
+      "explanation": "1. 計算每個字符出現的次數。\n2. 利用每個數字中獨特字符（z->0, w->2, u->4, x->6, g->8）確定這些數字的數量。\n3. 計算其他數字的數量，減去已確定的重疊字符數量。\n4. 將每個數字按順序重複其數量，拼接返回結果。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

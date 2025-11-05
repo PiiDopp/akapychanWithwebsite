@@ -1,0 +1,23 @@
+{
+  "ID": 1200,
+  "coding_practice": [
+    {
+      "title": "JSON 檔案儲存與讀取練習",
+      "description": "請寫一個程式，建立一個字典 data = {'name': 'Alice', 'age': 25, 'city': 'Taipei'}。\n1. 使用 json.dump() 將其寫入 data.json 檔。\n2. 再使用 json.load() 讀取該檔案並印出其中的 name 與 city。",
+      "examples": {
+        "input": "無（程式內建立）",
+        "output": "姓名： Alice\\n城市： Taipei"
+      },
+      "solution": "import json\n\ndata = {'name': 'Alice', 'age': 25, 'city': 'Taipei'}\n\n# 寫入 JSON 檔\nwith open('data.json', 'w', encoding='utf-8') as f:\n    json.dump(data, f, ensure_ascii=False, indent=2)\n\n# 讀取 JSON 檔\nwith open('data.json', 'r', encoding='utf-8') as f:\n    result = json.load(f)\n\nprint('姓名：', result['name'])\nprint('城市：', result['city'])"
+    },
+    {
+      "title": "即時匯率查詢小工具",
+      "description": "請使用 requests 模組串接匯率 API（https://api.exchangerate-api.com/v4/latest/USD），取得當前美元兌換台幣（TWD）的匯率。\n將結果顯示在 tkinter 視窗中，按下按鈕即可更新最新匯率。",
+      "examples": {
+        "input": "按下「更新匯率」按鈕",
+        "output": "目前美元匯率：約 32.5 TWD"
+      },
+      "solution": "import requests\nimport tkinter as tk\n\ndef get_rate():\n    try:\n        url = 'https://api.exchangerate-api.com/v4/latest/USD'\n        r = requests.get(url)\n        data = r.json()\n        rate = data['rates']['TWD']\n        label.config(text=f'目前美元匯率：約 {rate} TWD')\n    except Exception as e:\n        label.config(text='更新失敗，請檢查網路連線')\n\nwin = tk.Tk()\nwin.title('匯率查詢')\n\nlabel = tk.Label(win, text='請按下按鈕更新匯率', font=('Arial', 12))\nlabel.pack(pady=10)\n\ntk.Button(win, text='更新匯率', command=get_rate).pack(pady=5)\n\nwin.mainloop()"
+    }
+  ]
+}

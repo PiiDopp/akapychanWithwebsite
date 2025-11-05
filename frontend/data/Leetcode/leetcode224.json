@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode224",
+  "coding_practice": [
+    {
+      "title": "Basic Calculator",
+      "description": "Given a string s representing a valid expression, implement a basic calculator to evaluate it, and return the result of the evaluation.\n\nNote: You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as eval().",
+      "examples": [
+        {
+          "input": "s = \"1 + 1\"",
+          "output": "2"
+        },
+        {
+          "input": "s = \" 2-1 + 2 \"",
+          "output": "3"
+        },
+        {
+          "input": "s = \"(1+(4+5+2)-3)+(6+8)\"",
+          "output": "23"
+        }
+      ],
+      "constraints": "1 <= s.length <= 3 * 10^5\ns consists of digits, '+', '-', '(', ')', and ' '.\ns represents a valid expression.\n'+' is not used as a unary operation.\n'-' could be used as a unary operation.\nThere will be no two consecutive operators in the input.\nEvery number and running calculation will fit in a signed 32-bit integer.",
+      "solution": "class Solution:\n    def calculate(self, s):\n        stack = []\n        res = 0\n        num = 0\n        sign = 1\n        \n        for c in s:\n            if c.isdigit():\n                num = num * 10 + int(c)\n            elif c in '+-':\n                res += sign * num\n                num = 0\n                sign = 1 if c == '+' else -1\n            elif c == '(':\n                stack.append(res)\n                stack.append(sign)\n                res = 0\n                sign = 1\n            elif c == ')':\n                res += sign * num\n                num = 0\n                res *= stack.pop()  # 括號前的符號\n                res += stack.pop()  # 括號前的計算結果\n        res += sign * num\n        return res",
+      "explanation": "1. 使用棧 stack 保存遇到括號前的結果和符號。\n2. 遍歷每個字符，如果是數字就累計成 num。\n3. 遇到 '+' 或 '-'，將前一個數字乘以符號加到結果 res，更新符號。\n4. 遇到 '('，將當前結果和符號入棧，重置 res 與符號。\n5. 遇到 ')'，將 num 加入 res，再乘以括號前的符號，並加上括號前的結果。\n6. 遍歷結束後將最後 num 加入 res。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

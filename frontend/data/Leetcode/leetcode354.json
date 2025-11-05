@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode354",
+  "coding_practice": [
+    {
+      "title": "Russian Doll Envelopes",
+      "description": "You are given a 2D array of integers envelopes where envelopes[i] = [w_i, h_i] represents the width and the height of an envelope.\n\nOne envelope can fit into another if and only if both the width and height of one envelope are greater than the other envelope's width and height.\n\nReturn the maximum number of envelopes you can Russian doll (i.e., put one inside the other).\n\nNote: You cannot rotate an envelope.",
+      "examples": [
+        {
+          "input": "envelopes = [[5,4],[6,4],[6,7],[2,3]]",
+          "output": "3",
+          "explanation": "The maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7])."
+        },
+        {
+          "input": "envelopes = [[1,1],[1,1],[1,1]]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= envelopes.length <= 10^5\nenvelopes[i].length == 2\n1 <= w_i, h_i <= 10^5",
+      "solution": "class Solution:\n    def maxEnvelopes(self, envelopes):\n        if not envelopes:\n            return 0\n        # 先按寬度升序，如果寬度相同，按高度降序\n        envelopes.sort(key=lambda x: (x[0], -x[1]))\n        import bisect\n        dp = []\n        for _, h in envelopes:\n            idx = bisect.bisect_left(dp, h)\n            if idx == len(dp):\n                dp.append(h)\n            else:\n                dp[idx] = h\n        return len(dp)",
+      "explanation": "1. 將 envelopes 按寬度升序排序，如果寬度相同，按高度降序排序，這樣可避免寬度相同高度不同的干擾。\n2. 提取排序後的高度序列，問題轉化為在高度序列中求最長遞增子序列（LIS）。\n3. 使用二分查找優化 LIS 計算，dp 保存目前 LIS 的尾部元素。\n4. 對每個高度 h，找到 dp 中首個大於等於 h 的位置 idx，如果 idx 等於 dp 長度，追加 h，否則替換 dp[idx] = h。\n5. 最終 dp 長度即為最大套娃數量。",
+      "tag": "613",
+      "difficult": "hard"
+    }
+  ]
+}
+

@@ -1,0 +1,23 @@
+{
+  "ID": 700,
+  "coding_practice": [
+    {
+      "title": "質數判斷函數",
+      "description": "請寫一個函數 is_prime(n)，判斷一個整數是否為質數。如果是質數回傳 True，否則回傳 False。\n\n質數定義：大於 1，且除了 1 和自己本身外，沒有其他因數。",
+      "examples": {
+        "input": "print(is_prime(7))\nprint(is_prime(12))",
+        "output": "True\nFalse"
+      },
+      "solution": "def is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\n# 測試\nprint(is_prime(7))   # True\nprint(is_prime(12))  # False\nprint(is_prime(1))   # False"
+    },
+    {
+      "title": "計算平均分數",
+      "description": "請寫一個函數 calc_avg(*scores)，接收多個分數作為參數，並回傳平均值 (四捨五入到小數點後 2 位)。\n\n限制：不可使用內建函數 sum()。",
+      "examples": {
+        "input": "print(calc_avg(80, 90, 100))\nprint(calc_avg(70, 75, 85, 95))",
+        "output": "90.0\n81.25"
+      },
+      "solution": "def calc_avg(*scores):\n    total = 0\n    count = 0\n    for s in scores:\n        total += s\n        count += 1\n    return round(total / count, 2)\n\n# 測試\nprint(calc_avg(80, 90, 100))      # 90.0\nprint(calc_avg(70, 75, 85, 95))   # 81.25"
+    }
+  ]
+}

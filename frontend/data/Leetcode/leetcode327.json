@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode327",
+  "coding_practice": [
+    {
+      "title": "Count of Range Sum",
+      "description": "Given an integer array nums and two integers lower and upper, return the number of range sums that lie in [lower, upper] inclusive.\n\nRange sum S(i, j) is defined as the sum of the elements in nums between indices i and j inclusive, where i <= j.",
+      "examples": [
+        {
+          "input": "nums = [-2,5,-1], lower = -2, upper = 2",
+          "output": "3",
+          "explanation": "The three ranges are: [0,0], [2,2], and [0,2] and their respective sums are: -2, -1, 2."
+        },
+        {
+          "input": "nums = [0], lower = 0, upper = 0",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-2^31 <= nums[i] <= 2^31 - 1\n-10^5 <= lower <= upper <= 10^5\nThe answer is guaranteed to fit in a 32-bit integer.",
+      "solution": "class Solution:\n    def countRangeSum(self, nums, lower, upper):\n        prefix = [0]\n        for num in nums:\n            prefix.append(prefix[-1] + num)\n\n        def sort_and_count(lo, hi):\n            if hi - lo <= 1:\n                return 0\n            mid = (lo + hi) // 2\n            count = sort_and_count(lo, mid) + sort_and_count(mid, hi)\n            i = j = mid\n            for left in prefix[lo:mid]:\n                while i < hi and prefix[i] - left < lower:\n                    i += 1\n                while j < hi and prefix[j] - left <= upper:\n                    j += 1\n                count += j - i\n            prefix[lo:hi] = sorted(prefix[lo:hi])\n            return count\n\n        return sort_and_count(0, len(prefix))",
+      "explanation": "1. 計算前綴和 prefix，prefix[i] 表示 nums[0..i-1] 的和。\n2. 使用分治法 (merge sort) 對 prefix 進行排序和統計。\n3. 對於左右兩段子序列，統計跨越 mid 的範圍和落在 [lower, upper] 的數量。\n4. 合併左右子序列保持排序，以便計算上層的統計。\n5. 返回最終統計值作為答案。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

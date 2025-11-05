@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode467",
+  "coding_practice": [
+    {
+      "title": "Unique Substrings in Wraparound String",
+      "description": "We define the string base to be the infinite wraparound string of \"abcdefghijklmnopqrstuvwxyz\", so base will look like this:\n\n\"...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....\".\nGiven a string s, return the number of unique non-empty substrings of s are present in base.",
+      "examples": [
+        {
+          "input": "s = \"a\"",
+          "output": "1",
+          "explanation": "Only the substring \"a\" of s is in base."
+        },
+        {
+          "input": "s = \"cac\"",
+          "output": "2",
+          "explanation": "There are two substrings (\"a\", \"c\") of s in base."
+        },
+        {
+          "input": "s = \"zab\"",
+          "output": "6",
+          "explanation": "There are six substrings (\"z\", \"a\", \"b\", \"za\", \"ab\", and \"zab\") of s in base."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of lowercase English letters.",
+      "solution": "class Solution:\n    def findSubstringInWraproundString(self, p):\n        # dp[i] 表示以字母 chr(i + ord('a')) 結尾的最大子串長度\n        dp = [0] * 26\n        k = 0  # 目前連續子串長度\n        \n        for i in range(len(p)):\n            if i > 0 and (ord(p[i]) - ord(p[i-1])) % 26 == 1:\n                k += 1\n            else:\n                k = 1\n            dp[ord(p[i]) - ord('a')] = max(dp[ord(p[i]) - ord('a')], k)\n        \n        return sum(dp)",
+      "explanation": "1. 使用 dp 陣列記錄每個字母結尾的最大連續子串長度。\n2. 遍歷字符串 p，如果當前字符與前一個字符是相鄰的 wraparound 字母，則 k += 1，否則 k = 1。\n3. 更新 dp[當前字母] = max(dp[當前字母], k)。\n4. dp 中所有值之和即為唯一子串的總數。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

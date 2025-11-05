@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode483",
+  "coding_practice": [
+    {
+      "title": "Smallest Good Base",
+      "description": "Given an integer n represented as a string, return the smallest good base of n.\n\nWe call k >= 2 a good base of n, if all digits of n base k are 1's.",
+      "examples": [
+        {
+          "input": "n = \"13\"",
+          "output": "\"3\"",
+          "explanation": "13 base 3 is 111."
+        },
+        {
+          "input": "n = \"4681\"",
+          "output": "\"8\"",
+          "explanation": "4681 base 8 is 11111."
+        },
+        {
+          "input": "n = \"1000000000000000000\"",
+          "output": "\"999999999999999999\"",
+          "explanation": "1000000000000000000 base 999999999999999999 is 11."
+        }
+      ],
+      "constraints": "n is an integer in the range [3, 10^18].\nn does not contain any leading zeros.",
+      "solution": "class Solution:\n    def smallestGoodBase(self, n):\n        n = int(n)\n        max_m = n.bit_length()  # 最大位數\n        \n        for m in range(max_m, 1, -1):\n            left, right = 2, n - 1\n            while left <= right:\n                k = (left + right) // 2\n                # 計算 1 + k + k^2 + ... + k^(m-1)\n                s = (k**m - 1) // (k - 1)\n                if s == n:\n                    return str(k)\n                elif s < n:\n                    left = k + 1\n                else:\n                    right = k - 1\n        return str(n - 1)",
+      "explanation": "1. 將 n 轉成整數。\n2. 計算最大可能的位數 max_m = n.bit_length()。\n3. 從 max_m 到 2 遍歷位數 m，每次用二分法查找可能的 k。\n4. 用整數公式 (k**m - 1) // (k - 1) 計算總和，避免浮點數精度問題。\n5. 如果找到總和等於 n，即返回對應的 k。\n6. 如果遍歷所有 m 都找不到，則返回 n-1。",
+      "tag": "721",
+      "difficult": "hard"
+    }
+  ]
+}

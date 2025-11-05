@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode395",
+  "coding_practice": [
+    {
+      "title": "Longest Substring with At Least K Repeating Characters",
+      "description": "Given a string s and an integer k, return the length of the longest substring of s such that the frequency of each character in this substring is greater than or equal to k.\n\nif no such substring exists, return 0.",
+      "examples": [
+        {
+          "input": "s = \"aaabb\", k = 3",
+          "output": "3",
+          "explanation": "The longest substring is \"aaa\", as 'a' is repeated 3 times."
+        },
+        {
+          "input": "s = \"ababbc\", k = 2",
+          "output": "5",
+          "explanation": "The longest substring is \"ababb\", as 'a' is repeated 2 times and 'b' is repeated 3 times."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of only lowercase English letters.\n1 <= k <= 10^5",
+      "solution": "from collections import Counter\n\nclass Solution:\n    def longestSubstring(self, s, k):\n        if len(s) < k:\n            return 0\n\n        count = Counter(s)\n        for char in count:\n            if count[char] < k:\n                return max(self.longestSubstring(sub, k) for sub in s.split(char))\n        return len(s)",
+      "explanation": "1. 若字串長度小於 k，無法滿足條件，返回 0。\n2. 使用 Counter 計算每個字母出現次數。\n3. 找到出現次數小於 k 的字母，將字串以該字母分割，分別遞迴計算每個子串的最大長度。\n4. 若所有字母都至少出現 k 次，返回整個字串長度。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

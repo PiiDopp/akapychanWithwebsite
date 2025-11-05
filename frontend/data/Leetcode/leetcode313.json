@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode313",
+  "coding_practice": [
+    {
+      "title": "Super Ugly Number",
+      "description": "A super ugly number is a positive integer whose prime factors are in the array primes.\n\nGiven an integer n and an array of integers primes, return the nth super ugly number.\n\nThe nth super ugly number is guaranteed to fit in a 32-bit signed integer.",
+      "examples": [
+        {
+          "input": "n = 12, primes = [2,7,13,19]",
+          "output": "32",
+          "explanation": "[1,2,4,7,8,13,14,16,19,26,28,32] is the sequence of the first 12 super ugly numbers given primes = [2,7,13,19]."
+        },
+        {
+          "input": "n = 1, primes = [2,3,5]",
+          "output": "1",
+          "explanation": "1 has no prime factors, therefore all of its prime factors are in the array primes = [2,3,5]."
+        }
+      ],
+      "constraints": "1 <= n <= 10^5\n1 <= primes.length <= 100\n2 <= primes[i] <= 1000\nprimes[i] is guaranteed to be a prime number.\nAll the values of primes are unique and sorted in ascending order.",
+      "solution": "import heapq\n\nclass Solution:\n    def nthSuperUglyNumber(self, n, primes):\n        ugly = [1]\n        indices = [0] * len(primes)\n        vals = list(primes)\n        \n        for _ in range(1, n):\n            next_ugly = min(vals)\n            ugly.append(next_ugly)\n            \n            for i in range(len(primes)):\n                if vals[i] == next_ugly:\n                    indices[i] += 1\n                    vals[i] = ugly[indices[i]] * primes[i]\n        \n        return ugly[-1]",
+      "explanation": "1. 使用 ugly 列表保存目前已生成的 super ugly number，初始為 [1]。\n2. indices 記錄每個 prime 的當前乘法位置。\n3. vals 儲存每個 prime 對應當前乘的值。\n4. 每次從 vals 中選最小值作為下一個 super ugly number，並更新對應 prime 的索引和值。\n5. 重複 n-1 次，最後返回 ugly[-1]。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

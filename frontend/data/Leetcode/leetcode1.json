@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode1",
+  "coding_practice": [
+    {
+      "title": "Two Sum",
+      "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\nYou can return the answer in any order.",
+      "examples": [
+        {
+          "input": "nums = [2,7,11,15], target = 9",
+          "output": "[0,1]",
+          "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+        },
+        {
+          "input": "nums = [3,2,4], target = 6",
+          "output": "[1,2]"
+        },
+        {
+          "input": "nums = [3,3], target = 6",
+          "output": "[0,1]"
+        }
+      ],
+      "constraints": "2 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9\n-10^9 <= target <= 10^9\nOnly one valid answer exists.",
+      "follow up": "Can you come up with an algorithm that is less than O(n^2) time complexity?",
+      "solution": "class Solution(object):\n    def twoSum(self, nums, target):\n        \"\"\"\n        :type nums: List[int]\n        :type target: int\n        :rtype: List[int]\n        \"\"\"\n        dic = {}\n        for i, val in enumerate(nums):\n            if target - val in dic:\n                return [dic[target - val], i]\n            else:\n                dic[val] = i",
+      "explanation": "1. 建立一個空字典 dic，用來儲存數值與其索引。\n2. 遍歷 nums，每次取得索引 i 與數值 val。\n3. 檢查 target - val 是否已存在於 dic 中，若存在，代表兩數之和等於 target，直接回傳索引。\n4. 若不存在，將 val 與 i 加入 dic 中繼續迭代。\n5. 因為題目保證有唯一解，故一定能在迴圈中找到答案。",
+      "tag": "631",
+      "difficult": "easy"
+    }
+  ]
+}

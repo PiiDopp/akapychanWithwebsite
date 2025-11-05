@@ -1,0 +1,22 @@
+{
+  "ID": "leetcode232",
+  "coding_practice": [
+    {
+      "title": "Implement Queue using Stacks",
+      "description": "Implement a first in first out (FIFO) queue using only two stacks. The implemented queue should support all the functions of a normal queue (push, peek, pop, and empty).\n\nImplement the MyQueue class:\n\nvoid push(int x) Pushes element x to the back of the queue.\nint pop() Removes the element from the front of the queue and returns it.\nint peek() Returns the element at the front of the queue.\nboolean empty() Returns true if the queue is empty, false otherwise.\nNotes:\n\nYou must use only standard operations of a stack, which means only push to top, peek/pop from top, size, and is empty operations are valid.\nDepending on your language, the stack may not be supported natively. You may simulate a stack using a list or deque (double-ended queue) as long as you use only a stack's standard operations.",
+      "examples": [
+        {
+          "input": "Input\n[\"MyQueue\", \"push\", \"push\", \"peek\", \"pop\", \"empty\"]\n[[], [1], [2], [], [], []]",
+          "output": "[null, null, null, 1, 1, false]",
+          "explanation": "MyQueue myQueue = new MyQueue();\nmyQueue.push(1); // queue is: [1]\nmyQueue.push(2); // queue is: [1, 2] (leftmost is front of the queue)\nmyQueue.peek(); // return 1\nmyQueue.pop(); // return 1, queue is [2]\nmyQueue.empty(); // return false"
+        }
+      ],
+      "constraints": "1 <= x <= 9\nAt most 100 calls will be made to push, pop, peek, and empty.\nAll the calls to pop and peek are valid.",
+      "follow up": "Can you implement the queue such that each operation is amortized O(1) time complexity? In other words, performing n operations will take overall O(n) time even if one of those operations may take longer.",
+      "solution": "class MyQueue:\n    def __init__(self):\n        self.stack_in = []\n        self.stack_out = []\n\n    def push(self, x):\n        self.stack_in.append(x)\n\n    def pop(self):\n        self.peek()\n        return self.stack_out.pop()\n\n    def peek(self):\n        if not self.stack_out:\n            while self.stack_in:\n                self.stack_out.append(self.stack_in.pop())\n        return self.stack_out[-1]\n\n    def empty(self):\n        return not self.stack_in and not self.stack_out",
+      "explanation": "1. 使用兩個棧，一個負責入隊 (stack_in)，另一個負責出隊 (stack_out)。\n2. push 元素時直接加入 stack_in。\n3. pop 或 peek 時，如果 stack_out 為空，把 stack_in 全部倒入 stack_out，保持先入先出。\n4. empty 時只要兩個棧都空即可。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

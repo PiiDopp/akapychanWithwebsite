@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode77",
+  "coding_practice": [
+    {
+      "title": "Subsets",
+      "description": "Given an integer array nums of unique elements, return all possible subsets (the power set).\n\nThe solution set must not contain duplicate subsets. Return the solution in any order.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]"
+        },
+        {
+          "input": "nums = [0]",
+          "output": "[[],[0]]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10\n-10 <= nums[i] <= 10\nAll the numbers of nums are unique.",
+      "solution": "class Solution(object):\n    def subsets(self, nums):\n        res = []\n        def backtrack(start, path):\n            res.append(path[:])\n            for i in range(start, len(nums)):\n                path.append(nums[i])\n                backtrack(i + 1, path)\n                path.pop()\n        backtrack(0, [])\n        return res",
+      "explanation": "使用回溯法生成所有子集：\n1. 初始化結果列表 res。\n2. 定義回溯函數 backtrack，從索引 start 開始遍歷 nums，累積當前路徑 path。\n3. 每次調用 backtrack 都將當前 path 複製加入 res。\n4. 遞歸遍歷每個元素，生成包含當前元素的子集，回溯時移除最後一個元素。\n時間複雜度: O(n * 2^n)\n空間複雜度: O(n * 2^n)",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

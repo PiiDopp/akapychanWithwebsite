@@ -1,0 +1,49 @@
+{
+  "ID": 641,
+  "Title": "集合介紹",
+  "Intro": "\t集合（set）與字典（dict）一樣都是把元素放在 {} 內，不過 set 只有鍵（key）沒有值（value），類似數學裡的集合，可以進行聯集（|）、交集（&）、差集（-）與互斥或（^）等運算。另外，集合裡的元素沒有順序而且不可重複出現，不會記錄元素的位置，也不支援索引或切片運算。集合內的元素必須是不可變的（例如整數、浮點數、字串、元組），而串列、字典、集合這類可變資料型態不能作為集合元素。不過集合本身是可變的，因此可以動態增加或刪除元素。",
+  "exp": {
+    "cor_exp": [
+      "original = [\"abase\", \"abate\", \"abdicate\", \"abhor\", \"abate\", \"acrid\", \"appoint\", \"abate\", \"kindle\"]\n\nprint(\"單字收集的原始內容：\")\nprint(original)\n\nset1 = set(original)\nnot_duplicated = list(set1)\n\nprint(\"去除重複單字後的內容：\")\nprint(not_duplicated)\n\nprint(\"按照字母的排列順序：\")\nnot_duplicated.sort()\nprint(not_duplicated)"
+    ],
+    "mis_exp": [
+      "original = [[\"a\", \"b\"], [\"c\", \"d\"]]\nset1 = set(original)\n# 錯誤：list 是可變物件，不能成為集合元素",
+      "original = {\"a\": 1, \"b\": 2}\nset1 = set(original)\n# 錯誤：會只取鍵，不會保留鍵值對"
+    ]
+  },
+  "practice": [
+    {
+      "question": "關於集合 (set) 的特性，下列哪一個敘述是正確的？",
+      "options": [
+        "A. 集合的元素可以重複出現",
+        "B. 集合支援索引與切片運算",
+        "C. 集合內元素必須是不可變物件",
+        "D. 集合內的元素有固定順序"
+      ],
+      "answer": "C",
+      "explanation": "集合內的元素必須是不可變的資料型態（如整數、字串、元組），不可重複，且集合不支援索引與切片。"
+    },
+    {
+      "question": "若執行 set({\"a\":1, \"b\":2})，結果會是什麼？",
+      "options": [
+        "A. {\"a\": 1, \"b\": 2}",
+        "B. {1, 2}",
+        "C. {\"a\", \"b\"}",
+        "D. TypeError"
+      ],
+      "answer": "C",
+      "explanation": "將字典轉換為集合時，只會取出字典的鍵 (key)，因此結果是 {\"a\", \"b\"}。"
+    },
+    {
+      "question": "下列哪一種資料型態不能作為集合元素？",
+      "options": [
+        "A. 整數 (int)",
+        "B. 字串 (str)",
+        "C. 元組 (tuple)",
+        "D. 串列 (list)"
+      ],
+      "answer": "D",
+      "explanation": "串列是可變物件，因此不能作為集合元素；其他如 int、str、tuple 都是不可變物件，可以作為集合元素。"
+    }
+  ]
+}

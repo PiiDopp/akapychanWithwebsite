@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode400",
+  "coding_practice": [
+    {
+      "title": "Nth Digit",
+      "description": "Given an integer n, return the n^th digit of the infinite integer sequence [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ...].",
+      "examples": [
+        {
+          "input": "n = 3",
+          "output": "3"
+        },
+        {
+          "input": "n = 11",
+          "output": "0",
+          "explanation": "The 11th digit of the sequence 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ... is a 0, which is part of the number 10."
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def findNthDigit(self, n):\n        length = 1  # digit length\n        count = 9   # count of numbers with this digit length\n        start = 1   # starting number of this digit length\n        \n        while n > length * count:\n            n -= length * count\n            length += 1\n            count *= 10\n            start *= 10\n        \n        start += (n - 1) // length\n        s = str(start)\n        return int(s[(n - 1) % length])",
+      "explanation": "1. 從單位數字開始，計算每個位數範圍的總數字量。\n2. 當 n 超過當前位數範圍，扣除該範圍的總數字量並增加位數。\n3. 找到包含第 n 位的數字，將其轉成字串，取對應索引的數字。\n4. 返回該數字。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

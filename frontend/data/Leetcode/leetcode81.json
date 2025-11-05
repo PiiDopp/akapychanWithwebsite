@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode81",
+  "coding_practice": [
+    {
+      "title": "Search in Rotated Sorted Array II",
+      "description": "There is an integer array nums sorted in non-decreasing order (not necessarily with distinct values).\n\nBefore being passed to your function, nums is rotated at an unknown pivot index k (0 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,4,4,5,6,6,7] might be rotated at pivot index 5 and become [4,5,6,6,7,0,1,2,4,4].\n\nGiven the array nums after the rotation and an integer target, return true if target is in nums, or false if it is not in nums.\n\nYou must decrease the overall operation steps as much as possible.",
+      "examples": [
+        {
+          "input": "nums = [2,5,6,0,0,1,2], target = 0",
+          "output": "true"
+        },
+        {
+          "input": "nums = [2,5,6,0,0,1,2], target = 3",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5000\n-10^4 <= nums[i] <= 10^4\nnums is guaranteed to be rotated at some pivot.\n-10^4 <= target <= 10^4",
+      "follow up": "This problem is similar to Search in 33.Rotated Sorted Array, but nums may contain duplicates. Would this affect the runtime complexity? How and why?",
+      "solution": "class Solution(object):\n    def search(self, nums, target):\n        left, right = 0, len(nums) - 1\n        \n        while left <= right:\n            mid = (left + right) // 2\n            if nums[mid] == target:\n                return True\n            \n            if nums[left] == nums[mid] == nums[right]:\n                left += 1\n                right -= 1\n            elif nums[left] <= nums[mid]:\n                if nums[left] <= target < nums[mid]:\n                    right = mid - 1\n                else:\n                    left = mid + 1\n            else:\n                if nums[mid] < target <= nums[right]:\n                    left = mid + 1\n                else:\n                    right = mid - 1\n        return False",
+      "explanation": "1. 初始化左右指標 left 和 right，指向陣列首尾。\n2. 使用 while 迴圈進行二分搜尋。\n3. 計算中點 mid，若 nums[mid] == target，直接返回 True。\n4. 若 left、mid、right 三者相等，無法判斷有序區間，將左右邊界縮小一格。\n5. 判斷左半邊是否有序，若有序且 target 在左半邊，更新 right 指標；否則更新 left 指標。\n6. 若左半邊無序，則右半邊必有序，若 target 在右半邊範圍內，更新 left 指標；否則更新 right 指標。\n7. 若 while 迴圈結束仍未找到 target，返回 False。",
+      "tag": "530",
+      "difficult": "medium"
+    }
+  ]
+}

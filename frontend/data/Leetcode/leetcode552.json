@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode552",
+  "coding_practice": [
+    {
+      "title": "Student Attendance Record II",
+      "description": "An attendance record for a student can be represented as a string where each character signifies whether the student was absent, late, or present on that day. The record only contains the following three characters:\n\n'A': Absent.\n'L': Late.\n'P': Present.\nAny student is eligible for an attendance award if they meet both of the following criteria:\n\nThe student was absent ('A') for strictly fewer than 2 days total.\nThe student was never late ('L') for 3 or more consecutive days.\nGiven an integer n, return the number of possible attendance records of length n that make a student eligible for an attendance award. The answer may be very large, so return it modulo 10^9 + 7.",
+      "examples": [
+        {
+          "input": "2",
+          "output": "8",
+          "explanation": "There are 8 records with length 2 that are eligible for an award:\n\"PP\", \"AP\", \"PA\", \"LP\", \"PL\", \"AL\", \"LA\", \"LL\"\nOnly \"AA\" is not eligible because there are 2 absences (there need to be fewer than 2)."
+        },
+        {
+          "input": "1",
+          "output": "3"
+        },
+        {
+          "input": "10101",
+          "output": "183236316"
+        }
+      ],
+      "constraints": "1 <= n <= 10^5",
+      "solution": "class Solution:\n    def checkRecord(self, n):\n        MOD = 10**9 + 7\n        # dp[a][l] = count of sequences with a 'A's and ending with l consecutive 'L's\n        dp = [[0]*3 for _ in range(2)]\n        dp[0][0] = 1\n\n        for _ in range(n):\n            new_dp = [[0]*3 for _ in range(2)]\n            for a in range(2):\n                for l in range(3):\n                    val = dp[a][l]\n                    if val == 0:\n                        continue\n                    # Add 'P'\n                    new_dp[a][0] = (new_dp[a][0] + val) % MOD\n                    # Add 'A'\n                    if a == 0:\n                        new_dp[1][0] = (new_dp[1][0] + val) % MOD\n                    # Add 'L'\n                    if l < 2:\n                        new_dp[a][l+1] = (new_dp[a][l+1] + val) % MOD\n            dp = new_dp\n\n        return sum(dp[a][l] for a in range(2) for l in range(3)) % MOD",
+      "explanation": "1. 使用 dp[a][l] 記錄當前長度的出勤序列數量，a 為 'A' 出現次數，l 為連續 'L' 的數量。\n2. 對每一天，根據前一天的 dp 更新新的 dp:\n   - 加 'P'：連續 'L' 歸 0，'A' 不變\n   - 加 'A'：只能在前面 'A' = 0 時加，連續 'L' 歸 0\n   - 加 'L'：如果連續 'L' 小於 2，累加到 l+1\n3. 最後 sum(dp[a][l]) 即為長度 n 的所有合法序列數，對 MOD 取餘。",
+      "tag": "511",
+      "difficult": "hard"
+    }
+  ]
+}

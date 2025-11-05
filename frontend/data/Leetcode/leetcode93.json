@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode93",
+  "coding_practice": [
+    {
+      "title": "Restore IP Addresses",
+      "description": "A valid IP address consists of exactly four integers separated by single dots. Each integer is between 0 and 255 (inclusive) and cannot have leading zeros.\n\nFor example, \"0.1.2.201\" and \"192.168.1.1\" are valid IP addresses, but \"0.011.255.245\", \"192.168.1.312\" and \"192.168@1.1\" are invalid IP addresses.\nGiven a string s containing only digits, return all possible valid IP addresses that can be formed by inserting dots into s. You are not allowed to reorder or remove any digits in s. You may return the valid IP addresses in any order.",
+      "examples": [
+        {
+          "input": "s = \"25525511135\"",
+          "output": "[\"255.255.11.135\",\"255.255.111.35\"]"
+        },
+        {
+          "input": "s = \"0000\"",
+          "output": "[\"0.0.0.0\"]"
+        },
+        {
+          "input": "s = \"101023\"",
+          "output": "[\"1.0.10.23\",\"1.0.102.3\",\"10.1.0.23\",\"10.10.2.3\",\"101.0.2.3\"]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 20\ns consists of digits only.",
+      "solution": "class Solution(object):\n    def restoreIpAddresses(self, s):\n        res = []\n        def backtrack(start, path):\n            if start == len(s) and len(path) == 4:\n                res.append(\".\".join(path))\n                return\n            if len(path) >= 4:\n                return\n            for length in range(1, 4):\n                if start + length > len(s):\n                    break\n                part = s[start:start+length]\n                if (part.startswith('0') and len(part) > 1) or int(part) > 255:\n                    continue\n                backtrack(start+length, path + [part])\n        backtrack(0, [])\n        return res",
+      "explanation": "1. 使用回溯方法從字符串開頭開始探索可能的分段。\n2. 每次分割取 1 到 3 位字符，檢查其是否有效（不以 '0' 開頭除非單個 '0'，且小於等於 255）。\n3. 當累積四段且已遍歷完字符串時，加入結果列表。\n4. 遞迴探索所有可能分割組合，返回所有有效 IP 地址。",
+      "tag": "631",
+      "difficult": "medium"
+    }
+  ]
+}

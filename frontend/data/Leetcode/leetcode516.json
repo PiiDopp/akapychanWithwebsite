@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode516",
+  "coding_practice": [
+    {
+      "title": "Longest Palindromic Subsequence",
+      "description": "Given a string s, find the longest palindromic subsequence's length in s.\n\nA subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.",
+      "examples": [
+        {
+          "input": "\"bbbab\"",
+          "output": "4",
+          "explanation": "One possible longest palindromic subsequence is \"bbbb\"."
+        },
+        {
+          "input": "\"cbbd\"",
+          "output": "2",
+          "explanation": "One possible longest palindromic subsequence is \"bb\"."
+        }
+      ],
+      "constraints": "1 <= s.length <= 1000\ns consists only of lowercase English letters.",
+      "solution": "class Solution:\n    def longestPalindromeSubseq(self, s):\n        n = len(s)\n        dp = [[0] * n for _ in range(n)]\n        \n        for i in range(n-1, -1, -1):\n            dp[i][i] = 1\n            for j in range(i+1, n):\n                if s[i] == s[j]:\n                    dp[i][j] = dp[i+1][j-1] + 2\n                else:\n                    dp[i][j] = max(dp[i+1][j], dp[i][j-1])\n        return dp[0][n-1]",
+      "explanation": "1. 使用動態規劃，定義 dp[i][j] 為 s[i..j] 的最長回文子序列長度。\n2. 初始化 dp[i][i] = 1，每個單一字母都是回文。\n3. 從後向前遍歷 i，對每個 j > i，如果 s[i] == s[j]，則 dp[i][j] = dp[i+1][j-1] + 2。\n4. 否則 dp[i][j] = max(dp[i+1][j], dp[i][j-1])。\n5. 最終 dp[0][n-1] 即為整個字串的最長回文子序列長度。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

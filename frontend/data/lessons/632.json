@@ -1,0 +1,54 @@
+{
+  "ID": 632,
+  "Title": "常用的字典函數",
+  "Intro": "\t字典 (dict) 提供多種常用方法：clear() 清空字典但保留物件；copy() 建立一份淺層複製，與原字典互不影響；get() 根據鍵 (key) 取得值 (value)，若鍵不存在則回傳 None 或預設值；pop() 移除指定鍵並回傳其值，若鍵不存在則會報錯。",
+  "exp": {
+    "cor_exp": [
+      "# 建立字典\nscores = {'小明': 90, '小華': 85, '小美': 92}",
+      "# clear(): 清空字典內容，但字典仍存在\nscores.clear()\nprint(scores)  # {}",
+      "# copy(): 複製字典\nstudents = {'Tom': 18, 'Amy': 19}\nstudents_copy = students.copy()\nstudents_copy['Tom'] = 20\nprint(students)       # {'Tom': 18, 'Amy': 19}\nprint(students_copy)  # {'Tom': 20, 'Amy': 19}",
+      "# get(): 透過 key 取值\nperson = {'name': 'John', 'age': 25}\nprint(person.get('name'))        # John\nprint(person.get('gender'))      # None\nprint(person.get('gender', 'N/A')) # N/A",
+      "# pop(): 移除元素並回傳值\ngrades = {'數學': 80, '英文': 90, '國文': 85}\nremoved = grades.pop('英文')\nprint(removed)  # 90\nprint(grades)   # {'數學': 80, '國文': 85}"
+    ],
+    "mis_exp": [
+      "person.get('name', 'age')  # TypeError\n# 錯誤：get() 不支援多個 key 參數",
+      "grades = {'數學': 80, '英文': 90}\ngrades.pop('歷史')  # KeyError\n# 錯誤：pop() 移除不存在的 key 會報錯",
+      "result = scores.clear()\nprint(result)  # None\n# 錯誤：clear() 不是回傳清空後的字典，而是 None"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個關於 clear() 的敘述正確？",
+      "options": [
+        "A. clear() 會刪除字典物件本身",
+        "B. clear() 會清空字典並回傳 {}",
+        "C. clear() 會清空字典並回傳 None",
+        "D. clear() 只能刪除單一元素"
+      ],
+      "answer": "C",
+      "explanation": "clear() 方法會清空字典內容，但字典物件仍存在，回傳值為 None。"
+    },
+    {
+      "question": "若 person = {'name': 'John'}，則 person.get('age', '未知') 的輸出結果是？",
+      "options": [
+        "A. KeyError",
+        "B. None",
+        "C. '未知'",
+        "D. 0"
+      ],
+      "answer": "C",
+      "explanation": "get() 方法在 key 不存在時會回傳第二個參數的預設值，因此輸出 '未知'。"
+    },
+    {
+      "question": "下列哪個對 copy() 的描述是正確的？",
+      "options": [
+        "A. copy() 建立的是深層複製 (deep copy)",
+        "B. copy() 複製後修改副本不會影響原字典",
+        "C. copy() 複製後修改副本會同步修改原字典",
+        "D. copy() 會刪除原字典並建立新字典"
+      ],
+      "answer": "B",
+      "explanation": "copy() 建立淺層複製 (shallow copy)，修改副本中的元素不會影響原字典。"
+    }
+  ]
+}

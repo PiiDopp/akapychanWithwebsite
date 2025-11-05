@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode386",
+  "coding_practice": [
+    {
+      "title": "Lexicographical Numbers",
+      "description": "Given an integer n, return all the numbers in the range [1, n] sorted in lexicographical order.\n\nYou must write an algorithm that runs in O(n) time and uses O(1) extra space.",
+      "examples": [
+        {
+          "input": "n = 13",
+          "output": "[1,10,11,12,13,2,3,4,5,6,7,8,9]"
+        },
+        {
+          "input": "n = 2",
+          "output": "[1,2]"
+        }
+      ],
+      "constraints": "1 <= n <= 5 * 10^4",
+      "solution": "class Solution:\n    def lexicalOrder(self, n):\n        result = []\n\n        def dfs(current):\n            if current > n:\n                return\n            result.append(current)\n            for i in range(10):\n                next_num = current * 10 + i\n                if next_num > n:\n                    return\n                dfs(next_num)\n\n        for i in range(1, 10):\n            dfs(i)\n\n        return result",
+      "explanation": "1. 使用 DFS 遍歷所有數字，從 1 到 9 作為第一層。\n2. 對每個當前數字 current，生成 current*10 + i (0<=i<=9) 的下一層數字。\n3. 若 next_num 超過 n，則停止該分支。\n4. 按 DFS 遞歸順序加入 result，得到字典序排列。\n5. 因為不需要額外排序，時間複雜度為 O(n)，空間僅為遞歸棧深度 O(log n)。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

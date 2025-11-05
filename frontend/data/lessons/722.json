@@ -1,0 +1,49 @@
+{
+  "ID": 722,
+  "Title": "字串函數",
+  "Intro": "\t在 Python 中，字串屬於 str 型別，除了 str()、ord()、chr() 等內建函數，還有許多字串物件的方法可以直接操作字串。",
+  "exp": {
+    "cor_exp": [
+      "基礎函數\n函數\t說明\t\t\t\t範例\n\nstr(x)\t把其他型態轉成字串\tstr(123) → \"123\"\nord(c)\t字元轉 Unicode 編碼\tord(\"A\") → 65\nchr(n)\t編碼轉字元\t\t\tchr(65) → \"A\"",
+      "字串搜尋與替代\n函數\t\t\t\t說明\t\t\t\t\t\t範例\t\t\t\t輸出\n\nfind(sub)\t\t\t找子字串第一次出現的位置，找不到回傳 -1\t\"banana\".find(\"na\")\t\t2\nindex(sub)\t\t\t找子字串第一次出現的位置，找不到會報錯\t\t\"banana\".index(\"na\")\t\t2\ncount(sub)\t\t\t子字串出現次數\t\t\t\t\t\"banana\".count(\"na\")\t\t2\nreplace(old, new)\t取代子字串\t\t\t\t\t\"2025-09-14\".replace(\"-\", \"/\")\t\"2025/09/14\"\nstartswith(prefix)\t是否以某字串開頭\t\t\t\t\"hello\".startswith(\"he\")\tTrue\nendswith(suffix)\t是否以某字串結尾\t\t\t\t\"hello\".endswith(\"lo\")\t\tTrue\nsplit(sep)\t\t\t依分隔符號切割字串\t\t\t\t\"a,b,c\".split(\",\")\t\t['a','b','c']\njoin(list)\t\t用字串連接序列\t\t\t\t\" \".join([\"I\",\"love\",\"Python\"])\t\"I love Python\"\nstrip()\t\t去除前後空白\t\t\t\t\t\" hi \".strip()\t\t\t\"hi\"\nlstrip()\t\t去除左側空白\t\t\t\t\t\" hi \".lstrip()\t\t\t\"hi \"\nrstrip()\t\t去除右側空白\t\t\t\t\" hi \".rstrip()\t\t\t\" hi\"",
+      "字串大小寫\n函數\t\t說明\t\t\t\t\t\t範例\t\t\t\t輸出\ncapitalize()\t首字母大寫，其餘小寫\t\t\t\t\"hello world\".capitalize()\t\"Hello world\"\nlower()\t\t全部轉小寫\t\t\t\t\t\"PyThOn\".lower()\t\t\"python\"\nupper()\t\t全部轉大寫\t\t\t\t\t\"PyThOn\".upper()\t\t\"PYTHON\"\ntitle()\t\t每個單字首字母大寫\t\t\t\t\"hello world\".title()\t\t\"Hello World\"\nislower()\t判斷字串是否全為小寫\t\t\t\t\"python\".islower()\t\tTrue\nisupper()\t判斷字串是否全為大寫\t\t\t\t\"PYTHON\".isupper()\t\tTrue\nistitle()\t判斷字串是否為「標題格式」(每個單字首字母大寫)\t\"Hello World\".istitle()\t\tTrue",
+      "字串對齊、填充與分割\n函數\t\t\t\t說明\t\t\t\t\t\t範例\t\t\t\t輸出\ncenter(width, fillchar)\t置中對齊，左右補上字元（預設空白）\t\"hi\".center(6, \"-\")\t\t\"--hi--\"\nljust(width, fillchar)\t靠左對齊，右側補上字元（預設空白）\t\"hi\".ljust(6, \".\")\t\t\"hi....\"\nrjust(width, fillchar)\t靠右對齊，左側補上字元（預設空白）\t\"hi\".rjust(6, \".\")\t\t\"....hi\"\nzfill(width)\t\t在左側補零，使字串長度等於指定值\t\t\"42\".zfill(5)\t\t\t\"00042\"\npartition(sep)\t\t分割字串為 (前, 分隔符, 後) 三部分，只分割第一次出現\t\"hello world\".partition(\" \")\t('hello', ' ', 'world')\nsplitlines()\t\t依照換行符號 \\n 分割字串\t\t\t\"a\\nb\\nc\".splitlines()\t\t['a','b','c']"
+    ],
+    "mis_exp": []
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ns = \"banana\"\nprint(s.find(\"na\"))\nprint(s.index(\"na\"))",
+      "options": [
+        "A. 2 和 2",
+        "B. 2 和 ValueError",
+        "C. -1 和 2",
+        "D. 2 和 -1"
+      ],
+      "answer": "A",
+      "explanation": "find() 找到子字串回傳索引 2，index() 也回傳 2（若找不到才會拋出 ValueError）。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ntext = \" hello \"\nprint(text.strip())\nprint(text.lstrip())\nprint(text.rstrip())",
+      "options": [
+        "A. 'hello'，'hello'，'hello'",
+        "B. 'hello'，'hello '，' hello'",
+        "C. ' hello '，'hello'，'hello '",
+        "D. 'hello'，' hello '，' hello '"
+      ],
+      "answer": "B",
+      "explanation": "strip() 移除前後空白 → 'hello'；lstrip() 移除左側空白 → 'hello '；rstrip() 移除右側空白 → ' hello'。"
+    },
+    {
+      "question": "下列哪個判斷結果為 True？",
+      "options": [
+        "A. \"Python\".islower()",
+        "B. \"PYTHON\".istitle()",
+        "C. \"python\".isupper()",
+        "D. \"Hello World\".istitle()"
+      ],
+      "answer": "D",
+      "explanation": "只有 'Hello World' 符合標題格式 (每個單字首字母大寫)，所以 istitle() 回傳 True。"
+    }
+  ]
+}

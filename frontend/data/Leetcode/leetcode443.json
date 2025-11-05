@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode443",
+  "coding_practice": [
+    {
+      "title": "String Compression",
+      "description": "Given an array of characters chars, compress it using the following algorithm:\n\nBegin with an empty string s. For each group of consecutive repeating characters in chars:\n\nIf the group's length is 1, append the character to s.\nOtherwise, append the character followed by the group's length.\nThe compressed string s should not be returned separately, but instead, be stored in the input character array chars. Note that group lengths that are 10 or longer will be split into multiple characters in chars.\n\nAfter you are done modifying the input array, return the new length of the array.\n\nYou must write an algorithm that uses only constant extra space.\n\nNote: The characters in the array beyond the returned length do not matter and should be ignored.",
+      "examples": [
+        {
+          "input": "chars = [\"a\",\"a\",\"b\",\"b\",\"c\",\"c\",\"c\"]",
+          "output": "6",
+          "explanation": "The groups are \"aa\", \"bb\", and \"ccc\". This compresses to \"a2b2c3\"."
+        },
+        {
+          "input": "chars = [\"a\"]",
+          "output": "1",
+          "explanation": "The only group is \"a\", which remains uncompressed since it's a single character."
+        },
+        {
+          "input": "chars = [\"a\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\",\"b\"]",
+          "output": "4",
+          "explanation": "The groups are \"a\" and \"bbbbbbbbbbbb\". This compresses to \"ab12\"."
+        }
+      ],
+      "constraints": "1 <= chars.length <= 2000\nchars[i] is a lowercase English letter, uppercase English letter, digit, or symbol.",
+      "solution": "class Solution:\n    def compress(self, chars):\n        write = 0\n        left = 0\n        n = len(chars)\n        \n        while left < n:\n            right = left\n            while right < n and chars[right] == chars[left]:\n                right += 1\n            chars[write] = chars[left]\n            write += 1\n            count = right - left\n            if count > 1:\n                for c in str(count):\n                    chars[write] = c\n                    write += 1\n            left = right\n        \n        return write",
+      "explanation": "1. 使用雙指針 left 和 right 遍歷 chars，找到每個連續字符組。\n2. 將字符寫入 chars[write] 並增加 write。\n3. 如果組長度 > 1，將其數字字符逐一寫入 chars 並增加 write。\n4. 返回最後寫入的位置 write，即壓縮後的長度。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

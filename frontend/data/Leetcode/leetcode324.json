@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode324",
+  "coding_practice": [
+    {
+      "title": "Wiggle Sort II",
+      "description": "Given an integer array nums, reorder it such that nums[0] < nums[1] > nums[2] < nums[3]....\n\nYou may assume the input array always has a valid answer.",
+      "examples": [
+        {
+          "input": "nums = [1,5,1,1,6,4]",
+          "output": "[1,6,1,5,1,4]",
+          "explanation": "[1,4,1,5,1,6] is also accepted."
+        },
+        {
+          "input": "nums = [1,3,2,2,3,1]",
+          "output": "[2,3,1,3,1,2]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5 * 10^4\n0 <= nums[i] <= 5000\nIt is guaranteed that there will be an answer for the given input nums.",
+      "follow up": " Can you do it in O(n) time and/or in-place with O(1) extra space?",
+      "solution": "class Solution:\n    def wiggleSort(self, nums):\n        nums.sort()\n        n = len(nums)\n        half = (n + 1) // 2\n        left = nums[:half][::-1]\n        right = nums[half:][::-1]\n        nums[::2] = left\n        nums[1::2] = right",
+      "explanation": "1. 先將 nums 排序。\n2. 將前半部分反轉作為 left，後半部分反轉作為 right。\n3. 將 left 放到偶數索引，right 放到奇數索引。\n4. 這樣能保證 nums[0] < nums[1] > nums[2] < nums[3] 的交錯順序。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

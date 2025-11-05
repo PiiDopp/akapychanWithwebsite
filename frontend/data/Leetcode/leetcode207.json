@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode207",
+  "coding_practice": [
+    {
+      "title": "Course Schedule",
+      "description": "There are a total of numCourses courses you have to take, labeled from 0 to numCourses - 1. You are given an array prerequisites where prerequisites[i] = [a_i, b_i] indicates that you must take course b_i first if you want to take course a_i.\n\nFor example, the pair [0, 1], indicates that to take course 0 you have to first take course 1. Return true if you can finish all courses. Otherwise, return false.",
+      "examples": [
+        {
+          "input": "numCourses = 2, prerequisites = [[1,0]]",
+          "output": "true",
+          "explanation": "There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible."
+        },
+        {
+          "input": "numCourses = 2, prerequisites = [[1,0],[0,1]]",
+          "output": "false",
+          "explanation": "There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible."
+        }
+      ],
+      "constraints": "1 <= numCourses <= 2000\n0 <= prerequisites.length <= 5000\nprerequisites[i].length == 2\n0 <= a_i, b_i < numCourses\nAll the pairs prerequisites[i] are unique",
+      "solution": "from collections import deque\n\nclass Solution:\n    def canFinish(self, numCourses, prerequisites):\n        graph = [[] for _ in range(numCourses)]\n        indegree = [0] * numCourses\n        \n        for dest, src in prerequisites:\n            graph[src].append(dest)\n            indegree[dest] += 1\n        \n        queue = deque([i for i in range(numCourses) if indegree[i] == 0])\n        visited = 0\n        \n        while queue:\n            node = queue.popleft()\n            visited += 1\n            for neighbor in graph[node]:\n                indegree[neighbor] -= 1\n                if indegree[neighbor] == 0:\n                    queue.append(neighbor)\n        \n        return visited == numCourses",
+      "explanation": "1. 建立圖 graph 和入度 indegree 列表。\n2. 對每個課程依據 prerequisites 更新圖和入度。\n3. 將入度為 0 的課程加入隊列 queue。\n4. BFS 遍歷隊列，減少相鄰節點入度，若入度為 0 則加入隊列。\n5. 遍歷結束後，若 visited 等於 numCourses，返回 True，否則返回 False。",
+      "tag": "512",
+      "difficult": "medium"
+    }
+  ]
+}

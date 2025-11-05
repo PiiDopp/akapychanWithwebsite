@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode448",
+  "coding_practice": [
+    {
+      "title": "Find All Numbers Disappeared in an Array",
+      "description": "Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.",
+      "examples": [
+        {
+          "input": "nums = [4,3,2,7,8,2,3,1]",
+          "output": "[5,6]"
+        },
+        {
+          "input": "nums = [1,1]",
+          "output": "[2]"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 10^5\n1 <= nums[i] <= n",
+      "follow up": " Could you do it without extra space and in O(n) runtime? You may assume the returned list does not count as extra space.",
+      "solution": "class Solution:\n    def findDisappearedNumbers(self, nums):\n        n = len(nums)\n        for num in nums:\n            index = abs(num) - 1\n            nums[index] = -abs(nums[index])\n        return [i + 1 for i in range(n) if nums[i] > 0]",
+      "explanation": "1. 遍歷 nums，將對應索引 index = abs(num) - 1 的元素標記為負數，表示該數字已出現。\n2. 最後遍歷 nums，找出仍為正數的索引 i，對應的數字 i+1 為缺失的數字。\n3. 返回所有缺失數字的列表。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

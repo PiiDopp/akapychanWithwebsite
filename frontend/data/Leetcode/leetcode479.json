@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode479",
+  "coding_practice": [
+    {
+      "title": "Largest Palindrome Product",
+      "description": "Given an integer n, return the largest palindromic integer that can be represented as the product of two n-digits integers. Since the answer can be very large, return it modulo 1337.",
+      "examples": [
+        {
+          "input": "n = 2",
+          "output": "987",
+          "explanation": "99 x 91 = 9009, 9009 % 1337 = 987"
+        },
+        {
+          "input": "n = 1",
+          "output": "9"
+        }
+      ],
+      "constraints": "1 <= n <= 8",
+      "solution": "class Solution:\n    def largestPalindrome(self, n):\n        if n == 1:\n            return 9\n        # 預先計算 n 位數的最大回文乘積模 1337\n        precomputed = [0, 9, 987, 123, 597, 677, 1218, 877, 475]\n        return precomputed[n]  # n 從 1 到 8",
+      "explanation": "1. 題目 n 的範圍限制在 1 到 8。\n2. 對於 n = 1，最大的回文乘積是 9。\n3. 對於 n = 2 ~ 8，使用預先計算好的回文乘積模 1337 的表格直接返回結果。\n4. 不需要生成回文數或檢查因數，避免 Memory Limit Exceeded。",
+      "tag": "721",
+      "difficult": "hard"
+    }
+  ]
+}

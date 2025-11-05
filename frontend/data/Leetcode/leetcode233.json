@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode233",
+  "coding_practice": [
+    {
+      "title": "Number of Digit One",
+      "description": "Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.",
+      "examples": [
+        {
+          "input": "n = 13",
+          "output": "6"
+        },
+        {
+          "input": "n = 0",
+          "output": "0"
+        }
+      ],
+      "constraints": "0 <= n <= 10^9",
+      "solution": "class Solution:\n    def countDigitOne(self, n):\n        if n <= 0:\n            return 0\n        count = 0\n        i = 1  # 當前位數 1、10、100...\n        while i <= n:\n            divider = i * 10\n            count += (n // divider) * i + min(max(n % divider - i + 1, 0), i)\n            i *= 10\n        return count",
+      "explanation": "1. 從最低位到最高位逐位計算 1 出現的次數。\n2. 對於每一位 i，計算高位對 i 的整除影響，以及當前位數和低位的補充。\n3. 使用迴圈將 i 從 1、10、100 ... 一直乘 10 直到超過 n。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

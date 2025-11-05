@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode368",
+  "coding_practice": [
+    {
+      "title": "Largest Divisible Subset",
+      "description": "Given a set of distinct positive integers nums, return the largest subset answer such that every pair (answer[i], answer[j]) of elements in this subset satisfies:\nanswer[i] % answer[j] == 0, or\nanswer[j] % answer[i] == 0\nIf there are multiple solutions, return any of them.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "[1,2]",
+          "explanation": "[1,3] is also accepted."
+        },
+        {
+          "input": "nums = [1,2,4,8]",
+          "output": "[1,2,4,8]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n1 <= nums[i] <= 2 * 10^9\nAll the integers in nums are unique.",
+      "solution": "class Solution:\n    def largestDivisibleSubset(self, nums):\n        if not nums:\n            return []\n        nums.sort()\n        n = len(nums)\n        dp = [1] * n\n        prev = [-1] * n\n        max_index = 0\n\n        for i in range(n):\n            for j in range(i):\n                if nums[i] % nums[j] == 0 and dp[j] + 1 > dp[i]:\n                    dp[i] = dp[j] + 1\n                    prev[i] = j\n            if dp[i] > dp[max_index]:\n                max_index = i\n\n        res = []\n        while max_index >= 0:\n            res.append(nums[max_index])\n            max_index = prev[max_index]\n\n        return res[::-1]",
+      "explanation": "1. 將 nums 排序以便後續能逐步構建可整除子集。\n2. 使用 dp[i] 記錄以 nums[i] 結尾的最大子集長度。\n3. 使用 prev[i] 記錄 nums[i] 前一個可整除的元素索引。\n4. 遍歷 nums，若 nums[i] 可被前面 nums[j] 整除且形成更長子集，更新 dp[i] 與 prev[i]。\n5. 記錄最大子集的結尾索引 max_index。\n6. 透過 prev 反向追蹤重建子集並返回。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

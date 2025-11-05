@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode440",
+  "coding_practice": [
+    {
+      "title": "K-th Smallest in Lexicographical Order",
+      "description": "Given two integers n and k, return the kth lexicographically smallest integer in the range [1, n].",
+      "examples": [
+        {
+          "input": "n = 13, k = 2",
+          "output": "10",
+          "explanation": "The lexicographical order is [1, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9], so the second smallest number is 10."
+        },
+        {
+          "input": "n = 1, k = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= k <= n <= 10^9",
+      "solution": "class Solution:\n    def findKthNumber(self, n, k):\n        def count_prefix(prefix, n):\n            # 計算以 prefix 開頭的數字個數\n            cur = prefix\n            next_ = prefix + 1\n            cnt = 0\n            while cur <= n:\n                cnt += min(n + 1, next_) - cur\n                cur *= 10\n                next_ *= 10\n            return cnt\n\n        curr = 1\n        k -= 1\n        while k > 0:\n            cnt = count_prefix(curr, n)\n            if k >= cnt:\n                k -= cnt\n                curr += 1\n            else:\n                k -= 1\n                curr *= 10\n        return curr",
+      "explanation": "1. 使用字典樹思想計算每個前綴 prefix 的數字個數。\n2. 從 curr = 1 開始，逐步檢查以 curr 開頭的數字個數 cnt。\n3. 若 k >= cnt，表示 kth 數字不在以 curr 開頭的範圍內，則跳到下一個前綴 curr + 1，並減去 cnt。\n4. 若 k < cnt，表示 kth 數字在以 curr 開頭的範圍內，進入下一層前綴 curr * 10，並減去 1。\n5. 重複直到 k 為 0，返回當前 curr。",
+      "tag": "520",
+      "difficult": "hard"
+    }
+  ]
+}

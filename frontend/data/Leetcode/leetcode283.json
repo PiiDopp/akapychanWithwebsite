@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode283",
+  "coding_practice": [
+    {
+      "title": "Move Zeroes",
+      "description": "Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.\n\nNote that you must do this in-place without making a copy of the array.",
+      "examples": [
+        {
+          "input": "nums = [0,1,0,3,12]",
+          "output": "[1,3,12,0,0]"
+        },
+        {
+          "input": "nums = [0]",
+          "output": "[0]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-2^31 <= nums[i] <= 2^31 - 1",
+      "follow up": "Could you minimize the total number of operations done?",
+      "solution": "class Solution:\n    def moveZeroes(self, nums):\n        \"\"\"\n        Do not return anything, modify nums in-place instead.\n        \"\"\"\n        zero_pos = 0  # 指向下一個應該放非零數字的位置\n        for i in range(len(nums)):\n            if nums[i] != 0:\n                nums[zero_pos], nums[i] = nums[i], nums[zero_pos]\n                zero_pos += 1",
+      "explanation": "1. 設定 zero_pos 指向下一個非零元素應該放的位置。\n2. 遍歷 nums，當遇到非零元素時，將其與 zero_pos 位置交換。\n3. 每次交換後，zero_pos 向右移動一格。\n4. 遍歷完成後，所有零都會被移到數組末尾，非零元素的相對順序保持不變。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

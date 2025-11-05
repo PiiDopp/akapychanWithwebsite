@@ -1,0 +1,46 @@
+{
+  "ID": 721,
+  "Title": "數值函數",
+  "Intro": "\tPython 提供許多「內建函數」，不需要額外匯入模組就能使用。包括數值函數、字串函數與序列型別相關函數。",
+  "exp": {
+    "cor_exp": [
+      "數值處理 & 型態轉換\n函數\t\t\t說明\t\t\t\t\t範例\n\nabs(x)\t\t\t絕對值\t\t\t\t\tabs(-10) → 10\npow(x, y)\t\tx 的 y 次方\t\t\t\tpow(2, 3) → 8\nround(x, n)\t\t四捨五入，保留 n 位小數\tround(3.14159, 2) → 3.14\nmax(a, b, …)\t取最大值\t\t\t\t\tmax(2, 8, 5) → 8\nmin(a, b, …)\t取最小值\t\t\t\t\tmin(2, 8, 5) → 2\nsum(iterable)\t加總序列元素\t\t\t\tsum([1,2,3]) → 6\nint(x)\t\t\t轉整數\t\t\t\t\tint(\"123\") → 123\nfloat(x)\t\t轉浮點數\t\t\t\t\tfloat(\"3.14\") → 3.14\nbin(x)\t\t\t轉二進位字串\t\t\t\tbin(10) → '0b1010'\nhex(x)\t\t\t轉十六進位字串\t\t\thex(255) → '0xff'\noct(x)\t\t\t轉八進位字串\t\t\t\toct(8) → '0o10'"
+    ],
+    "mis_exp": []
+  },
+  "practice": [
+    {
+      "question": "在 Python 3 中，以下程式的輸出為何？\n\nprint(round(2.5))\nprint(round(3.5))",
+      "options": [
+        "A. 3 和 4",
+        "B. 2 和 4",
+        "C. 3 和 5",
+        "D. 2 和 5"
+      ],
+      "answer": "B",
+      "explanation": "Python 3 的 round 採用「就近偶數」(banker’s rounding)：2.5 → 2、3.5 → 4。"
+    },
+    {
+      "question": "下列哪一個判斷為 True？",
+      "options": [
+        "A. bin(10) == \"1010\"",
+        "B. hex(255) == \"0xff\"",
+        "C. oct(8) == \"010\"",
+        "D. int(\"3.14\") == 3"
+      ],
+      "answer": "B",
+      "explanation": "bin(10) 會回傳 \"0b1010\"、oct(8) 回傳 \"0o10\"；int(\"3.14\") 會拋出 ValueError。只有 hex(255) 會得到 \"0xff\"。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnums = [2, 7, -5, 4]\nprint(max(nums), min(nums), sum(nums))",
+      "options": [
+        "A. 7 -5 8",
+        "B. 7 2 13",
+        "C. 4 -5 8",
+        "D. 7 -5 13"
+      ],
+      "answer": "A",
+      "explanation": "max(nums)=7、min(nums)=-5、sum(nums)=2+7-5+4=8。"
+    }
+  ]
+}

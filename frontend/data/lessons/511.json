@@ -1,0 +1,76 @@
+{
+  "ID": 511,
+  "Title": "range() 基本用法",
+  "Intro": "\t在 Python 中，range() 用來產生一個整數序列，常搭配 for 迴圈使用。range 可接受 1~3 個參數：start、stop、step。預設 start 為 0，step 為 1。",
+  "exp": {
+    "cor_exp": [
+      "for i in range(5):\n    print(i)  # 輸出 0,1,2,3,4",
+      "for i in range(1, 6):\n    print(i)  # 輸出 1,2,3,4,5",
+      "for i in range(0, 10, 2):\n    print(i)  # 輸出 0,2,4,6,8",
+      "for i in range(10, 0, -3):\n    print(i)  # 輸出 10,7,4,1"
+    ],
+    "mis_exp": [
+      "for i in range 5:\n    print(i)  # 錯誤：缺少括號",
+      "for i in range(1,10,0):\n    print(i)  # 錯誤：step 不能為 0",
+      "for i in range(10,0,2):\n    print(i)  # 錯誤：從大到小，step 必須為負數"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(10):\n    print(i)",
+      "options": [
+        "A. 1 到 10",
+        "B. 0 到 9",
+        "C. 0 到 10",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "range(10) 從 0 開始，到 9 結束，不包含 10。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(1, 11):\n    print(i)",
+      "options": [
+        "A. 1 到 10",
+        "B. 0 到 10",
+        "C. 1 到 11",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "range(1, 11) 從 1 開始，到 10 結束，不包含 11。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(0, 21, 2):\n    print(i)",
+      "options": [
+        "A. 0,1,2,...,20",
+        "B. 0,2,4,...,20",
+        "C. 0,2,4,...,22",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "range(0, 21, 2) 從 0 開始，每次加 2，到 20 結束，輸出偶數。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(10, 0, -1):\n    print(i)",
+      "options": [
+        "A. 1 到 10",
+        "B. 10 到 1",
+        "C. 10 到 0",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "range(10, 0, -1) 從 10 開始，每次減 1，到 1 結束，不包含 0。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nfor i in range 5:\n    print(i)",
+      "options": [
+        "A. 0 到 4",
+        "B. 1 到 5",
+        "C. 程式錯誤",
+        "D. None"
+      ],
+      "answer": "C",
+      "explanation": "range() 缺少括號，會導致語法錯誤。"
+    }
+  ]
+
+}

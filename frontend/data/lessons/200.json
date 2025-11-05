@@ -1,0 +1,23 @@
+{
+  "ID": 200,
+  "coding_practice": [
+    {
+      "title": "BMI 計算器\n",
+      "description": "請撰寫一個程式，依序讀入使用者的姓名、身高（公分，float）、體重（公斤，float），計算 BMI = 體重(kg) / (身高(m))^2，並印出「<姓名> 的 BMI 為 <數值>」。數值四捨五入到小數點後 1 位。\n",
+      "examples": {
+        "input": "Alice\n160\n50\n",
+        "output": "Alice 的 BMI 為 19.5\n"
+      },
+      "solution": "name = input()\nheight_cm = float(input())\nweight = float(input())\nheight_m = height_cm / 100\nbmi = weight / (height_m ** 2)\nprint(f\"{name} 的 BMI 為 {bmi:.1f}\")\n"
+    },
+    {
+      "title": "兩數計算小工具\n",
+      "description": "請撰寫一個程式，讀入一行包含兩個以空白分隔的整數，將其轉為 int 後，計算並輸出四個結果：和、差（第一個減第二個）、積、平均（保留到小數點後 1 位）。輸出格式固定為：\n和:<和> 差:<差> 積:<積> 平均:<平均>\n",
+      "examples": {
+        "input": "12 3\n",
+        "output": "和:15 差:9 積:36 平均:7.5\n"
+      },
+      "solution": "line = input().strip()\na_str, b_str = line.split()\na = int(a_str)\nb = int(b_str)\nsum_val = a + b\ndiff_val = a - b\nprod_val = a * b\navg_val = (a + b) / 2\nprint(f\"和:{sum_val} 差:{diff_val} 積:{prod_val} 平均:{avg_val:.1f}\")\n"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "ID": 621,
+  "Title": "元組介紹",
+  "Intro": "\t元組 (tuple) 也是一種有序物件，一旦建立之後，元組中的元素不能任意更改個數與內容值，意指元組是不能更改的序列。這和串列 (list) 可以動態增加或刪減元素不同。也就是說當元組建立之後，絕對不能變動每個索引所指向的元素。",
+  "exp": {
+    "cor_exp": [
+      "tup = (28, 39, 58, 67, 97, 54)\nprint('目前元組內的所有元素：')\nfor item in range(len(tup)):\n    print('tup[%2d] %3d' % (item, tup[item]))"
+    ],
+    "mis_exp": [
+      "tup = (28, 39, 58)\ntup[0] = 99  # 錯誤：tuple 不能修改元素",
+      "tup = (1, 2, 3)\ntup.append(4)  # 錯誤：tuple 沒有 append 方法"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個是合法的元組定義？",
+      "options": [
+        "A. tup = [1, 2, 3]",
+        "B. tup = (1, 2, 3)",
+        "C. tup = {1, 2, 3}",
+        "D. tup = <1, 2, 3>"
+      ],
+      "answer": "B",
+      "explanation": "元組使用小括號 () 定義，例如 (1, 2, 3)。"
+    },
+    {
+      "question": "若有 tup = (10, 20, 30)，執行下列哪一個操作會產生錯誤？",
+      "options": [
+        "A. print(tup[0])",
+        "B. len(tup)",
+        "C. tup[1] = 99",
+        "D. for x in tup: print(x)"
+      ],
+      "answer": "C",
+      "explanation": "tuple 元素不能修改，因此 tup[1] = 99 會產生錯誤。"
+    },
+    {
+      "question": "關於 tuple 的敘述，下列何者正確？",
+      "options": [
+        "A. tuple 建立後可以自由新增元素",
+        "B. tuple 和 list 一樣都能用 append() 新增資料",
+        "C. tuple 是不可變動的序列，一旦建立就不能修改元素",
+        "D. tuple 的元素必須全部是相同型別"
+      ],
+      "answer": "C",
+      "explanation": "tuple 屬於不可變動的序列，一旦建立後，元素的內容不可更改。"
+    }
+  ]
+}

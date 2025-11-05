@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode485",
+  "coding_practice": [
+    {
+      "title": "Max Consecutive Ones",
+      "description": "Given a binary array nums, return the maximum number of consecutive 1's in the array.",
+      "examples": [
+        {
+          "input": "nums = [1,1,0,1,1,1]",
+          "output": "3",
+          "explanation": "The first two digits or the last three digits are consecutive 1s. The maximum number of consecutive 1s is 3."
+        },
+        {
+          "input": "nums = [1,0,1,1,0,1]",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\nnums[i] is either 0 or 1.",
+      "solution": "class Solution:\n    def findMaxConsecutiveOnes(self, nums):\n        max_count = 0\n        count = 0\n        for num in nums:\n            if num == 1:\n                count += 1\n                max_count = max(max_count, count)\n            else:\n                count = 0\n        return max_count",
+      "explanation": "1. 初始化計數器 count 和最大值 max_count。\n2. 遍歷 nums，如果遇到 1，count 增加，並更新 max_count。\n3. 如果遇到 0，重置 count 為 0。\n4. 遍歷完成後返回 max_count。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

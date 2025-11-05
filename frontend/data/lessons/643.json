@@ -1,0 +1,55 @@
+{
+  "ID": 643,
+  "Title": "常用的集合函數",
+  "Intro": "\t集合 (set) 使用 add() 來新增單一元素；若要一次新增多個元素，則可使用 update() 方法。刪除元素可用 remove() 或 discard()。其中 remove() 在刪除不存在的元素時會引發錯誤，而 discard() 則不會。",
+  "exp": {
+    "cor_exp": [
+      "# 建立集合\nfruits = {'apple', 'banana'}",
+      "# 使用 add() 新增單一元素\nfruits.add('orange')\nprint(fruits)  # {'apple', 'banana', 'orange'}",
+      "# 使用 update() 一次新增多個元素\nfruits.update(['grape', 'melon'])\nprint(fruits)  # {'apple', 'banana', 'orange', 'grape', 'melon'}",
+      "# 使用 remove() 移除元素\nfruits.remove('banana')\nprint(fruits)",
+      "# 使用 discard() 移除不存在元素，不會報錯\nfruits.discard('pineapple')"
+    ],
+    "mis_exp": [
+      "listfruits.add(['grape', 'melon'])  # TypeError\n# 錯誤：add() 一次只能新增一個元素，不能傳入 ",
+      "fruits.remove('kiwi')  # KeyError\n# 錯誤：remove() 移除不存在的元素會引發 KeyError",
+      "print(fruits[0])   # TypeError\nprint(fruits[0:2]) # TypeError\n# 錯誤：集合不支援索引或切片"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪個方法可以一次新增多個元素到集合中？",
+      "options": [
+        "A. add()",
+        "B. update()",
+        "C. append()",
+        "D. insert()"
+      ],
+      "answer": "B",
+      "explanation": "add() 只能新增單一元素，若要一次新增多個元素，必須使用 update()。"
+    },
+    {
+      "question": "關於 remove() 與 discard() 的差異，下列敘述何者正確？",
+      "options": [
+        "A. remove() 與 discard() 都會在刪除不存在的元素時報錯",
+        "B. remove() 不會報錯，discard() 才會報錯",
+        "C. 兩者都不會報錯",
+        "D. remove() 會報錯，discard() 不會報錯"
+      ],
+      "answer": "D",
+      "explanation": "remove() 刪除不存在的元素時會引發 KeyError，而 discard() 在相同情況下不會報錯。"
+    },
+    {
+      "question": "若建立集合 fruits = {'apple', 'banana'}，執行 fruits.add(['grape', 'melon']) 的結果為？",
+      "options": [
+        "A. {'apple', 'banana', 'grape', 'melon'}",
+        "B. {'apple', 'banana', ['grape', 'melon']}",
+        "C. 會引發 TypeError",
+        "D. {'apple', 'banana'}"
+      ],
+      "answer": "C",
+      "explanation": "add() 只能新增單一元素，傳入 list 屬於不可雜湊 (unhashable) 的型別，因此會引發 TypeError。"
+    }
+  ]
+}
+

@@ -1,0 +1,51 @@
+{
+  "ID": 642,
+  "Title": "集合的運算",
+  "Intro": "\t集合 (set) 的元素必須是不可變的資料型態，因此可以包含整數、字串、浮點數、布林值與元組 (tuple)。但像串列 (list)、字典 (dict)、集合 (set) 這類可變物件，則不能成為集合的元素，否則會發生錯誤。",
+  "exp": {
+    "cor_exp": [
+      "# 集合內含不同型態的元素 (整數、字串、浮點數、布林值、tuple)\nvalid_set = {1, 'apple', 3.14, True, (10, 20)}\nprint(valid_set)",
+      "# tuple 可以作為集合元素\ntuple_set = {(1, 2), (3, 4), (5, 6)}\nprint(tuple_set)"
+    ],
+    "mis_exp": [
+      "invalid_set = {[1, 2], [3, 4]}   # TypeError\n# 錯誤：list 是可變的，不能放進集合",
+      "invalid_set = {{'a': 1, 'b': 2}} # TypeError\n# 錯誤：dict 不能成為集合元素",
+      "invalid_set = {{1, 2}, {3, 4}}   # TypeError\n# 錯誤：set 不能成為集合元素"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個可以正確成為集合的元素？",
+      "options": [
+        "A. [1, 2, 3]",
+        "B. {'x': 10, 'y': 20}",
+        "C. (5, 6, 7)",
+        "D. {8, 9}"
+      ],
+      "answer": "C",
+      "explanation": "tuple 是不可變物件，可以作為集合的元素；list、dict、set 都是可變物件，不能作為集合的元素。"
+    },
+    {
+      "question": "若定義 invalid_set = {[1, 2], (3, 4)}，會發生什麼情況？",
+      "options": [
+        "A. 建立成功，元素為 [1, 2] 與 (3, 4)",
+        "B. 建立成功，元素為 (3, 4)，list 會自動轉換",
+        "C. 發生 TypeError 錯誤",
+        "D. 建立成功，但 [1, 2] 會被忽略"
+      ],
+      "answer": "C",
+      "explanation": "因為 [1, 2] 是 list，可變物件，不能作為集合元素，會直接觸發 TypeError。"
+    },
+    {
+      "question": "下列關於集合 (set) 元素的描述，何者正確？",
+      "options": [
+        "A. 集合元素可以是任何型態的物件",
+        "B. 集合元素必須是不可變物件，例如 int、str、tuple",
+        "C. 集合元素可以包含其他集合",
+        "D. 集合元素必須是數字型態"
+      ],
+      "answer": "B",
+      "explanation": "集合元素必須是不可變物件 (immutable)，例如整數、字串、浮點數、布林值與元組；不能包含 list、dict 或其他 set。"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode535",
+  "coding_practice": [
+    {
+      "title": "Encode and Decode TinyURL",
+      "description": "Note: This is a companion problem to the System Design problem: Design TinyURL.\nTinyURL is a URL shortening service where you enter a URL such as https://leetcode.com/problems/design-tinyurl and it returns a short URL such as http://tinyurl.com/4e9iAk. Design a class to encode a URL and decode a tiny URL.\n\nThere is no restriction on how your encode/decode algorithm should work. You just need to ensure that a URL can be encoded to a tiny URL and the tiny URL can be decoded to the original URL.\n\nImplement the Solution class:\n\nSolution() Initializes the object of the system.\nString encode(String longUrl) Returns a tiny URL for the given longUrl.\nString decode(String shortUrl) Returns the original long URL for the given shortUrl. It is guaranteed that the given shortUrl was encoded by the same object.",
+      "examples": [
+        {
+          "input": "\"https://leetcode.com/problems/design-tinyurl\"",
+          "output": "\"https://leetcode.com/problems/design-tinyurl\"",
+          "explanation": "Solution obj = new Solution();\nstring tiny = obj.encode(url); // returns the encoded tiny url.\nstring ans = obj.decode(tiny); // returns the original url after decoding it."
+        }
+      ],
+      "constraints": "1 <= url.length <= 10^4\nurl is guaranteed to be a valid URL.",
+      "solution": "import random\nimport string\n\nclass Codec:\n    def __init__(self):\n        self.url_map = {}\n        self.base_url = \"http://tinyurl.com/\"\n    \n    def encode(self, longUrl):\n        key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))\n        while key in self.url_map:\n            key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))\n        self.url_map[key] = longUrl\n        return self.base_url + key\n\n    def decode(self, shortUrl):\n        key = shortUrl.replace(self.base_url, '')\n        return self.url_map.get(key, '')",
+      "explanation": "1. 使用字典 url_map 存儲短 URL 對應的原始長 URL。\n2. encode 生成一個 6 位的隨機字串作為短 URL 的 key，避免重複。\n3. 將 key 對應的長 URL 儲存到字典，返回 base_url + key 作為短 URL。\n4. decode 從短 URL 中提取 key，查找字典返回對應長 URL。\n5. 確保同一對象的短 URL 可正確解碼。",
+      "tag": "830",
+      "difficult": "medium"
+    }
+  ]
+}

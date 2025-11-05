@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode209",
+  "coding_practice": [
+    {
+      "title": "Minimum Size Subarray Sum",
+      "description": "Given an array of positive integers nums and a positive integer target, return the minimal length of a subarray whose sum is greater than or equal to target. If there is no such subarray, return 0 instead.",
+      "examples": [
+        {
+          "input": "target = 7, nums = [2,3,1,2,4,3]",
+          "output": "2",
+          "explanation": "The subarray [4,3] has the minimal length under the problem constraint."
+        },
+        {
+          "input": "target = 4, nums = [1,4,4]",
+          "output": "1"
+        },
+        {
+          "input": "target = 11, nums = [1,1,1,1,1,1,1,1]",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= target <= 10^9\n1 <= nums.length <= 10^5\n1 <= nums[i] <= 10^4",
+      "follow up": "If you have figured out the O(n) solution, try coding another solution of which the time complexity is O(n log(n)).",
+      "solution": "class Solution:\n    def minSubArrayLen(self, target, nums):\n        left = 0\n        total = 0\n        min_len = float('inf')\n        \n        for right in range(len(nums)):\n            total += nums[right]\n            \n            while total >= target:\n                min_len = min(min_len, right - left + 1)\n                total -= nums[left]\n                left += 1\n                \n        return 0 if min_len == float('inf') else min_len",
+      "explanation": "1. 使用滑動窗口，初始化 left 為 0，total 為 0，min_len 為無限大。\n2. 遍歷右指針 right，每次將 nums[right] 加入 total。\n3. 當 total >= target 時，更新 min_len 並縮小左指針 left，同時減去 total。\n4. 遍歷完成後，若 min_len 仍為無限大，返回 0，否則返回 min_len。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

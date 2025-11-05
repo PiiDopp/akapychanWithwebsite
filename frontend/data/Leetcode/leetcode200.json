@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode200",
+  "coding_practice": [
+    {
+      "title": "Number of Islands",
+      "description": "Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.\nAn island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.",
+      "examples": [
+        {
+          "input": "grid = [\n  [\"1\",\"1\",\"1\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"0\",\"0\",\"0\",\"0\",\"0\"]\n]",
+          "output": "1"
+        },
+        {
+          "input": "grid = [\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"0\",\"0\",\"1\",\"0\",\"0\"],\n  [\"0\",\"0\",\"0\",\"1\",\"1\"]\n]",
+          "output": "3"
+        }
+      ],
+      "constraints": "m == grid.length\nn == grid[i].length\n1 <= m, n <= 300\ngrid[i][j] is '0' or '1'.",
+      "solution": "class Solution:\n    def numIslands(self, grid):\n        if not grid:\n            return 0\n        m, n = len(grid), len(grid[0])\n        visited = [[False]*n for _ in range(m)]\n        def dfs(i, j):\n            if i < 0 or i >= m or j < 0 or j >= n:\n                return\n            if grid[i][j] == '0' or visited[i][j]:\n                return\n            visited[i][j] = True\n            dfs(i+1, j)\n            dfs(i-1, j)\n            dfs(i, j+1)\n            dfs(i, j-1)\n        count = 0\n        for i in range(m):\n            for j in range(n):\n                if grid[i][j] == '1' and not visited[i][j]:\n                    dfs(i, j)\n                    count += 1\n        return count",
+      "explanation": "1. 初始化 visited 二維陣列來追蹤已拜訪的格子。\n2. 遍歷每個格子，若為 '1' 且未訪問，啟動 DFS。\n3. DFS 將所有相連的 '1' 標記為已訪問。\n4. 每啟動一次 DFS，計數器加一，表示找到一個島嶼。\n5. 最後返回島嶼數量。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

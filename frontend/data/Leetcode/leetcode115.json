@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode115",
+  "coding_practice": [
+    {
+      "title": "Distinct Subsequences",
+      "description": "Given two strings s and t, return the number of distinct subsequences of s which equals t.\n\nThe test cases are generated so that the answer fits on a 32-bit signed integer.",
+      "examples": [
+        {
+          "input": "s = \"rabbbit\", t = \"rabbit\"",
+          "output": 3,
+          "explanation": "There are 3 ways to generate \"rabbit\" from s:\n1. rabbbit (remove the first 'b')\n2. rabbbit (remove the second 'b')\n3. rabbbit (remove the third 'b')"
+        },
+        {
+          "input": "s = \"babgbag\", t = \"bag\"",
+          "output": 5,
+          "explanation": "There are 5 ways to generate \"bag\" from s:\n1. babgbag (use the first 'b', 'a', 'g')\n2. babgbag (use the first 'b', 'a', second 'g')\n3. babgbag (use the second 'b', 'a', 'g')\n4. babgbag (use the second 'b', 'a', second 'g')\n5. babgbag (use the third 'b', 'a', second 'g')"
+        }
+      ],
+      "constraints": "1 <= s.length, t.length <= 1000\ns and t consist of English letters.",
+      "solution": "class Solution(object):\n    def numDistinct(self, s, t):\n        m, n = len(s), len(t)\n        dp = [[0]*(n+1) for _ in range(m+1)]\n        for i in range(m+1):\n            dp[i][0] = 1\n        for i in range(1, m+1):\n            for j in range(1, n+1):\n                if s[i-1] == t[j-1]:\n                    dp[i][j] = dp[i-1][j-1] + dp[i-1][j]\n                else:\n                    dp[i][j] = dp[i-1][j]\n        return dp[m][n]",
+      "explanation": "1. 建立一個大小為 (m+1)*(n+1) 的 dp 陣列，dp[i][j] 表示 s 前 i 個字元中匹配 t 前 j 個字元的方案數。\n2. 初始條件：空字串 t 可以由任何 s 前綴匹配，方案數為 1。\n3. 遍歷 s 和 t 的字元，若 s[i-1] == t[j-1]，則 dp[i][j] = dp[i-1][j-1] + dp[i-1][j]，否則 dp[i][j] = dp[i-1][j]。\n4. 最終答案為 dp[m][n]，表示 s 的前 m 個字元匹配 t 的前 n 個字元的方案數。",
+      "tag": "723",
+      "difficult": "hard"
+    }
+  ]
+}

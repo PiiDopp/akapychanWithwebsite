@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-trans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AkaPyChan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../css/ai-chat.css" />
+    <link rel="stylesheet" href="../css/reset.css" />
+    <script type="module" src="../js/ai-chat/main.js"></script>
+    <script src="../js/viewTransitions.js" defer></script>
+  </head>
+  <body>
+    <div class="chatbot">
+      <header>
+        <h2>AkaPyChan</h2>
+        <a class="backBtn" href="/html/welcome.html"><span><b>回到主畫面</b></span></a>
+      </header>
+      <hr>
+      <ul class="chatbox">
+        <li class="chat-incoming" data-typewriter>
+          <i class="fas fa-robot"></i>
+          <div class="ai-rich-content">
+<p>您好，我是 AkaPyChan 的專屬助教，很高興為您解答任何與 Python 相關的問題。
+
+請選擇以下模式：
+模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）
+模式 2｜程式驗證（貼上你的 Python 程式碼）
+模式 3｜程式解釋（貼上要解釋的 Python 程式碼）
+
+**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。
+</p>
+          </div>
+        </li>
+      </ul>
+      <div class="toolbar"></div>
+      <div class="chatinput">
+        <textarea placeholder="Enter a message..." required></textarea>
+        <i class="fas fa-paper-plane"></i>
+      </div>
+    </div>
+  </body>
+</html>

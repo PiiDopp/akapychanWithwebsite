@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode168",
+  "coding_practice": [
+    {
+      "title": "Excel Sheet Column Title",
+      "description": "Given an integer columnNumber, return its corresponding column title as it appears in an Excel sheet.\n\nFor example:\nA -> 1\nB -> 2\nC -> 3\n...\nZ -> 26\nAA -> 27\nAB -> 28\n...",
+      "examples": [
+        {
+          "input": "columnNumber = 1",
+          "output": "\"A\""
+        },
+        {
+          "input": "columnNumber = 28",
+          "output": "\"AB\""
+        },
+        {
+          "input": "columnNumber = 701",
+          "output": "\"ZY\""
+        }
+      ],
+      "constraints": "1 <= columnNumber <= 2^31 - 1",
+      "solution": "class Solution:\n    def convertToTitle(self, columnNumber):\n        res = ''\n        while columnNumber > 0:\n            columnNumber -= 1\n            res = chr(columnNumber % 26 + ord('A')) + res\n            columnNumber //= 26\n        return res",
+      "explanation": "1. 將 columnNumber 減 1 是因為 Excel 的編號是從 1 開始，而我們需要從 0 計算模 26。\n2. 使用 chr() 將模 26 的結果轉換成對應的字母。\n3. 將每次得到的字母加到結果字串最前面。\n4. columnNumber 整除 26，重複步驟直到 columnNumber 為 0。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

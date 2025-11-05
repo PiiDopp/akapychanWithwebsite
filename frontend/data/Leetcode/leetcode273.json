@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode273",
+  "coding_practice": [
+    {
+      "title": "Integer to English Words",
+      "description": "Convert a non-negative integer num to its English words representation.",
+      "examples": [
+        {
+          "input": "num = 123",
+          "output": "\"One Hundred Twenty Three\""
+        },
+        {
+          "input": "num = 12345",
+          "output": "\"Twelve Thousand Three Hundred Forty Five\""
+        },
+        {
+          "input": "num = 1234567",
+          "output": "\"One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven\""
+        }
+      ],
+      "constraints": "0 <= num <= 2^31 - 1",
+      "solution": "class Solution:\n    def numberToWords(self, num):\n        if num == 0:\n            return \"Zero\"\n\n        def one(num):\n            switcher = [\"\", \"One\", \"Two\", \"Three\", \"Four\", \"Five\", \"Six\", \"Seven\", \"Eight\", \"Nine\"]\n            return switcher[num]\n\n        def two_less_20(num):\n            switcher = [\"Ten\", \"Eleven\", \"Twelve\", \"Thirteen\", \"Fourteen\", \"Fifteen\",\n                        \"Sixteen\", \"Seventeen\", \"Eighteen\", \"Nineteen\"]\n            return switcher[num - 10]\n\n        def ten(num):\n            switcher = [\"\", \"\", \"Twenty\", \"Thirty\", \"Forty\", \"Fifty\", \"Sixty\", \"Seventy\", \"Eighty\", \"Ninety\"]\n            return switcher[num]\n\n        def two(num):\n            if num == 0:\n                return \"\"\n            elif num < 10:\n                return one(num)\n            elif num < 20:\n                return two_less_20(num)\n            else:\n                tens = num // 10\n                rest = num % 10\n                return ten(tens) + (\" \" + one(rest) if rest != 0 else \"\")\n\n        def three(num):\n            hundred = num // 100\n            rest = num % 100\n            if hundred != 0 and rest != 0:\n                return one(hundred) + \" Hundred \" + two(rest)\n            elif hundred == 0 and rest != 0:\n                return two(rest)\n            elif hundred != 0 and rest == 0:\n                return one(hundred) + \" Hundred\"\n            else:\n                return \"\"\n\n        billion = num // 1000000000\n        million = (num - billion * 1000000000) // 1000000\n        thousand = (num - billion * 1000000000 - million * 1000000) // 1000\n        rest = num % 1000\n\n        result = \"\"\n        if billion != 0:\n            result += three(billion) + \" Billion\"\n        if million != 0:\n            result += \" \" if result != \"\" else \"\"\n            result += three(million) + \" Million\"\n        if thousand != 0:\n            result += \" \" if result != \"\" else \"\"\n            result += three(thousand) + \" Thousand\"\n        if rest != 0:\n            result += \" \" if result != \"\" else \"\"\n            result += three(rest)\n        return result",
+      "explanation": "1. 將數字分段，每段三位數處理，分別對應 Billion, Million, Thousand, Hundreds.\n2. 定義三個輔助函數: one() 處理 1-9, two_less_20() 處理 10-19, ten() 處理十位數 20,30,...90。\n3. two() 用來處理小於 100 的數字，依據大小決定調用 one() 或 two_less_20() 或 ten() 加上個位數。\n4. three() 處理三位數，先計算百位，再處理剩餘兩位數。\n5. 主函數按 Billion, Million, Thousand, rest 的順序將每段數字轉換為英文，最後拼接成完整字串。\n6. 處理 0 特殊情況，直接返回 \"Zero\"。",
+      "tag": "613",
+      "difficult": "hard"
+    }
+  ]
+}

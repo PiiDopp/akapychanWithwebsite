@@ -1,0 +1,49 @@
+{
+  "ID": 613,
+  "Title": "常用的串列函數",
+  "Intro": "\t使用 append() 方法可以將新資料附加到串列的尾端。由於串列屬於可變動的序列資料型態，因此可以隨時增加或刪減元素。",
+  "exp": {
+    "cor_exp": [
+      "num = int(input('請輸入總人數: '))\nstudent = []  # 建立空的 list 串列\nprint('請輸入 {0} 個數值：'.format(num))\n\n# 以 for/in 迴圈依序讀取要輸入的分數\nfor item in range(1, num + 1):\n    score = int(input())  # 取得輸入數值\n    student.append(score)  # 將輸入數值新增到串列\nprint('已輸入完畢')\n\n# 輸出資料\nprint('總共輸入的分數', end='\\n')\nfor item in student:\n    print('{:3d}'.format(item), end=' ')"
+    ],
+    "mis_exp": [
+      "student = []\nstudent.append 100  # 錯誤：append 需要括號",
+      "student = []\nappend(student, 50)  # 錯誤：append 是 list 的方法，不能這樣呼叫"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行以下程式後，student 的內容為何？\n\nstudent = []\nstudent.append(10)\nstudent.append(20)\nstudent.append(30)",
+      "options": [
+        "A. [10, 20, 30]",
+        "B. [30, 20, 10]",
+        "C. [10, [20, 30]]",
+        "D. [10, 20]"
+      ],
+      "answer": "A",
+      "explanation": "append() 會將元素依序加到尾端，因此結果為 [10, 20, 30]。"
+    },
+    {
+      "question": "下列哪一個寫法會造成錯誤？",
+      "options": [
+        "A. student = []; student.append(50)",
+        "B. student = [1, 2]; student.append(3)",
+        "C. student = []; student.append 100",
+        "D. student = ['a']; student.append('b')"
+      ],
+      "answer": "C",
+      "explanation": "append 必須搭配括號，例如 append(100)，不能寫成 append 100。"
+    },
+    {
+      "question": "關於 append() 的敘述，下列何者正確？",
+      "options": [
+        "A. append() 會將新元素加到串列的最前面",
+        "B. append() 一次只能新增一個元素到串列尾端",
+        "C. append() 可以同時新增多個元素",
+        "D. append() 新增元素時會自動排序"
+      ],
+      "answer": "B",
+      "explanation": "append() 一次只能新增一個元素，且會加在串列尾端，不會自動排序。"
+    }
+  ]
+}

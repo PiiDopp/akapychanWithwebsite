@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode829",
+  "coding_practice": [
+    {
+      "title": "Consecutive Numbers Sum",
+      "description": "Given an integer n, return the number of ways you can write n as the sum of consecutive positive integers.",
+      "examples": [
+        {
+          "input": "n = 5",
+          "output": "2",
+          "explanation": "5 = 2 + 3"
+        },
+        {
+          "input": "n = 9",
+          "output": "3",
+          "explanation": "9 = 4 + 5 = 2 + 3 + 4"
+        },
+        {
+          "input": "n = 15",
+          "output": "4",
+          "explanation": "15 = 8 + 7 = 4 + 5 + 6 = 1 + 2 + 3 + 4 + 5"
+        }
+      ],
+      "constraints": "1 <= n <= 10^9",
+      "solution": "class Solution:\n    def consecutiveNumbersSum(self, n):\n        count = 0\n        k = 1\n        while k * (k - 1) // 2 < n:\n            if (n - k * (k - 1) // 2) % k == 0:\n                count += 1\n            k += 1\n        return count",
+      "explanation": "1. 遍歷所有可能的項數 k。\n2. 計算 x = (n - k*(k-1)/2) / k。\n3. 如果 x 為正整數，則計數加一。\n4. 返回計數。",
+      "tag": "721",
+      "difficult": "hard"
+    }
+  ]
+}

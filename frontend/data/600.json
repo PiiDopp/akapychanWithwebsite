@@ -1,0 +1,23 @@
+{
+  "ID": 600,
+  "coding_practice": [
+    {
+      "title": "串列操作練習",
+      "description": "請建立一個串列，內容包含整數 1 到 5，接著完成以下操作：\n1. 新增一個元素 6 到串列尾端。\n2. 刪除串列中的第 2 個元素（索引 1 的位置）。\n3. 輸出最後的串列結果。",
+      "examples": {
+        "input": "無（程式內建立）",
+        "output": "[1, 3, 4, 5, 6]"
+      },
+      "solution": "nums = [1, 2, 3, 4, 5]\n\nnums.append(6)\n\ndel nums[1]\n\nprint(nums)  # [1, 3, 4, 5, 6]"
+    },
+    {
+      "title": "集合函數練習",
+      "description": "請建立一個集合 fruits = {'apple', 'banana'}，並完成以下操作：\n1. 使用 add() 新增 'orange'。\n2. 使用 update() 一次新增 'grape' 與 'melon'。\n3. 使用 remove() 移除 'banana'。\n4. 使用 discard() 嘗試移除 'pineapple'（此元素不存在）。\n最後輸出集合。",
+      "examples": {
+        "input": "無（程式內建立）",
+        "output": "{'apple', 'orange', 'grape', 'melon'}"
+      },
+      "solution": "fruits = {'apple', 'banana'}\n\nfruits.add('orange')\n\nfruits.update(['grape', 'melon'])\n\nfruits.remove('banana')\n\nfruits.discard('pineapple')\n\nprint(fruits)  # {'apple', 'orange', 'grape', 'melon'}"
+    }
+  ]
+}

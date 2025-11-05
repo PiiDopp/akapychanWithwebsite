@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode34",
+  "coding_practice": [
+    {
+      "title": "Find First and Last Position of Element in Sorted Array",
+      "description": "Given an array of integers nums sorted in non-decreasing order, find the starting and ending position of a given target value.\n\nIf target is not found in the array, return [-1, -1].\n\nYou must write an algorithm with O(log n) runtime complexity.",
+      "examples": [
+        {
+          "input": "nums = [5,7,7,8,8,10], target = 8",
+          "output": "[3,4]"
+        },
+        {
+          "input": "nums = [5,7,7,8,8,10], target = 6",
+          "output": "[-1,-1]"
+        },
+        {
+          "input": "nums = [], target = 0",
+          "output": "[-1,-1]"
+        }
+      ],
+      "constraints": "0 <= nums.length <= 10^5\n-10^9 <= nums[i] <= 10^9\nnums is a non-decreasing array.\n-10^9 <= target <= 10^9",
+      "solution": "class Solution(object):\n    def searchRange(self, nums, target):\n        \"\"\"\n        :type nums: List[int]\n        :type target: int\n        :rtype: List[int]\n        \"\"\"\n        def findLeft(nums, target):\n            left, right = 0, len(nums) - 1\n            index = -1\n            while left <= right:\n                mid = (left + right) // 2\n                if nums[mid] >= target:\n                    right = mid - 1\n                else:\n                    left = mid + 1\n                if nums[mid] == target:\n                    index = mid\n            return index\n\n        def findRight(nums, target):\n            left, right = 0, len(nums) - 1\n            index = -1\n            while left <= right:\n                mid = (left + right) // 2\n                if nums[mid] <= target:\n                    left = mid + 1\n                else:\n                    right = mid - 1\n                if nums[mid] == target:\n                    index = mid\n            return index\n\n        return [findLeft(nums, target), findRight(nums, target)]",
+      "explanation": "1. 初始化：\n   1.1 定義兩個輔助函數 findLeft 與 findRight。\n2. findLeft：\n   2.1 使用二分搜尋尋找 target 的第一個位置。\n   2.2 當 nums[mid] >= target，縮小右邊界；否則增加左邊界。\n   2.3 如果 nums[mid] == target，更新 index。\n3. findRight：\n   3.1 使用二分搜尋尋找 target 的最後一個位置。\n   3.2 當 nums[mid] <= target，增加左邊界；否則縮小右邊界。\n   3.3 如果 nums[mid] == target，更新 index。\n4. 返回 [findLeft(nums, target), findRight(nums, target)]。\n5. 複雜度分析：\n   5.1 時間複雜度：O(log n)\n   5.2 空間複雜度：O(1)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

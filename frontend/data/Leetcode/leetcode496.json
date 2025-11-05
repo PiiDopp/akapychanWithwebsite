@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode496",
+  "coding_practice": [
+    {
+      "title": "Next Greater Element I",
+      "description": "The next greater element of some element x in an array is the first greater element that is to the right of x in the same array.\n\nYou are given two distinct 0-indexed integer arrays nums1 and nums2, where nums1 is a subset of nums2.\n\nFor each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2. If there is no next greater element, then the answer for this query is -1.\n\nReturn an array ans of length nums1.length such that ans[i] is the next greater element as described above.",
+      "examples": [
+        {
+          "input": "nums1 = [4,1,2], nums2 = [1,3,4,2]",
+          "output": "[-1,3,-1]",
+          "explanation": "The next greater element for each value of nums1 is as follows:\n- 4 is underlined in nums2 = [1,3,4,2]. There is no next greater element, so the answer is -1.\n- 1 is underlined in nums2 = [1,3,4,2]. The next greater element is 3.\n- 2 is underlined in nums2 = [1,3,4,2]. There is no next greater element, so the answer is -1."
+        },
+        {
+          "input": "nums1 = [2,4], nums2 = [1,2,3,4]",
+          "output": "[3,-1]",
+          "explanation": "The next greater element for each value of nums1 is as follows:\n- 2 is underlined in nums2 = [1,2,3,4]. The next greater element is 3.\n- 4 is underlined in nums2 = [1,2,3,4]. There is no next greater element, so the answer is -1."
+        }
+      ],
+      "constraints": "1 <= nums1.length <= nums2.length <= 1000\n0 <= nums1[i], nums2[i] <= 10^4\nAll integers in nums1 and nums2 are unique.\nAll the integers of nums1 also appear in nums2.",
+      "follow up": "Could you find an O(nums1.length + nums2.length) solution?",
+      "solution": "class Solution:\n    def nextGreaterElement(self, nums1, nums2):\n        stack = []\n        next_greater = {}\n        \n        for num in nums2:\n            while stack and num > stack[-1]:\n                next_greater[stack.pop()] = num\n            stack.append(num)\n        \n        return [next_greater.get(x, -1) for x in nums1]",
+      "explanation": "1. 使用單調棧遍歷 nums2，棧中存儲尚未找到下一個更大元素的數字。\n2. 當遇到比棧頂元素大的數字時，棧頂元素的下一個更大元素即為當前數字，更新字典 next_greater。\n3. 將當前數字壓入棧中，繼續處理。\n4. 遍歷完成後，對 nums1 中的每個元素查詢 next_greater 字典，若不存在則返回 -1。\n5. 返回結果列表。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

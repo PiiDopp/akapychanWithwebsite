@@ -1,0 +1,50 @@
+{
+  "ID": 712,
+  "Title": "參數傳遞",
+  "Intro": "\t當我們呼叫函數時，可以把資料「傳進去」函數內部，這些資料會被函數接收，並用來完成運算。\n這個「傳進去的資料」叫做 引數 (arguments)，而函數定義時的接收名稱，叫做 參數 (parameters)。",
+  "exp": {
+    "cor_exp": [
+      "def greet(name):\n    print(\"Hello,\", name)\n\ngreet(\"Alice\")   # 輸出：Hello, Alice\ngreet(\"Bob\")     # 輸出：Hello, Bob\n\n# 這裡的 name 是 參數，\"Alice\" 與 \"Bob\" 則是 引數。",
+      "def add(a, b):\n    return a + b\n\nprint(add(3, 5))   # 輸出 8\nprint(add(10, 20)) # 輸出 30\n\n# 呼叫函數時，必須依照定義的參數數量傳入對應的引數。",
+      "def greet(name=\"Guest\"):\n    print(\"Welcome,\", name)\n\ngreet()          # 輸出：Welcome, Guest\ngreet(\"Alice\")   # 輸出：Welcome, Alice\n\n# 可以在定義函數時，給參數一個 預設值，讓呼叫時可以選擇「不傳入」，就會自動套用預設值。"
+    ],
+    "mis_exp": [
+      "def greet(name=\"Guest\", message):\n    print(message, name)\n\n# Python 要求：有預設值的參數必須放在後面。"
+    ]
+  },
+  "practice": [
+    {
+      "question": "在 Python 中，函數定義時的名稱稱為什麼？呼叫函數時傳入的資料又稱為什麼？",
+      "options": [
+        "A. 引數 (arguments)，參數 (parameters)",
+        "B. 參數 (parameters)，引數 (arguments)",
+        "C. 變數 (variables)，資料 (data)",
+        "D. 型態 (types)，值 (values)"
+      ],
+      "answer": "B",
+      "explanation": "函數定義中的名稱稱為參數 (parameters)，呼叫時傳入的實際資料稱為引數 (arguments)。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ndef add(a, b):\n    return a + b\n\nprint(add(3, 5))\nprint(add(10, 20))",
+      "options": [
+        "A. 3 和 10",
+        "B. 8 和 30",
+        "C. 3 和 20",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "第一次呼叫 add(3, 5) 輸出 8，第二次呼叫 add(10, 20) 輸出 30。"
+    },
+    {
+      "question": "下列哪一個函數定義會造成語法錯誤？",
+      "options": [
+        "A. def greet(name=\"Guest\"): print(\"Welcome,\", name)",
+        "B. def greet(name, message=\"Hello\"): print(message, name)",
+        "C. def greet(name=\"Guest\", message): print(message, name)",
+        "D. def greet(name): print(\"Hi,\", name)"
+      ],
+      "answer": "C",
+      "explanation": "Python 規定有預設值的參數必須放在最後，選項 C 把有預設值的 name 放在 message 前面會報錯。"
+    }
+  ]
+}

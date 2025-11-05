@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode30",
+  "coding_practice": [
+    {
+      "title": "Substring with Concatenation of All Words",
+      "description": "You are given a string s and an array of strings words. All the strings of words are of the same length.\n\nA concatenated string is a string that exactly contains all the strings of any permutation of words concatenated.\n\nFor example, if words = [\"ab\",\"cd\",\"ef\"], then \"abcdef\", \"abefcd\", \"cdabef\", \"cdefab\", \"efabcd\", and \"efcdab\" are all concatenated strings. \"acdbef\" is not a concatenated string because it is not the concatenation of any permutation of words.\nReturn an array of the starting indices of all the concatenated substrings in s. You can return the answer in any order.",
+      "examples": [
+        {
+          "input": "s = \"barfoothefoobarman\", words = [\"foo\",\"bar\"]",
+          "output": "[0,9]",
+          "explanation": "The substring starting at 0 is \"barfoo\". It is the concatenation of [\"bar\",\"foo\"] which is a permutation of words.\nThe substring starting at 9 is \"foobar\". It is the concatenation of [\"foo\",\"bar\"] which is a permutation of words."
+        },
+        {
+          "input": "s = \"wordgoodgoodgoodbestword\", words = [\"word\",\"good\",\"best\",\"word\"]",
+          "output": "[]",
+          "explanation": "There is no concatenated substring."
+        },
+        {
+          "input": "s = \"barfoofoobarthefoobarman\", words = [\"bar\",\"foo\",\"the\"]",
+          "output": "[6,9,12]",
+          "explanation": "The substring starting at 6 is \"foobarthe\". It is the concatenation of [\"foo\",\"bar\",\"the\"].\nThe substring starting at 9 is \"barthefoo\". It is the concatenation of [\"bar\",\"the\",\"foo\"].\nThe substring starting at 12 is \"thefoobar\". It is the concatenation of [\"the\",\"foo\",\"bar\"]."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\n1 <= words.length <= 5000\n1 <= words[i].length <= 30\ns and words[i] consist of lowercase English letters.",
+      "solution": "class Solution(object):\n    def findSubstring(self, s, words):\n        \"\"\"\n        :type s: str\n        :type words: List[str]\n        :rtype: List[int]\n        \"\"\"\n        ret = []\n        n = len(s)\n        k = len(words)\n        m = len(words[0])\n        p = m * k\n        initWindow = []\n        notValid = set()\n        valid = set()\n\n        if n < p:\n            return []\n\n        def validSubtring(substring):\n            tempWords = words[:]\n            i = 0\n            while i < p:\n                currWord = substring[i:i+m]\n                if currWord in tempWords:\n                    tempWords.remove(currWord)\n                i += m\n            return tempWords == []\n\n        for i in range(p):\n            initWindow.append(s[i])\n\n        if validSubtring(''.join(initWindow)):\n            ret.append(0)\n\n        i = p\n        while i < n:\n            initWindow.pop(0)\n            initWindow.append(s[i])\n            tempString = ''.join(initWindow)\n            if tempString not in notValid:\n                if tempString in valid or validSubtring(tempString):\n                    ret.append(i - p + 1)\n                    valid.add(tempString)\n                else:\n                    notValid.add(tempString)\n            i += 1\n\n        return ret",
+      "explanation": "1. 初始化：\n   1.1 建立一個集合 valid 來快取有效的子字串，並建立一個集合 notValid 來快取無效的子字串。\n   1.2 定義一個輔助函數 validSubstring 來檢查子字串是否是單字的有效連接。\n2. 滑動視窗：\n   2.1 使用大小為 p（連接詞的總長度）的滑動視窗。\n   2.2 對於每個新視窗（子字串），檢查其是否處於 notValid 或 valid 狀態。\n   2.3 如果子字串未緩存，則呼叫 validSubstring 來確定其有效性並更新快取。\n3. 有效子字串檢查：\n   3.1 檢查子字串是否由單字清單中的所有單字組成且恰好一次。\n   3.2 使用列表統計子字串中每個單字的出現次數，並將其與單字列表進行比較。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n * m * k)\n   4.2 空間複雜度：O(n)",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

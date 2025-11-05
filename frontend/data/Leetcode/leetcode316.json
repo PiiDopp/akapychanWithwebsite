@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode316",
+  "coding_practice": [
+    {
+      "title": "Remove Duplicate Letters",
+      "description": "Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results.",
+      "examples": [
+        {
+          "input": "s = \"bcabc\"",
+          "output": "\"abc\""
+        },
+        {
+          "input": "s = \"cbacdcbc\"",
+          "output": "\"acdb\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of lowercase English letters.",
+      "note": "This question is the same as 1081",
+      "solution": "class Solution:\n    def removeDuplicateLetters(self, s):\n        stack = []\n        seen = set()\n        last_occurrence = {c:i for i,c in enumerate(s)}\n        \n        for i, c in enumerate(s):\n            if c not in seen:\n                while stack and c < stack[-1] and i < last_occurrence[stack[-1]]:\n                    seen.discard(stack.pop())\n                stack.append(c)\n                seen.add(c)\n        \n        return ''.join(stack)",
+      "explanation": "1. 使用 stack 保存當前結果字母。\n2. 使用 seen 集合記錄已加入的字母，避免重複。\n3. 使用 last_occurrence 記錄每個字母最後出現的位置。\n4. 遍歷字母，若字母未在 stack 中，則將大於當前字母且後面仍會出現的字母從 stack 移除。\n5. 最後將 stack 中的字母合併成結果，保證字典序最小且無重複。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

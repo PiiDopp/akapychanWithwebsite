@@ -1,0 +1,52 @@
+{
+  "ID": 1030,
+  "Title": "其他實用函數",
+  "Intro": "\t在 Python 中，有許多內建函數能協助我們更有效率地處理資料，例如 enumerate() 用於同時取得索引與值、zip() 可將多個序列組合成對、sorted() 可排序任意可迭代物件。這些函數經常搭配 comprehension 或 lambda 使用。",
+  "exp": {
+    "cor_exp": [
+      "# enumerate() 取得索引與值\nfruits = ['apple', 'banana', 'cherry']\nfor index, fruit in enumerate(fruits):\n    print(index, fruit)\n# 輸出：\n# 0 apple\n# 1 banana\n# 2 cherry",
+      "# zip() 同時迭代多個序列\nnames = ['Alice', 'Bob', 'Cindy']\nscores = [85, 90, 78]\nfor name, score in zip(names, scores):\n    print(name, '的分數是', score)\n# 輸出：\n# Alice 的分數是 85\n# Bob 的分數是 90\n# Cindy 的分數是 78",
+      "# sorted() 排序與 key 搭配\nnums = [5, 2, 9, 1]\nprint(sorted(nums))  # [1, 2, 5, 9]\n\nwords = ['apple', 'banana', 'pear', 'kiwi']\nprint(sorted(words, key=len))  # ['pear', 'kiwi', 'apple', 'banana']"
+    ],
+    "mis_exp": [
+      "# 錯誤：enumerate() 未解包索引與值\nfruits = ['apple', 'banana']\nfor item in enumerate(fruits):\n    print(item)\n# 會輸出 (索引, 值) 的 tuple，而非分開顯示",
+      "# 錯誤：zip() 長度不一\nnames = ['A', 'B']\nscores = [90, 80, 70]\nfor n, s in zip(names, scores):\n    print(n, s)\n# 只會配對最短序列長度（此例只執行兩次）",
+      "# 錯誤：sorted() 排序錯誤型態\nnums = [3, '5', 2]\nprint(sorted(nums))  # TypeError：int 與 str 無法比較"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式結果為何？\n\nfruits = ['apple', 'banana', 'cherry']\nfor i, f in enumerate(fruits):\n    print(i, f)",
+      "options": [
+        "A. apple 0 banana 1 cherry 2",
+        "B. 0 apple\\n1 banana\\n2 cherry",
+        "C. (0, 'apple'), (1, 'banana'), (2, 'cherry')",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "enumerate() 同時提供索引與值，會逐行輸出 0 apple、1 banana、2 cherry。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nnames = ['Amy', 'Ben', 'Cindy']\nscores = [90, 70, 80]\nfor n, s in zip(names, scores):\n    print(n, s)",
+      "options": [
+        "A. Amy 90\\nBen 70\\nCindy 80",
+        "B. ['Amy', 'Ben', 'Cindy', 'scores']",
+        "C. 程式錯誤",
+        "D. (Amy, Ben, Cindy) (90, 70, 80)"
+      ],
+      "answer": "A",
+      "explanation": "zip() 將多個序列元素配對迭代，輸出 Amy 90、Ben 70、Cindy 80。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nnums = [5, 1, 9, 3]\nprint(sorted(nums, reverse=True))",
+      "options": [
+        "A. [1, 3, 5, 9]",
+        "B. [9, 5, 3, 1]",
+        "C. [5, 1, 9, 3]",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "sorted() 可搭配 reverse=True 進行遞減排序，輸出 [9, 5, 3, 1]。"
+    }
+  ]
+}

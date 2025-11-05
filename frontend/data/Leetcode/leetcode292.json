@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode292",
+  "coding_practice": [
+    {
+      "title": "Nim Game",
+      "description": "You are playing the following Nim Game with your friend:\n\nInitially, there is a heap of stones on the table.\nYou and your friend will alternate taking turns, and you go first.\nOn each turn, the person whose turn it is will remove 1 to 3 stones from the heap.\nThe one who removes the last stone is the winner.\nGiven n, the number of stones in the heap, return true if you can win the game assuming both you and your friend play optimally, otherwise return false.",
+      "examples": [
+        {
+          "input": "n = 4",
+          "output": "false",
+          "explanation": "These are the possible outcomes:\n1. You remove 1 stone. Your friend removes 3 stones, including the last stone. Your friend wins.\n2. You remove 2 stones. Your friend removes 2 stones, including the last stone. Your friend wins.\n3. You remove 3 stones. Your friend removes the last stone. Your friend wins.\nIn all outcomes, your friend wins."
+        },
+        {
+          "input": "n = 1",
+          "output": "true"
+        },
+        {
+          "input": "n = 2",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def canWinNim(self, n):\n        # 如果石子數量是 4 的倍數，先手必輸；否則先手必勝\n        return n % 4 != 0",
+      "explanation": "1. 分析遊戲規則發現，每次可以拿 1 到 3 顆石頭。\n2. 當石頭數量為 4 的倍數時，無論先手怎麼拿，都會讓對手能夠拿到 4 的倍數減少到 0，先手必輸。\n3. 若石頭數量不是 4 的倍數，先手可以調整第一次拿的石頭數，使剩下石頭數為 4 的倍數，從而必勝。",
+      "tag": "520",
+      "difficult": "easy"
+    }
+  ]
+}

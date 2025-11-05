@@ -1,0 +1,65 @@
+{
+  "ID": 520,
+  "Title": "while 迴圈",
+  "Intro": "\t在 Python 中，while 迴圈會在條件為 True 時重複執行縮排區塊程式碼，直到條件變為 False 才停止。通常用於迴圈次數不固定，或需要根據某種條件停止的情況。",
+  "exp": {
+    "cor_exp": [
+      "i = 0\nwhile i < 5:\n    print(i)\n    i += 1  # 輸出 0,1,2,3,4",
+      "n = 10\nwhile n > 0:\n    print(n)\n    n -= 2  # 輸出 10,8,6,4,2",
+      "password = ''\nwhile password != '1234':\n    password = input('請輸入密碼: ')\nprint('登入成功')",
+      "total = 0\nnum = 1\nwhile num <= 5:\n    total += num\n    num += 1\nprint(total)  # 輸出 15"
+    ],
+    "mis_exp": [
+      "i = 0\nwhile i < 5\n    print(i)\n    i += 1  # 錯誤：缺少冒號",
+      "count = 0\nwhile count < 3:\nprint(count)  # 錯誤：缺少縮排",
+      "n = 1\nwhile n < 5:\n    print(n)  # 錯誤：無更新條件，可能造成無限迴圈"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ni = 1\nwhile i <= 10:\n    print(i)\n    i += 1",
+      "options": [
+        "A. 1 到 10 的數字，每行一個",
+        "B. 0 到 9 的數字，每行一個",
+        "C. 無限迴圈",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "i 從 1 開始，每次加 1，條件 i <= 10 成立時輸出，直到 10 後停止。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ntotal = 0\nnum = 1\nwhile num <= 100:\n    total += num\n    num += 1\nprint(total)",
+      "options": [
+        "A. 5050",
+        "B. 100",
+        "C. 4950",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "while 迴圈累加 1 到 100 的數字，總和為 5050。"
+    },
+    {
+      "question": "執行下列程式碼會發生什麼？\n\npassword = ''\nwhile password != '1234':\n    password = input('請輸入密碼: ')\nprint('登入成功')",
+      "options": [
+        "A. 使用者輸入正確密碼 '1234' 前，程式會一直要求輸入",
+        "B. 程式只輸出一次登入成功",
+        "C. 無限迴圈，不管輸入什麼",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "while 條件為 False 前會重複要求輸入，直到輸入 '1234' 才停止並印出登入成功。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\ni = 0\nwhile i < 5\n    print(i)\n    i += 1",
+      "options": [
+        "A. 0 到 4 的數字",
+        "B. 無限迴圈",
+        "C. 程式錯誤",
+        "D. 不輸出任何東西"
+      ],
+      "answer": "C",
+      "explanation": "while 後缺少冒號，Python 會報 SyntaxError。"
+    }
+  ]
+
+}

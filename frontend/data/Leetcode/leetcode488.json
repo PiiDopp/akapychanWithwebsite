@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode488",
+  "coding_practice": [
+    {
+      "title": "Zuma Game",
+      "description": "You are playing a variation of the game Zuma. \nIn this variation of Zuma, there is a single row of colored balls on a board, where each ball can be colored red 'R', yellow 'Y', blue 'B', green 'G', or white 'W'. You also have several colored balls in your hand. \nYour goal is to clear all of the balls from the board. On each turn: \nPick any ball from your hand and insert it in between two balls in the row or on either end of the row. \nIf there is a group of three or more consecutive balls of the same color, remove the group of balls from the board. \nIf this removal causes more groups of three or more of the same color to form, then continue removing each group until there are none left. If there are no more balls on the board, then you win the game. \nRepeat this process until you either win or do not have any more balls in your hand. \nGiven a string board, representing the row of balls on the board, and a string hand, representing the balls in your hand, return the minimum number of balls you have to insert to clear all the balls from the board. If you cannot clear all the balls from the board using the balls in your hand, return -1",
+      "examples": [
+        {
+          "input": "board = \"WRRBBW\", hand = \"RB\"",
+          "output": "-1",
+          "explanation": "It is impossible to clear all the balls. The best you can do is: \n- Insert 'R' so the board becomes WRRRBBW. WRRRBBW -> WBBW. \n- Insert 'B' so the board becomes WBBBW. WBBBW -> WW. \nThere are still balls remaining on the board, and you are out of balls to insert."
+        },
+        {
+          "input": "board = \"WWRRBBWW\", hand = \"WRBRW\"",
+          "output": "2",
+          "explanation": "To make the board empty: \n- Insert 'R' so the board becomes WWRRRBBWW. WWRRRBBWW -> WWBBWW. \n- Insert 'B' so the board becomes WWBBBWW. WWBBBWW -> WWWW -> empty. \n2 balls from your hand were needed to clear the board."
+        },
+        {
+          "input": "board = \"G\", hand = \"GGGGG\"",
+          "output": "2",
+          "explanation": "To make the board empty: \n- Insert 'G' so the board becomes GG. \n- Insert 'G' so the board becomes GGG. GGG -> empty. \n2 balls from your hand were needed to clear the board."
+        }
+      ],
+      "constraints": "1 <= board.length <= 16\n1 <= hand.length <= 5\nboard and hand consist of the characters 'R', 'Y', 'B', 'G', and 'W'.\nThe initial row of balls on the board will not have any groups of three or more consecutive balls of the same color.",
+      "solution": "import collections \n\nclass Solution(object):\n    def findMinStep(self, board, hand):\n        \"\"\"\n        :type board: str\n        :type hand: str\n        :rtype: int\n        \"\"\"\n        \n        # Function to remove consecutive same balls from the board\n        def remove_same(s, i):\n            if i < 0:\n                return s\n            \n            left = right = i\n            while left > 0 and s[left-1] == s[i]:\n                left -= 1\n            while right+1 < len(s) and s[right+1] == s[i]:\n                right += 1\n            \n            length = right - left + 1\n            if length >= 3:\n                new_s = s[:left] + s[right+1:]\n                return remove_same(new_s, left-1)  # recursively clean the new string\n            else:\n                return s\n\n        # Sort hand to optimize insertion\n        hand = \"\".join(sorted(hand))\n\n        # BFS queue: (current board, current hand, current step)\n        q = collections.deque([(board, hand, 0)])\n        visited = set([(board, hand)])  # Visited states to prevent reprocessing\n\n        while q:\n            curr_board, curr_hand, step = q.popleft()\n\n            for i in range(len(curr_board) + 1):\n                for j in range(len(curr_hand)):\n                    # Skip consecutive balls in hand to prevent duplicate insertions\n                    if j > 0 and curr_hand[j] == curr_hand[j-1]:\n                        continue\n                    \n                    # Skip positions where we don't need to insert (if left side has same color)\n                    if i > 0 and curr_board[i-1] == curr_hand[j]:\n                        continue\n                    \n                    pick = False\n                    # Check if inserting the ball will help remove\n                    # 1. Same color with the right ball\n                    # 2. Left and right balls are the same, but current hand ball is different\n                    if i < len(curr_board) and curr_board[i] == curr_hand[j]:\n                        pick = True\n                    if 0 < i < len(curr_board) and curr_board[i-1] == curr_board[i] and curr_board[i] != curr_hand[j]:\n                        pick = True\n                    \n                    if pick:\n                        # Simulate the board after insertion and removal\n                        new_board = remove_same(curr_board[:i] + curr_hand[j] + curr_board[i:], i)\n                        new_hand = curr_hand[:j] + curr_hand[j+1:]  # Remove the used ball from hand\n                        \n                        # If the board is empty, return the number of steps\n                        if not new_board:\n                            return step + 1\n                        \n                        # If the new state is not visited, process it\n                        if (new_board, new_hand) not in visited:\n                            q.append((new_board, new_hand, step + 1))\n                            visited.add((new_board, new_hand))\n\n        # If no solution was found\n        return -1",
+      "explanation": "1. 將手牌 hand 排序，方便 BFS 中跳過重複顏色的球。\n2. BFS 搜索，每個節點代表當前 board 狀態、手牌狀態和已插入球數步數。\n3. 對 board 的每個位置和手牌中的每個球嘗試插入，只有可能消除的插入位置才嘗試。\n4. 插入球後，使用 remove_same(i) 進行遞迴消除，直到穩定。\n5. 如果 board 清空，返回當前步數 step + 1。\n6. 記錄 visited 狀態，避免重複搜索。\n7. BFS 保證找到最少插入數的解，如果 BFS 遍歷完仍無法清空 board，返回 -1。",
+      "tag": "530",
+      "difficult": "hard"
+    }
+  ]
+}
+

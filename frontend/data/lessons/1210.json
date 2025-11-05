@@ -1,0 +1,52 @@
+{
+  "ID": 1210,
+  "Title": "JSON 資料讀寫",
+  "Intro": "\tJSON（JavaScript Object Notation）是一種常見的資料交換格式，常用於儲存設定、檔案資料或網路傳輸。Python 內建 json 模組可將資料結構（如字典、串列）轉換為 JSON 字串或檔案，也能從 JSON 檔案載入資料回到 Python 物件中。",
+  "exp": {
+    "cor_exp": [
+      "# 將字典寫入 JSON 檔案\nimport json\n\ndata = {'name': 'Alice', 'age': 25, 'city': 'Taipei'}\n\nwith open('data.json', 'w', encoding='utf-8') as f:\n    json.dump(data, f, ensure_ascii=False, indent=2)\n\nprint('JSON 檔案已建立！')",
+      "# 從 JSON 檔案讀取資料\nimport json\n\nwith open('data.json', 'r', encoding='utf-8') as f:\n    result = json.load(f)\n\nprint(result)\nprint('姓名：', result['name'])",
+      "# 使用 dumps() 與 loads() 在記憶體中轉換\nimport json\n\ndata = {'product': 'book', 'price': 199}\n\njson_str = json.dumps(data, ensure_ascii=False)\nprint('轉換為 JSON 字串：', json_str)\n\npython_obj = json.loads(json_str)\nprint('轉回 Python 物件：', python_obj)"
+    ],
+    "mis_exp": [
+      "# 錯誤：未開啟檔案模式為寫入\nimport json\ndata = {'a': 1}\nwith open('data.json', 'r') as f:\n    json.dump(data, f)  # 錯誤：'r' 模式無法寫入",
+      "# 錯誤：dump() 與 dumps() 混淆\nimport json\ndata = {'x': 10}\njson.dump(data)  # TypeError：缺少檔案物件參數",
+      "# 錯誤：讀取不存在的檔案\nimport json\nwith open('not_exist.json', 'r') as f:\n    data = json.load(f)  # FileNotFoundError"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一段程式能正確將字典寫入 data.json 檔？",
+      "options": [
+        "A. json.dump(data, 'data.json')",
+        "B. with open('data.json', 'w') as f: json.dump(data, f)",
+        "C. json.dumps(data, f)",
+        "D. open('data.json', 'w').write(json.dump(data))"
+      ],
+      "answer": "B",
+      "explanation": "dump() 需搭配 open() 檔案物件才能寫入，正確寫法為選項 B。"
+    },
+    {
+      "question": "執行下列程式輸出結果為何？\n\nimport json\nobj = {'a': 1, 'b': 2}\njson_str = json.dumps(obj)\nprint(type(json_str))",
+      "options": [
+        "A. <class 'dict'>",
+        "B. <class 'str'>",
+        "C. <class 'list'>",
+        "D. <class 'tuple'>"
+      ],
+      "answer": "B",
+      "explanation": "dumps() 會回傳字串（str），不是字典。"
+    },
+    {
+      "question": "若 data.json 檔案不存在，執行下列程式會發生什麼？\n\nimport json\nwith open('data.json', 'r') as f:\n    data = json.load(f)",
+      "options": [
+        "A. 自動建立空白檔案",
+        "B. 回傳空字典",
+        "C. FileNotFoundError",
+        "D. 無任何輸出"
+      ],
+      "answer": "C",
+      "explanation": "以 'r' 模式讀取不存在的檔案會發生 FileNotFoundError。"
+    }
+  ]
+}

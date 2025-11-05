@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode60",
+  "coding_practice": [
+    {
+      "title": "Permutation Sequence",
+      "description": "The set [1, 2, 3, ..., n] contains a total of n! unique permutations.\n\nBy listing and labeling all of the permutations in order, we get the following sequence for n = 3:\n\n\"123\"\n\"132\"\n\"213\"\n\"231\"\n\"312\"\n\"321\"\nGiven n and k, return the kth permutation sequence.",
+      "examples": [
+        {
+          "input": "n = 3, k = 3",
+          "output": "\"213\""
+        },
+        {
+          "input": "n = 4, k = 9",
+          "output": "\"2314\""
+        },
+        {
+          "input": "n = 3, k = 1",
+          "output": "\"123\""
+        }
+      ],
+      "constraints": "1 <= n <= 9\n1 <= k <= n!",
+      "solution": "class Solution(object):\n    def getPermutation(self, n, k):\n        \"\"\"\n        :type n: int\n        :type k: int\n        :rtype: str\n        \"\"\"\n        import math\n        numbers = list(range(1, n + 1))\n        k -= 1  # convert k to 0-indexed\n        result = []\n\n        for i in range(n, 0, -1):\n            fact = math.factorial(i - 1)\n            index = k // fact\n            result.append(str(numbers.pop(index)))\n            k %= fact\n\n        return ''.join(result)",
+      "explanation": "1. 將 k 轉換為 0-index。\n2. 建立數字列表 numbers = [1,2,...,n]。\n3. 從高位到低位迭代：\n   3.1 計算 (i-1)! 作為當前位置的分組大小。\n   3.2 用 k // fact 得到當前應該選的數字索引。\n   3.3 將該數字從 numbers 中移除並加入結果。\n   3.4 更新 k = k % fact。\n4. 返回結果組成的字串。\n5. 複雜度分析：\n   5.1 時間複雜度：O(n^2)\n   5.2 空間複雜度：O(n)",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

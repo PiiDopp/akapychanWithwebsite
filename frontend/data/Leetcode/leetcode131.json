@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode131",
+  "coding_practice": [
+    {
+      "title": "Palindrome Partitioning",
+      "description": "Given a string s, partition s such that every substring of the partition is a palindrome. Return all possible palindrome partitioning of s.",
+      "examples": [
+        {
+          "input": "s = \"aab\"",
+          "output": "[[\"a\",\"a\",\"b\"],[\"aa\",\"b\"]]"
+        },
+        {
+          "input": "s = \"a\"",
+          "output": "[[\"a\"]]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 16\ns contains only lowercase English letters.",
+      "solution": "class Solution:\n    def partition(self, s):\n        res = []\n\n        def is_palindrome(sub):\n            return sub == sub[::-1]\n\n        def dfs(start, path):\n            if start == len(s):\n                res.append(path[:])\n                return\n            for end in range(start + 1, len(s) + 1):\n                if is_palindrome(s[start:end]):\n                    dfs(end, path + [s[start:end]])\n\n        dfs(0, [])\n        return res",
+      "explanation": "1. 定義函數 is_palindrome 判斷子字串是否為迴文。\n2. 使用 DFS 遞迴，每次嘗試從 start 到 end 的所有切割點。\n3. 若子字串是迴文，將其加入當前路徑，遞迴處理剩餘部分。\n4. 當 start 到達字串末尾，將完整路徑加入結果。\n5. 返回所有可能的迴文分割結果。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

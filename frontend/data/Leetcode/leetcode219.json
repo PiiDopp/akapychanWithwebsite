@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode219",
+  "coding_practice": [
+    {
+      "title": "Contains Duplicate II",
+      "description": "Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3,1], k = 3",
+          "output": "true"
+        },
+        {
+          "input": "nums = [1,0,1,1], k = 1",
+          "output": "true"
+        },
+        {
+          "input": "nums = [1,2,3,1,2,3], k = 2",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-10^9 <= nums[i] <= 10^9\n0 <= k <= 10^5",
+      "solution": "class Solution:\n    def containsNearbyDuplicate(self, nums, k):\n        index_map = {}\n        for i, num in enumerate(nums):\n            if num in index_map and i - index_map[num] <= k:\n                return True\n            index_map[num] = i\n        return False",
+      "explanation": "1. 建立一個字典 index_map 記錄每個元素最後出現的位置。\n2. 遍歷 nums，如果當前元素已存在於字典中且與之前索引的距離 <= k，返回 True。\n3. 否則更新字典中該元素的索引。\n4. 遍歷結束仍未找到符合條件的元素，返回 False。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

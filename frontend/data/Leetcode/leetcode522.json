@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode522",
+  "coding_practice": [
+    {
+      "title": "Longest Uncommon Subsequence II",
+      "description": "Given an array of strings strs, return the length of the longest uncommon subsequence between them. If the longest uncommon subsequence does not exist, return -1.\n\nAn uncommon subsequence between an array of strings is a string that is a subsequence of one string but not the others.\n\nA subsequence of a string s is a string that can be obtained after deleting any number of characters from s.\n\nFor example, \"abc\" is a subsequence of \"aebdc\" because you can delete the underlined characters in \"aebdc\" to get \"abc\". Other subsequences of \"aebdc\" include \"aebdc\", \"aeb\", and \"\" (empty string).",
+      "examples": [
+        {
+          "input": "[\"aba\",\"cdc\",\"eae\"]",
+          "output": "3"
+        },
+        {
+          "input": "[\"aaa\",\"aaa\",\"aa\"]",
+          "output": "-1"
+        }
+      ],
+      "constraints": "2 <= strs.length <= 50\n1 <= strs[i].length <= 10\nstrs[i] consists of lowercase English letters.",
+      "solution": "class Solution:\n    def findLUSlength(self, strs):\n        res = -1\n        strs.sort(key=lambda x: -len(x))\n        for i, s in enumerate(strs):\n            if all(not self.is_subsequence(s, t) for j, t in enumerate(strs) if i != j):\n                return len(s)\n        return res\n\n    def is_subsequence(self, s, t):\n        it = iter(t)\n        return all(c in it for c in s)",
+      "explanation": "1. 將 strs 按字串長度降序排序，優先檢查長字串。\n2. 對每個字串 s，檢查其是否為其他字串的子序列。\n3. 若 s 不是任何其他字串的子序列，則 s 是不常見的子序列，直接返回其長度。\n4. 若遍歷所有字串都找不到不常見的子序列，返回 -1。\n5. is_subsequence 函數使用迭代器檢查 s 是否為 t 的子序列。",
+      "tag": "723",
+      "difficult": "medium"
+    }
+  ]
+}

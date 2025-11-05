@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode846",
+  "coding_practice": [
+    {
+      "description": "Alice has some number of cards and she wants to rearrange the cards into groups so that each group is of size groupSize, and consists of groupSize consecutive cards.\n\nGiven an integer array hand where hand[i] is the value written on the ith card and an integer groupSize, return true if she can rearrange the cards, or false otherwise.",
+      "examples": [
+        {
+          "input": "hand = [1,2,3,6,2,3,4,7,8], groupSize = 3",
+          "output": true,
+          "explanation": "Alice's hand can be rearranged as [1,2,3],[2,3,4],[6,7,8]"
+        },
+        {
+          "input": "hand = [1,2,3,4,5], groupSize = 4",
+          "output": false,
+          "explanation": "Alice's hand can not be rearranged into groups of 4."
+        }
+      ],
+      "constraints": "1 <= hand.length <= 10^4\n0 <= hand[i] <= 10^9\n1 <= groupSize <= hand.length",
+      "note": "This question is the same as 1296",
+      "solution": "from collections import Counter\n\nclass Solution:\n    def isNStraightHand(self, hand, groupSize):\n        if len(hand) % groupSize != 0:\n            return False\n        \n        count = Counter(hand)\n        for card in sorted(count):\n            freq = count[card]\n            if freq > 0:\n                for i in range(card, card + groupSize):\n                    if count[i] < freq:\n                        return False\n                    count[i] -= freq\n        return True",
+      "explanation": "1. 檢查總牌數是否能整除 groupSize，不能則返回 False。\n2. 對手牌計數並排序，從最小的牌開始形成順子。\n3. 每形成一次順子，對應牌的數量減去最小牌的出現次數。\n4. 如果某張牌數量不足，返回 False。\n5. 全部順子成功形成，返回 True。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

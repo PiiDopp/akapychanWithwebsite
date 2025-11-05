@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode398",
+  "coding_practice": [
+    {
+      "title": "Random Pick Index",
+      "description": "Given an integer array nums with possible duplicates, randomly output the index of a given target number. You can assume that the given target number must exist in the array.\n\nImplement the Solution class:\n\nSolution(int[] nums) Initializes the object with the array nums.\nint pick(int target) Picks a random index i from nums where nums[i] == target. If there are multiple valid i's, then each index should have an equal probability of returning.",
+      "examples": [
+        {
+          "input": "[\"Solution\", \"pick\", \"pick\", \"pick\"], [[[1, 2, 3, 3, 3]], [3], [1], [3]]",
+          "output": "[null, 4, 0, 2]",
+          "explanation": "Solution solution = new Solution([1, 2, 3, 3, 3]);\nsolution.pick(3); // It should return either index 2, 3, or 4 randomly. Each index should have equal probability of returning.\nsolution.pick(1); // It should return 0. Since in the array only nums[0] is equal to 1.\nsolution.pick(3); // It should return either index 2, 3, or 4 randomly. Each index should have equal probability of returning."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 2 * 10^4\n-2^31 <= nums[i] <= 2^31 - 1\ntarget is an integer from nums.\nAt most 10^4 calls will be made to pick.",
+      "solution": "import random\nfrom collections import defaultdict\n\nclass Solution:\n    def __init__(self, nums):\n        self.num_indices = defaultdict(list)\n        for i, num in enumerate(nums):\n            self.num_indices[num].append(i)\n\n    def pick(self, target):\n        return random.choice(self.num_indices[target])",
+      "explanation": "1. 使用 defaultdict 將每個數字對應到其所有索引。\n2. 初始化時將 nums 的索引存入字典。\n3. pick 方法隨機從對應目標數字的索引列表中選擇一個返回。",
+      "tag": "631",
+      "difficult": "medium"
+    }
+  ]
+}

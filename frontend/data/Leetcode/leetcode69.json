@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode69",
+  "coding_practice": [
+    {
+      "title": "Sqrt(x)",
+      "description": "Given a non-negative integer x, return the square root of x rounded down to the nearest integer. The returned integer should be non-negative as well.\n\nYou must not use any built-in exponent function or operator.\n\nFor example, do not use pow(x, 0.5) in c++ or x ** 0.5 in python.",
+      "examples": [
+        {
+          "input": "x = 4",
+          "output": "2",
+          "explanation": "The square root of 4 is 2, so we return 2."
+        },
+        {
+          "input": "x = 8",
+          "output": "2",
+          "explanation": "The square root of 8 is 2.82842..., and since we round it down to the nearest integer, 2 is returned."
+        }
+      ],
+      "constraints": "0 <= x <= 2^31 - 1",
+      "solution": "class Solution(object):\n    def mySqrt(self, x):\n        \"\"\"\n        :type x: int\n        :rtype: int\n        \"\"\"\n        if x < 2:\n            return x\n        \n        left, right = 1, x // 2\n        while left <= right:\n            mid = (left + right) // 2\n            if mid * mid == x:\n                return mid\n            elif mid * mid < x:\n                left = mid + 1\n            else:\n                right = mid - 1\n        \n        return right",
+      "explanation": "1. 使用二分法搜尋 1 到 x//2 之間的平方根。\n2. 若 mid*mid 等於 x，則返回 mid。\n3. 若 mid*mid < x，則更新左邊界 left = mid + 1。\n4. 若 mid*mid > x，則更新右邊界 right = mid - 1。\n5. 返回 right 作為向下取整的平方根。",
+      "tag": 711,
+      "difficult": "easy"
+    }
+  ]
+}

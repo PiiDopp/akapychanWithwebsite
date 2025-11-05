@@ -1,0 +1,22 @@
+{
+  "ID": "leetcode295",
+  "coding_practice": [
+    {
+      "title": "Find Median from Data Stream",
+      "description": "The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value, and the median is the mean of the two middle values.\n\nFor example, for arr = [2,3,4], the median is 3.\nFor example, for arr = [2,3], the median is (2 + 3) / 2 = 2.5.\nImplement the MedianFinder class:\n\nMedianFinder() initializes the MedianFinder object.\nvoid addNum(int num) adds the integer num from the data stream to the data structure.\ndouble findMedian() returns the median of all elements so far. Answers within 10-5 of the actual answer will be accepted.",
+      "examples": [
+        {
+          "input": "[\"MedianFinder\", \"addNum\", \"addNum\", \"findMedian\", \"addNum\", \"findMedian\"], [[], [1], [2], [], [3], []]",
+          "output": "[null, null, null, 1.5, null, 2.0]",
+          "explanation": "MedianFinder medianFinder = new MedianFinder();\nmedianFinder.addNum(1);    // arr = [1]\nmedianFinder.addNum(2);    // arr = [1, 2]\nmedianFinder.findMedian(); // return 1.5 (i.e., (1 + 2) / 2)\nmedianFinder.addNum(3);    // arr[1, 2, 3]\nmedianFinder.findMedian(); // return 2.0"
+        }
+      ],
+      "constraints": "-10^5 <= num <= 10^5\nThere will be at least one element in the data structure before calling findMedian.\nAt most 5 * 10^4 calls will be made to addNum and findMedian.",
+      "follow up": "If all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?\nIf 99% of all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?",
+      "solution": "import heapq\n\nclass MedianFinder(object):\n    def __init__(self):\n        self.small = []\n        self.large = []\n\n    def addNum(self, num):\n        heapq.heappush(self.small, -num)\n        if self.small and self.large and (-self.small[0] > self.large[0]):\n            val = -heapq.heappop(self.small)\n            heapq.heappush(self.large, val)\n        if len(self.small) > len(self.large) + 1:\n            val = -heapq.heappop(self.small)\n            heapq.heappush(self.large, val)\n        elif len(self.large) > len(self.small):\n            val = heapq.heappop(self.large)\n            heapq.heappush(self.small, -val)\n\n    def findMedian(self):\n        if len(self.small) > len(self.large):\n            return -self.small[0]\n        else:\n            return (-self.small[0] + self.large[0]) / 2.0",
+      "explanation": "1. 使用兩個堆疊：小頂堆 large 存較大的一半數字，最大堆 small 存較小的一半數字（取負數模擬最大堆）。\n2. 新增數字時，先放入 small，若 small 的最大值大於 large 的最小值，將值交換保持大小關係。\n3. 調整兩個堆的大小，使 small 不小於 large 且差距不超過 1。\n4. 找中位數時，若 small 堆較大，返回 small 堆頂；若相等，返回 small 和 large 的堆頂平均值。",
+      "tag": "613",
+      "difficult": "hard"
+    }
+  ]
+}

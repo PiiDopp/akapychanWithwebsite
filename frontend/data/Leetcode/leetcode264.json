@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode264",
+  "coding_practice": [
+    {
+      "title": "Ugly Number II",
+      "description": "An ugly number is a positive integer whose prime factors are limited to 2, 3, and 5. \n\nGiven an integer n, return the nth ugly number.",
+      "examples": [
+        {
+          "input": "n = 10",
+          "output": "12",
+          "explanation": "[1, 2, 3, 4, 5, 6, 8, 9, 10, 12] is the sequence of the first 10 ugly numbers."
+        },
+        {
+          "input": "n = 1",
+          "output": "1",
+          "explanation": "1 has no prime factors, therefore all of its prime factors are limited to 2, 3, and 5."
+        }
+      ],
+      "constraints": "1 <= n <= 1690",
+      "solution": "class Solution:\n    def nthUglyNumber(self, n):\n        ugly = [1]\n        i2 = i3 = i5 = 0\n\n        while len(ugly) < n:\n            next2, next3, next5 = ugly[i2]*2, ugly[i3]*3, ugly[i5]*5\n            next_ugly = min(next2, next3, next5)\n            ugly.append(next_ugly)\n\n            if next_ugly == next2:\n                i2 += 1\n            if next_ugly == next3:\n                i3 += 1\n            if next_ugly == next5:\n                i5 += 1\n\n        return ugly[-1]",
+      "explanation": "1. 使用三個指針 i2, i3, i5 分別追蹤 2, 3, 5 的倍數位置。\n2. 每次取三個候選最小值作為下一個 ugly number，並對應指針前進。\n3. 重複直到生成 n 個 ugly numbers，返回最後一個。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

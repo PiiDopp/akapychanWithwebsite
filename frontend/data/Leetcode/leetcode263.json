@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode263",
+  "coding_practice": [
+    {
+      "title": "Ugly Number",
+      "description": "An ugly number is a positive integer which does not have a prime factor other than 2, 3, and 5.\n\nGiven an integer n, return true if n is an ugly number.",
+      "examples": [
+        {
+          "input": "n = 6",
+          "output": "true",
+          "explanation": "6 = 2 × 3"
+        },
+        {
+          "input": "n = 1",
+          "output": "true",
+          "explanation": "1 has no prime factors."
+        },
+        {
+          "input": "n = 14",
+          "output": "false",
+          "explanation": "14 is not ugly since it includes the prime factor 7."
+        }
+      ],
+      "constraints": "-2^31 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def isUgly(self, n):\n        if n <= 0:\n            return False\n        for p in [2, 3, 5]:\n            while n % p == 0:\n                n //= p\n        return n == 1",
+      "explanation": "1. If n is less than or equal to 0, it cannot be ugly.\n2. Divide n by 2, 3, and 5 as long as it's divisible.\n3. If the remaining n is 1, then all prime factors are 2, 3, or 5, so return True; otherwise, return False.",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode31",
+  "coding_practice": [
+    {
+      "title": "Next Permutation",
+      "description": "A permutation of an array of integers is an arrangement of its members into a sequence or linear order.\n\nFor example, for arr = [1,2,3], the following are all the permutations of arr: [1,2,3], [1,3,2], [2, 1, 3], [2, 3, 1], [3,1,2], [3,2,1].\nThe next permutation of an array of integers is the next lexicographically greater permutation of its integer. More formally, if all the permutations of the array are sorted in one container according to their lexicographical order, then the next permutation of that array is the permutation that follows it in the sorted container. If such arrangement is not possible, the array must be rearranged as the lowest possible order (i.e., sorted in ascending order).\n\nFor example, the next permutation of arr = [1,2,3] is [1,3,2].\nSimilarly, the next permutation of arr = [2,3,1] is [3,1,2].\nWhile the next permutation of arr = [3,2,1] is [1,2,3] because [3,2,1] does not have a lexicographical larger rearrangement.\nGiven an array of integers nums, find the next permutation of nums.\n\nThe replacement must be in place and use only constant extra memory.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "[1,3,2]"
+        },
+        {
+          "input": "nums = [3,2,1]",
+          "output": "[1,2,3]"
+        },
+        {
+          "input": "nums = [1,1,5]",
+          "output": "[1,5,1]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 100\n0 <= nums[i] <= 100",
+      "solution": "class Solution(object):\n    def nextPermutation(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: void Do not return anything, modify nums in-place instead.\n        \"\"\"\n        n = len(nums)\n        i = n - 2\n\n        while i >= 0 and nums[i] >= nums[i + 1]:\n            i -= 1\n\n        if i >= 0:\n            j = n - 1\n            while nums[j] <= nums[i]:\n                j -= 1\n            nums[i], nums[j] = nums[j], nums[i]\n\n        left, right = i + 1, n - 1\n        while left < right:\n            nums[left], nums[right] = nums[right], nums[left]\n            left += 1\n            right -= 1",
+      "explanation": "1. 初始化：\n   1.1 從右往左找到第一個下降的元素索引 i（nums[i] < nums[i+1]）。\n2. 找到交換元素：\n   2.1 從右往左找到第一個大於 nums[i] 的元素索引 j，交換 nums[i] 與 nums[j]。\n3. 翻轉子陣列：\n   3.1 翻轉 i+1 到末尾的子陣列，使其成為最小排列。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n)\n   4.2 空間複雜度：O(1)，原地修改。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

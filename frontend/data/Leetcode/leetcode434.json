@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode434",
+  "coding_practice": [
+    {
+      "title": "Number of Segments in a String",
+      "description": "Given a string s, return the number of segments in the string.\n\nA segment is defined to be a contiguous sequence of non-space characters.",
+      "examples": [
+        {
+          "input": "s = \"Hello, my name is John\"",
+          "output": "5",
+          "explanation": "The five segments are [\"Hello,\", \"my\", \"name\", \"is\", \"John\"]"
+        },
+        {
+          "input": "s = \"Hello\"",
+          "output": "1"
+        }
+      ],
+      "constraints": "0 <= s.length <= 300\ns consists of lowercase and uppercase English letters, digits, or one of the following characters \"!@#$%^&*()_+-=',:.\".\nThe only space character in s is ' '.",
+      "solution": "class Solution:\n    def countSegments(self, s):\n        # 使用 str.split() 將字串按照空白分割，並去除空字串\n        return len([segment for segment in s.split(' ') if segment])",
+      "explanation": "1. 使用 str.split(' ') 將字串按照空格分割成多個子字串。\n2. 過濾掉空字串，因為連續空格可能產生空元素。\n3. 返回剩餘子字串的長度，即段數。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

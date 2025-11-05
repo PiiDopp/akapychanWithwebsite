@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode447",
+  "coding_practice": [
+    {
+      "title": "Number of Boomerangs",
+      "description": "You are given n points in the plane that are all distinct, where points[i] = [x_i, y_i]. A boomerang is a tuple of points (i, j, k) such that the distance between i and j equals the distance between i and k (the order of the tuple matters).\n\nReturn the number of boomerangs.",
+      "examples": [
+        {
+          "input": "points = [[0,0],[1,0],[2,0]]",
+          "output": "2",
+          "explanation": "The two boomerangs are [[1,0],[0,0],[2,0]] and [[1,0],[2,0],[0,0]]."
+        },
+        {
+          "input": "points = [[1,1],[2,2],[3,3]]",
+          "output": "2"
+        },
+        {
+          "input": "points = [[1,1]]",
+          "output": "0"
+        }
+      ],
+      "constraints": "n == points.length\n1 <= n <= 500\npoints[i].length == 2\n-10^4 <= x_i, y_i <= 10^4\nAll the points are unique.",
+      "solution": "from collections import defaultdict\n\nclass Solution:\n    def numberOfBoomerangs(self, points):\n        total = 0\n        for x1, y1 in points:\n            dist_count = defaultdict(int)\n            for x2, y2 in points:\n                if (x1, y1) != (x2, y2):\n                    d = (x1 - x2) ** 2 + (y1 - y2) ** 2\n                    dist_count[d] += 1\n            for count in dist_count.values():\n                total += count * (count - 1)\n        return total",
+      "explanation": "1. 對每個點 (x1, y1) 遍歷所有其他點 (x2, y2) 並計算平方距離 d。\n2. 使用字典 dist_count 記錄每個距離出現的次數。\n3. 若某個距離出現 count 次，則可以組成 count * (count - 1) 個 boomerangs。\n4. 對所有點累加結果，返回 total。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

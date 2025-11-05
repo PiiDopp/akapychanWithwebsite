@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode459",
+  "coding_practice": [
+    {
+      "title": "Repeated Substring Pattern",
+      "description": "Given a string s, check if it can be constructed by taking a substring of it and appending multiple copies of the substring together.",
+      "examples": [
+        {
+          "input": "s = \"abab\"",
+          "output": "true",
+          "explanation": "It is the substring \"ab\" twice."
+        },
+        {
+          "input": "s = \"aba\"",
+          "output": "false"
+        },
+        {
+          "input": "s = \"abcabcabcabc\"",
+          "output": "true",
+          "explanation": "It is the substring \"abc\" four times or the substring \"abcabc\" twice."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of lowercase English letters.",
+      "solution": "class Solution:\n    def repeatedSubstringPattern(self, s):\n        n = len(s)\n        for i in range(1, n // 2 + 1):\n            if n % i == 0:\n                if s[:i] * (n // i) == s:\n                    return True\n        return False",
+      "explanation": "1. 遍歷可能的子串長度 i 從 1 到 n//2。\n2. 如果 n 能被 i 整除，檢查 s[:i] 重複 n//i 次是否等於 s。\n3. 若相等，返回 True，表示存在重複子串。\n4. 否則遍歷完成後返回 False。",
+      "tag": "612",
+      "difficult": "easy"
+    }
+  ]
+}
+

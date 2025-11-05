@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode495",
+  "coding_practice": [
+    {
+      "title": "Teemo Attacking",
+      "description": "Our hero Teemo is attacking an enemy Ashe with poison attacks! When Teemo attacks Ashe, Ashe gets poisoned for a exactly duration seconds. More formally, an attack at second t will mean Ashe is poisoned during the inclusive time interval [t, t + duration - 1]. If Teemo attacks again before the poison effect ends, the timer for it is reset, and the poison effect will end duration seconds after the new attack.\n\nYou are given a non-decreasing integer array timeSeries, where timeSeries[i] denotes that Teemo attacks Ashe at second timeSeries[i], and an integer duration.\n\nReturn the total number of seconds that Ashe is poisoned.",
+      "examples": [
+        {
+          "input": "timeSeries = [1,4], duration = 2",
+          "output": "4",
+          "explanation": "Teemo's attacks on Ashe go as follows:\n- At second 1, Teemo attacks, and Ashe is poisoned for seconds 1 and 2.\n- At second 4, Teemo attacks, and Ashe is poisoned for seconds 4 and 5.\nAshe is poisoned for seconds 1, 2, 4, and 5, which is 4 seconds in total."
+        },
+        {
+          "input": "timeSeries = [1,2], duration = 2",
+          "output": "3",
+          "explanation": "Teemo's attacks on Ashe go as follows:\n- At second 1, Teemo attacks, and Ashe is poisoned for seconds 1 and 2.\n- At second 2 however, Teemo attacks again and resets the poison timer. Ashe is poisoned for seconds 2 and 3.\nAshe is poisoned for seconds 1, 2, and 3, which is 3 seconds in total."
+        }
+      ],
+      "constraints": "1 <= timeSeries.length <= 10^4\n0 <= timeSeries[i], duration <= 10^7\ntimeSeries is sorted in non-decreasing order.",
+      "solution": "class Solution:\n    def findPoisonedDuration(self, timeSeries, duration):\n        if not timeSeries:\n            return 0\n        total = 0\n        for i in range(len(timeSeries) - 1):\n            total += min(timeSeries[i + 1] - timeSeries[i], duration)\n        total += duration\n        return total",
+      "explanation": "1. 遍歷每次攻擊，計算本次攻擊造成的中毒時間。\n2. 若下一次攻擊在中毒結束之前，取兩次攻擊時間差與 duration 的最小值，避免重複計算。\n3. 累加所有中毒時間，最後加上最後一次攻擊的 duration。\n4. 返回總中毒秒數。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

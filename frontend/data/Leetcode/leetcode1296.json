@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode1296",
+  "coding_practice": [
+    {
+      "title": "Divide Array in Sets of K Consecutive Numbers",
+      "description": "Given an array of integers nums and a positive integer k, check whether it is possible to divide this array into sets of k consecutive numbers.\n\nReturn true if it is possible. Otherwise, return false.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3,3,4,4,5,6], k = 4",
+          "output": "true",
+          "explanation": "Array can be divided into [1,2,3,4] and [3,4,5,6]."
+        },
+        {
+          "input": "nums = [3,2,1,2,3,4,3,4,5,9,10,11], k = 3",
+          "output": "true",
+          "explanation": "Array can be divided into [1,2,3] , [2,3,4] , [3,4,5] and [9,10,11]."
+        },
+        {
+          "input": "nums = [1,2,3,4], k = 3",
+          "output": "false",
+          "explanation": "Each array should be divided in subarrays of size 3."
+        }
+      ],
+      "constraints": "1 <= k <= nums.length <= 10^5; 1 <= nums[i] <= 10^9",
+      "note": "This question is the same as 846",
+      "solution": "from collections import Counter\n\nclass Solution:\n    def isPossibleDivide(self, nums, k):\n        if len(nums) % k != 0:\n            return False\n\n        count = Counter(nums)\n        for num in sorted(count):\n            if count[num] > 0:\n                need = count[num]\n                for i in range(num, num + k):\n                    if count[i] < need:\n                        return False\n                    count[i] -= need\n        return True",
+      "explanation": "1. 先檢查 nums 的長度是否能被 k 整除，否則無法平均分組。\n2. 使用 Counter 計算每個數字出現次數，並從最小的數字開始建立連續序列。\n3. 對每個出現次數大於 0 的數字，嘗試組成 [num, num+1, ..., num+k-1] 的組。\n4. 若任何數字不足以組成該序列則回傳 False，全部組成成功則回傳 True。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

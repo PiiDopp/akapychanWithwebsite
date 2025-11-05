@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode373",
+  "coding_practice": [
+    {
+      "title": "Find K Pairs with Smallest Sums",
+      "description": "You are given two integer arrays nums1 and nums2 sorted in non-decreasing order and an integer k.\n\nDefine a pair (u, v) which consists of one element from the first array and one element from the second array.\n\nReturn the k pairs (u_1, v_1), (u_2, v_2), ..., (u_k, v_k) with the smallest sums.",
+      "examples": [
+        {
+          "input": "nums1 = [1,7,11], nums2 = [2,4,6], k = 3",
+          "output": "[[1,2],[1,4],[1,6]]",
+          "explanation": "The first 3 pairs are returned from the sequence: [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]"
+        },
+        {
+          "input": "nums1 = [1,1,2], nums2 = [1,2,3], k = 2",
+          "output": "[[1,1],[1,1]]",
+          "explanation": "The first 2 pairs are returned from the sequence: [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]"
+        }
+      ],
+      "constraints": "1 <= nums1.length, nums2.length <= 10^5\n-10^9 <= nums1[i], nums2[i] <= 10^9\nnums1 and nums2 both are sorted in non-decreasing order.\n1 <= k <= 10^4\nk <= nums1.length * nums2.length",
+      "solution": "import heapq\n\nclass Solution:\n    def kSmallestPairs(self, nums1, nums2, k):\n        if not nums1 or not nums2:\n            return []\n        heap = []\n        res = []\n        for i in range(min(k, len(nums1))):\n            heapq.heappush(heap, (nums1[i] + nums2[0], i, 0))\n        while heap and len(res) < k:\n            sum_val, i, j = heapq.heappop(heap)\n            res.append([nums1[i], nums2[j]])\n            if j + 1 < len(nums2):\n                heapq.heappush(heap, (nums1[i] + nums2[j+1], i, j+1))\n        return res",
+      "explanation": "1. 使用最小堆(heapq)維護當前最小和的組合。\n2. 初始將 nums1 前 k 個元素與 nums2[0] 配對推入堆。\n3. 每次彈出堆頂組合並加入結果。\n4. 將下一個可能的組合 (i, j+1) 推入堆。\n5. 重複直到收集 k 個組合。",
+      "tag": "632",
+      "difficult": "medium"
+    }
+  ]
+}

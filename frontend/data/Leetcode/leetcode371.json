@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode371",
+  "coding_practice": [
+    {
+      "title": "Sum of Two Integers",
+      "description": "Given two integers a and b, return the sum of the two integers without using the operators + and -.",
+      "examples": [
+        {
+          "input": "a = 1, b = 2",
+          "output": "3"
+        },
+        {
+          "input": "a = 2, b = 3",
+          "output": "5"
+        }
+      ],
+      "constraints": "-1000 <= a, b <= 1000",
+      "solution": "class Solution:\n    def getSum(self, a, b):\n        MASK = 0xFFFFFFFF\n        MAX_INT = 0x7FFFFFFF\n\n        while b != 0:\n            carry = (a & b) & MASK\n            a = (a ^ b) & MASK\n            b = (carry << 1) & MASK\n\n        return a if a <= MAX_INT else ~(a ^ MASK)",
+      "explanation": "1. 使用位運算模擬加法。\n2. carry = a & b 計算進位，a ^ b 計算不帶進位的加法結果。\n3. 將 carry 左移一位，表示進位的數值，重複直到 carry 為 0。\n4. 因為 Python 整數無上限，使用 MASK 處理負數，使其模擬 32 位整數。\n5. 若結果大於 MAX_INT，轉換為負數輸出。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

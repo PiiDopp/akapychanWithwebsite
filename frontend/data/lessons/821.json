@@ -1,0 +1,53 @@
+{
+  "ID": 821,
+  "Title": "random模組",
+  "Intro": "\trandom 模組用來產生隨機數、隨機選取、打亂序列等，常用於 模擬、遊戲、統計抽樣。",
+  "exp": {
+    "cor_exp": [
+      "import random",
+      "產生隨機浮點數\nprint(random.random())   # 0.0 ~ 1.0 之間的隨機浮點數\nprint(random.uniform(5, 10))  # 5 ~ 10 之間的隨機浮點數",
+      "產生隨機整數\nprint(random.randint(1, 6))   # 包含 1 和 6\nprint(random.randrange(1, 10, 2))  # 1 ~ 9 間的奇數",
+      "從序列中隨機取樣\nitems = ['apple', 'banana', 'cherry']\nprint(random.choice(items))      # 隨機選一個\nprint(random.sample(items, 2))   # 隨機選 2 個（不重複）\nprint(random.choices(items, k=5)) # 隨機選 5 個（可重複）",
+      "打亂序列順序\nnumbers = [1, 2, 3, 4, 5]\nrandom.shuffle(numbers)\nprint(numbers)   # 列表順序被隨機打亂",
+      "設定隨機種子（可重現結果）\nrandom.seed(10)   # 固定種子\nprint(random.randint(1, 100))  # 每次執行結果相同"
+    ],
+    "mis_exp": [
+      "1. 隨機性質：random 產生的是「偽隨機數」，依靠演算法和種子，並非真正的物理隨機。\n2. 種子 (seed)：同樣的種子會產生相同的隨機序列 → 用於「測試可重現」。\n3. 選取差異：choice()：單一元素；sample()：多個元素，不重複；choices()：多個元素，可重複。\n4. 安全性：若要做加密或安全用途，不建議用 random，改用 secrets 模組。"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼可能輸出什麼？\n\nimport random\nprint(random.randint(1, 6))",
+      "options": [
+        "A. 只會輸出 1",
+        "B. 1 到 5 之間的整數",
+        "C. 1 到 6 之間的整數",
+        "D. 0 到 6 之間的整數"
+      ],
+      "answer": "C",
+      "explanation": "randint(a, b) 會回傳 [a, b] 範圍內的整數，包含 1 和 6。"
+    },
+    {
+      "question": "下列哪一個函數會回傳一個 0.0 到 1.0 之間的浮點數？",
+      "options": [
+        "A. random.randint()",
+        "B. random.choice()",
+        "C. random.random()",
+        "D. random.randrange()"
+      ],
+      "answer": "C",
+      "explanation": "random.random() 會回傳一個 0.0 到 1.0 之間的隨機浮點數。"
+    },
+    {
+      "question": "執行下列程式碼後，numbers 的內容可能變成什麼？\n\nimport random\nnumbers = [1, 2, 3, 4]\nrandom.shuffle(numbers)\nprint(numbers)",
+      "options": [
+        "A. [1, 2, 3, 4]",
+        "B. [4, 3, 2, 1]",
+        "C. [2, 1, 4, 3]",
+        "D. 以上皆有可能"
+      ],
+      "answer": "D",
+      "explanation": "shuffle() 會隨機打亂列表，結果可能不同，因此以上皆有可能。"
+    }
+  ]
+}

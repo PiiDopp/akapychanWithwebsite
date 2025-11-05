@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode503",
+  "coding_practice": [
+    {
+      "title": "Next Greater Element II",
+      "description": "Given a circular integer array nums (i.e., the next element of nums[nums.length - 1] is nums[0]), return the next greater number for every element in nums.\n\nThe next greater number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. If it doesn't exist, return -1 for this number.",
+      "examples": [
+        {
+          "input": "nums = [1,2,1]",
+          "output": "[2,-1,2]",
+          "explanation": "The first 1's next greater number is 2;\nThe number 2 can't find next greater number.\nThe second 1's next greater number needs to search circularly, which is also 2."
+        },
+        {
+          "input": "nums = [1,2,3,4,3]",
+          "output": "[2,3,4,-1,4]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9",
+      "solution": "class Solution:\n    def nextGreaterElements(self, nums):\n        n = len(nums)\n        res = [-1] * n\n        stack = []\n\n        for i in range(2 * n):\n            while stack and nums[stack[-1]] < nums[i % n]:\n                res[stack.pop()] = nums[i % n]\n            if i < n:\n                stack.append(i)\n        return res",
+      "explanation": "1. 由於陣列是環狀的，將其遍歷兩倍長度（2 * n），模擬循環效果。\n2. 使用單調棧儲存索引，棧內元素對應的值是尚未找到下一個更大元素的數。\n3. 若當前數字比棧頂索引對應的值大，則此數即為該索引的下一個更大元素。\n4. 對前 n 個元素（避免重複處理）壓入棧中。\n5. 返回結果陣列 res。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

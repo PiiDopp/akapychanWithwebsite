@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode491",
+  "coding_practice": [
+    {
+      "title": "Non-decreasing Subsequences",
+      "description": "Given an integer array nums, return all the different possible non-decreasing subsequences of the given array with at least two elements. You may return the answer in any order.",
+      "examples": [
+        {
+          "input": "nums = [4,6,7,7]",
+          "output": "[[4,6],[4,6,7],[4,6,7,7],[4,7],[4,7,7],[6,7],[6,7,7],[7,7]]"
+        },
+        {
+          "input": "nums = [4,4,3,2,1]",
+          "output": "[[4,4]]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 15\n-100 <= nums[i] <= 100",
+      "solution": "class Solution:\n    def findSubsequences(self, nums):\n        res = []\n\n        def backtrack(start, path):\n            if len(path) > 1:\n                res.append(path[:])\n            used = set()\n            for i in range(start, len(nums)):\n                if (not path or nums[i] >= path[-1]) and nums[i] not in used:\n                    used.add(nums[i])\n                    path.append(nums[i])\n                    backtrack(i + 1, path)\n                    path.pop()\n\n        backtrack(0, [])\n        return res",
+      "explanation": "1. 使用回溯法遍歷所有可能的子序列。\n2. 使用 path 儲存當前子序列，當長度大於 1 時加入結果 res。\n3. 使用 used 集合避免在同一層重複選擇相同元素，防止產生重複子序列。\n4. 對每個索引 i，如果當前元素大於等於 path 的最後一個元素，則加入 path 並遞迴搜索下一個元素。\n5. 回溯時移除最後加入的元素，繼續探索其他可能。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}
+

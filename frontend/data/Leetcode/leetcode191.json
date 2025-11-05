@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode191",
+  "coding_practice": [
+    {
+      "title": "Number of 1 Bits",
+      "description": "Given a positive integer n, write a function that returns the number of set bits in its binary representation (also known as the Hamming weight).",
+      "examples": [
+        {
+          "input": "n = 11",
+          "output": "3",
+          "explanation": "The input binary string 1011 has a total of three set bits."
+        },
+        {
+          "input": "n = 128",
+          "output": "1",
+          "explanation": "The input binary string 10000000 has a total of one set bit."
+        },
+        {
+          "input": "n = 2147483645",
+          "output": "30",
+          "explanation": "The input binary string 1111111111111111111111111111101 has a total of thirty set bits."
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "follow up": "If this function is called many times, how would you optimize it?",
+      "solution": "class Solution:\n    def hammingWeight(self, n):\n        count = 0\n        while n:\n            count += n & 1\n            n >>= 1\n        return count",
+      "explanation": "1. 初始化計數器 count 為 0。\n2. 使用 while 循環，當 n 不為 0 時，不斷檢查 n 的最右位是否為 1 (n & 1)。\n3. 若為 1，將 count 加 1，然後右移 n 一位 (n >>= 1)，重複直到 n 為 0。\n4. 返回 count，即 Hamming weight。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

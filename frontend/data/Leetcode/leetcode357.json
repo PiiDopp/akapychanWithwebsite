@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode357",
+  "coding_practice": [
+    {
+      "title": "Count Numbers with Unique Digits",
+      "description": "Given an integer n, return the count of all numbers with unique digits, x, where 0 <= x < 10^n.",
+      "examples": [
+        {
+          "input": "n = 2",
+          "output": "91",
+          "explanation": "The answer should be the total numbers in the range of 0 ≤ x < 100, excluding 11,22,33,44,55,66,77,88,99"
+        },
+        {
+          "input": "n = 0",
+          "output": "1"
+        }
+      ],
+      "constraints": "0 <= n <= 8",
+      "solution": "class Solution:\n    def countNumbersWithUniqueDigits(self, n):\n        if n == 0:\n            return 1\n        n = min(n, 10)  # 超過10位數會重複\n        res = 10\n        uniqueDigits = 9\n        availableNumber = 9\n        for i in range(2, n + 1):\n            uniqueDigits *= availableNumber\n            res += uniqueDigits\n            availableNumber -= 1\n        return res",
+      "explanation": "1. 若 n == 0，唯一數字為 0，返回 1。\n2. 超過 10 位數的情況會出現重複，因此 n = min(n, 10)。\n3. 初始化 res = 10（0~9），uniqueDigits = 9（首位可選數字），availableNumber = 9（剩餘可選數字）。\n4. 從 i=2 到 n，計算每個長度的唯一數字數量，uniqueDigits *= availableNumber，累加到 res。\n5. 每增加一位，availableNumber 減 1。\n6. 返回 res 即為 0 <= x < 10^n 的唯一數字總數。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

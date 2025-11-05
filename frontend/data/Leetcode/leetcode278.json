@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode278",
+  "coding_practice": [
+    {
+      "title": "First Bad Version",
+      "description": "You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.\n\nSuppose you have n versions [1, 2, ..., n] and you want to find out the first bad one, which causes all the following ones to be bad.\n\nYou are given an API bool isBadVersion(version) which returns whether version is bad. Implement a function to find the first bad version. You should minimize the number of calls to the API.",
+      "examples": [
+        {
+          "input": "n = 5, bad = 4",
+          "output": "4",
+          "explanation": "call isBadVersion(3) -> false\ncall isBadVersion(5) -> true\ncall isBadVersion(4) -> true\nThen 4 is the first bad version."
+        },
+        {
+          "input": "n = 1, bad = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= bad <= n <= 2^31 - 1",
+      "solution": "# The isBadVersion API is already defined for you.\n# def isBadVersion(version):\n\nclass Solution:\n    def firstBadVersion(self, n):\n        left, right = 1, n\n        while left < right:\n            mid = left + (right - left) // 2\n            if isBadVersion(mid):\n                right = mid\n            else:\n                left = mid + 1\n        return left",
+      "explanation": "1. 採用二分搜尋法，初始搜尋範圍為 1 到 n。\n2. 每次取中間值 mid 檢查是否為壞版本。\n3. 若 mid 是壞版本，代表第一個壞版本在左側（包含 mid），將 right 移到 mid。\n4. 若 mid 不是壞版本，則第一個壞版本一定在右側，將 left 移到 mid + 1。\n5. 當 left == right 時，該位置即為第一個壞版本。",
+      "tag": "723",
+      "difficult": "easy"
+    }
+  ]
+}

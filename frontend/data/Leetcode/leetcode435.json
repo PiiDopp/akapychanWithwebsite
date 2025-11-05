@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode435",
+  "coding_practice": [
+    {
+      "title": "Non-overlapping Intervals",
+      "description": "Given an array of intervals intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.\n\nNote that intervals which only touch at a point are non-overlapping. For example, [1, 2] and [2, 3] are non-overlapping.",
+      "examples": [
+        {
+          "input": "intervals = [[1,2],[2,3],[3,4],[1,3]]",
+          "output": "1",
+          "explanation": "[1,3] can be removed and the rest of the intervals are non-overlapping."
+        },
+        {
+          "input": "intervals = [[1,2],[1,2],[1,2]]",
+          "output": "2",
+          "explanation": "You need to remove two [1,2] to make the rest of the intervals non-overlapping."
+        },
+        {
+          "input": "intervals = [[1,2],[2,3]]",
+          "output": "0",
+          "explanation": "You don't need to remove any of the intervals since they're already non-overlapping."
+        }
+      ],
+      "constraints": "1 <= intervals.length <= 10^5\nintervals[i].length == 2\n-5*10^4 <= starti < endi <= 5*10^4",
+      "solution": "class Solution:\n    def eraseOverlapIntervals(self, intervals):\n        if not intervals:\n            return 0\n        \n        # 先按照結束時間排序\n        intervals.sort(key=lambda x: x[1])\n        end = intervals[0][1]\n        count = 1  # 記錄不重疊區間數\n        \n        for i in range(1, len(intervals)):\n            if intervals[i][0] >= end:\n                end = intervals[i][1]\n                count += 1\n        \n        # 需要移除的區間數 = 總區間數 - 不重疊區間數\n        return len(intervals) - count",
+      "explanation": "1. 將 intervals 按結束時間升序排序。\n2. 初始化 end 為第一個區間的結束時間，count 記錄不重疊區間數。\n3. 遍歷每個區間，如果當前區間的開始時間 >= end，則更新 end 並增加 count。\n4. 最後需要移除的區間數 = 總區間數 - 不重疊區間數。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode45",
+  "coding_practice": [
+    {
+      "title": "Jump Game II",
+      "description": "You are given a 0-indexed array of integers nums of length n. You are initially positioned at index 0.\n\nEach element nums[i] represents the maximum length of a forward jump from index i. In other words, if you are at index i, you can jump to any index (i + j) where:\n\n0 <= j <= nums[i] and\ni + j < n\nReturn the minimum number of jumps to reach index n - 1. The test cases are generated such that you can reach index n - 1.",
+      "examples": [
+        {
+          "input": "nums = [2,3,1,1,4]",
+          "output": "2",
+          "explanation": "The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index."
+        },
+        {
+          "input": "nums = [2,3,0,1,4]",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 104\n0 <= nums[i] <= 1000\nIt's guaranteed that you can reach nums[n - 1].",
+      "solution": "class Solution(object):\n    def jump(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        n = len(nums)\n        if n <= 1:\n            return 0\n\n        jumps = 0\n        current_end = 0\n        farthest = 0\n\n        for i in range(n - 1):\n            farthest = max(farthest, i + nums[i])\n            if i == current_end:\n                jumps += 1\n                current_end = farthest\n\n        return jumps",
+      "explanation": "1. 初始化變量：jumps = 0, current_end = 0, farthest = 0。\n2. 遍歷 nums 陣列（直到倒數第二個位置）：\n   2.1 更新 farthest = max(farthest, i + nums[i])。\n   2.2 如果 i == current_end，表示到達當前跳躍範圍的終點：\n       - 增加跳躍次數 jumps += 1\n       - 更新 current_end = farthest\n3. 遍歷結束後返回 jumps。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n)\n   4.2 空間複雜度：O(1)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

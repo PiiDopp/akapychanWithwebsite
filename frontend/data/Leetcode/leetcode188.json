@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode188",
+  "coding_practice": [
+    {
+      "title": "Best Time to Buy and Sell Stock IV",
+      "description": "You are given an integer array prices where prices[i] is the price of a given stock on the ith day, and an integer k. \n\nFind the maximum profit you can achieve. You may complete at most k transactions: i.e. you may buy at most k times and sell at most k times.\n\nNote: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).",
+      "examples": [
+        {
+          "input": "k = 2, prices = [2,4,1]",
+          "output": "2",
+          "explanation": "Buy on day 1 (price = 2) and sell on day 2 (price = 4), profit = 4-2 = 2."
+        },
+        {
+          "input": "k = 2, prices = [3,2,6,5,0,3]",
+          "output": "7",
+          "explanation": "Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-2 = 4. Then buy on day 5 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3."
+        }
+      ],
+      "constraints": "1 <= k <= 100\n1 <= prices.length <= 1000\n0 <= prices[i] <= 1000",
+      "solution": "class Solution:\n    def maxProfit(self, k, prices):\n        n = len(prices)\n        if n == 0:\n            return 0\n        if k >= n // 2:\n            profit = 0\n            for i in range(1, n):\n                if prices[i] > prices[i - 1]:\n                    profit += prices[i] - prices[i - 1]\n            return profit\n        dp = [[0]*n for _ in range(k+1)]\n        for t in range(1, k+1):\n            max_diff = -prices[0]\n            for d in range(1, n):\n                dp[t][d] = max(dp[t][d-1], prices[d] + max_diff)\n                max_diff = max(max_diff, dp[t-1][d] - prices[d])\n        return dp[k][n-1]",
+      "explanation": "1. If k >= n//2, we can consider it as unlimited transactions and sum all positive differences.\n2. Otherwise, we use DP with dp[t][d] representing max profit using t transactions up to day d.\n3. For each transaction, keep track of max_diff = max(dp[t-1][d] - prices[d]) to calculate profit efficiently.\n4. Return dp[k][n-1] as the result.",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

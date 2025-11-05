@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode125",
+  "coding_practice": [
+    {
+      "title": "Valid Palindrome",
+      "description": "A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.\n\nGiven a string s, return true if it is a palindrome, or false otherwise.",
+      "examples": [
+        {
+          "input": "s = \"A man, a plan, a canal: Panama\"",
+          "output": "true",
+          "explanation": "\"amanaplanacanalpanama\" is a palindrome."
+        },
+        {
+          "input": "s = \"race a car\"",
+          "output": "false",
+          "explanation": "\"raceacar\" is not a palindrome."
+        },
+        {
+          "input": "s = \" \"",
+          "output": "true",
+          "explanation": "s is an empty string \"\" after removing non-alphanumeric characters. Since an empty string reads the same forward and backward, it is a palindrome."
+        }
+      ],
+      "constraints": "1 <= s.length <= 2 * 10^5\ns consists only of printable ASCII characters.",
+      "solution": "class Solution:\n    def isPalindrome(self, s):\n        filtered = [c.lower() for c in s if c.isalnum()]\n        return filtered == filtered[::-1]",
+      "explanation": "1. 遍歷字串 s，將字母和數字保留，其餘去掉，並統一轉為小寫。\n2. 比較處理後的字串是否與其反轉相同。\n3. 若相同則為迴文，返回 True；否則返回 False。",
+      "tag": "722",
+      "difficult": "easy"
+    }
+  ]
+}

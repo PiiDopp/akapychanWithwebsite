@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode523",
+  "coding_practice": [
+    {
+      "title": "Continuous Subarray Sum",
+      "description": "Given an integer array nums and an integer k, return true if nums has a good subarray or false otherwise.\n\nA good subarray is a subarray where:\n\nits length is at least two, and\nthe sum of the elements of the subarray is a multiple of k.\nNote that:\n\nA subarray is a contiguous part of the array.\nAn integer x is a multiple of k if there exists an integer n such that x = n * k. 0 is always a multiple of k.\n\nNote that:\n\nA subarray is a contiguous part of the array.\n\nAn integer x is a multiple of k if there exists an integer n such that x = n * k. 0 is always a multiple of k.",
+      "examples": [
+        {
+          "input": "[23,2,4,6,7], 6",
+          "output": "true",
+          "explanation": "[2, 4] is a continuous subarray of size 2 whose elements sum up to 6."
+        },
+        {
+          "input": "[23,2,6,4,7], 6",
+          "output": "true",
+          "explanation": "[23, 2, 6, 4, 7] is a continuous subarray of size 5 whose elements sum up to 42.\n42 is a multiple of 6 because 42 = 7 * 6 and 7 is an integer."
+        },
+        {
+          "input": "[23,2,6,4,7], 13",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n0 <= nums[i] <= 10^9\n0 <= sum(nums[i]) <= 2^31 - 1\n1 <= k <= 2^31 - 1",
+      "solution": "class Solution:\n    def checkSubarraySum(self, nums, k):\n        mod_map = {0: -1}\n        total = 0\n        for i, num in enumerate(nums):\n            total += num\n            if k != 0:\n                total %= k\n            if total in mod_map:\n                if i - mod_map[total] > 1:\n                    return True\n            else:\n                mod_map[total] = i\n        return False",
+      "explanation": "1. 使用前綴和取餘數的方法，建立 mod_map 紀錄前綴和對 k 取餘後的索引。\n2. 初始化 mod_map[0] = -1，方便處理從頭開始的子陣列。\n3. 遍歷 nums，累加總和 total，若 k != 0 則 total % k。\n4. 若 total 已在 mod_map 中，且當前索引與 mod_map[total] 差值大於 1，表示存在符合條件的子陣列，返回 True。\n5. 否則將 total 對應的索引加入 mod_map。\n6. 遍歷完成仍未找到符合條件的子陣列，返回 False。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

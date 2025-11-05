@@ -1,0 +1,51 @@
+{
+  "ID": 950,
+  "Title": "with 語法與自動關閉檔案",
+  "Intro": "\t在進行檔案操作時，若忘記關閉檔案可能造成資源浪費或寫入失敗。Python 提供 with 語法（又稱 context manager）自動管理開啟與關閉的流程，不論是否發生錯誤，程式都會自動執行關閉動作，是開啟檔案的最佳做法。",
+  "exp": {
+    "cor_exp": [
+      "# 使用 with 語法讀取檔案\nwith open('data.txt', 'r', encoding='utf-8') as file:\n    content = file.read()\n    print('檔案內容：')\n    print(content)\n# 離開 with 區塊後會自動關閉檔案",
+      "# 使用 with 寫入檔案\nwith open('output.txt', 'w', encoding='utf-8') as f:\n    f.write('使用 with 寫入資料\\n')\n    f.write('不需要手動關閉檔案')\nprint('寫入完成！')",
+      "# 搭配例外處理\ntry:\n    with open('not_exist.txt', 'r', encoding='utf-8') as f:\n        data = f.read()\nexcept FileNotFoundError:\n    print('找不到檔案，但程式不會中斷！')"
+    ],
+    "mis_exp": [
+      "# 錯誤：未使用 with 導致檔案未關閉\nf = open('data.txt', 'r')\nprint(f.read())\n# 若忘記 f.close()，可能導致資源未釋放",
+      "# 錯誤：with 語法錯誤\nwith open('data.txt', 'r')  # 少了冒號\n    content = file.read()"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一種方式能確保檔案在讀取完畢後自動關閉？",
+      "options": [
+        "A. 使用 open() 並手動呼叫 close()",
+        "B. 使用 try / except 包住 open()",
+        "C. 使用 with open() as 變數",
+        "D. 使用 close(open('data.txt'))"
+      ],
+      "answer": "C",
+      "explanation": "使用 with open() as 變數 可自動在區塊結束時關閉檔案，是最安全的作法。"
+    },
+    {
+      "question": "執行下列程式後，檔案會關閉嗎？\n\nwith open('test.txt', 'w') as f:\n    f.write('hello')\nprint('完成')",
+      "options": [
+        "A. 不會關閉，需手動 close()",
+        "B. 會自動關閉",
+        "C. 若發生錯誤才會關閉",
+        "D. 檔案內容不會寫入"
+      ],
+      "answer": "B",
+      "explanation": "with 語法會在離開區塊後自動呼叫 close()，無論是否發生錯誤。"
+    },
+    {
+      "question": "關於 with 語法的敘述，下列何者錯誤？",
+      "options": [
+        "A. with 可以用於檔案開啟與關閉管理",
+        "B. with 語法只能用在檔案操作",
+        "C. with 區塊結束後會自動關閉檔案",
+        "D. with open('file', 'r') as f: 是常見語法"
+      ],
+      "answer": "B",
+      "explanation": "with 可用於多種資源管理（如資料庫連線、網路連線），不僅限於檔案操作。"
+    }
+  ]
+}

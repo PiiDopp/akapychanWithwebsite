@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode410",
+  "coding_practice": [
+    {
+      "title": "Split Array Largest Sum",
+      "description": "Given an integer array nums and an integer k, split nums into k non-empty subarrays such that the largest sum of any subarray is minimized.\n\nReturn the minimized largest sum of the split.\n\nA subarray is a contiguous part of the array.",
+      "examples": [
+        {
+          "input": "nums = [7,2,5,10,8], k = 2",
+          "output": "18",
+          "explanation": "There are four ways to split nums into two subarrays.\nThe best way is to split it into [7,2,5] and [10,8], where the largest sum among the two subarrays is only 18."
+        },
+        {
+          "input": "nums = [1,2,3,4,5], k = 2",
+          "output": "9",
+          "explanation": "There are four ways to split nums into two subarrays.\nThe best way is to split it into [1,2,3] and [4,5], where the largest sum among the two subarrays is only 9."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n0 <= nums[i] <= 10^6\n1 <= k <= min(50, nums.length)",
+      "solution": "class Solution:\n    def splitArray(self, nums, m):\n        def can_split(mid):\n            count, curr_sum = 1, 0\n            for num in nums:\n                if curr_sum + num > mid:\n                    count += 1\n                    curr_sum = num\n                else:\n                    curr_sum += num\n            return count <= m\n        \n        left, right = max(nums), sum(nums)\n        while left < right:\n            mid = (left + right) // 2\n            if can_split(mid):\n                right = mid\n            else:\n                left = mid + 1\n        return left",
+      "explanation": "1. 使用二分搜尋的思想，設定左右邊界為最大單個元素和整個數組和。\n2. 定義 can_split(mid) 判斷是否可以將 nums 分割為不超過 m 個子數組，使每個子數組的和不超過 mid。\n3. 若可以分割，收縮右邊界；否則增加左邊界。\n4. 最終 left 即為最小的最大子數組和。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

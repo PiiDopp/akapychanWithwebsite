@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode409",
+  "coding_practice": [
+    {
+      "title": "Longest Palindrome",
+      "description": "Given a string s which consists of lowercase or uppercase letters, return the length of the longest palindrome that can be built with those letters.\nLetters are case sensitive, for example, \"Aa\" is not considered a palindrome.",
+      "examples": [
+        {
+          "input": "s = \"abccccdd\"",
+          "output": "7",
+          "explanation": "One longest palindrome that can be built is \"dccaccd\", whose length is 7."
+        },
+        {
+          "input": "s = \"a\"",
+          "output": "1",
+          "explanation": "The longest palindrome that can be built is \"a\", whose length is 1."
+        }
+      ],
+      "constraints": "1 <= s.length <= 2000\ns consists of lowercase and/or uppercase English letters only.",
+      "solution": "class Solution:\n    def longestPalindrome(self, s):\n        from collections import Counter\n        count = Counter(s)\n        length = 0\n        odd_found = False\n        for val in count.values():\n            if val % 2 == 0:\n                length += val\n            else:\n                length += val - 1\n                odd_found = True\n        if odd_found:\n            length += 1\n        return length",
+      "explanation": "1. 使用 Counter 統計每個字母的出現次數。\n2. 遍歷所有字母的出現次數，偶數次的直接加到長度 length。\n3. 若為奇數次，則加上 val-1，並標記 odd_found 為 True。\n4. 若存在奇數次字母，可將其中一個放在回文的中間，因此長度再加 1。\n5. 最後回傳長度 length。",
+      "tag": "622",
+      "difficult": "easy"
+    }
+  ]
+}

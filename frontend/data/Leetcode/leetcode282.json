@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode282",
+  "coding_practice": [
+    {
+      "title": "Expression Add Operators",
+      "description": "Given a string num that contains only digits and an integer target, return all possibilities to insert the binary operators '+', '-', and/or '*' between the digits of num so that the resultant expression evaluates to the target value.\n\nNote that operands in the returned expressions should not contain leading zeros.\n\nNote that a number can contain multiple digits.",
+      "examples": [
+        {
+          "input": "num = \"123\", target = 6",
+          "output": "[\"1*2*3\",\"1+2+3\"]",
+          "explanation": "Both \"1*2*3\" and \"1+2+3\" evaluate to 6."
+        },
+        {
+          "input": "num = \"232\", target = 8",
+          "output": "[\"2*3+2\",\"2+3*2\"]",
+          "explanation": "Both \"2*3+2\" and \"2+3*2\" evaluate to 8."
+        },
+        {
+          "input": "num = \"3456237490\", target = 9191",
+          "output": "[]",
+          "explanation": "There are no expressions that can be created from \"3456237490\" to evaluate to 9191."
+        }
+      ],
+      "constraints": "1 <= num.length <= 10\nnum consists of only digits.\n-2^31 <= target <= 2^31 - 1",
+      "solution": "class Solution:\n    def addOperators(self, num, target):\n        res = []\n\n        def backtrack(index, path, value, last):\n            if index == len(num):\n                if value == target:\n                    res.append(path)\n                return\n\n            for i in range(index + 1, len(num) + 1):\n                temp = num[index:i]\n                if len(temp) > 1 and temp[0] == '0':\n                    continue\n                curr = int(temp)\n                if index == 0:\n                    backtrack(i, temp, curr, curr)\n                else:\n                    backtrack(i, path + '+' + temp, value + curr, curr)\n                    backtrack(i, path + '-' + temp, value - curr, -curr)\n                    backtrack(i, path + '*' + temp, value - last + last * curr, last * curr)\n\n        backtrack(0, '', 0, 0)\n        return res",
+      "explanation": "1. 使用回溯法 (backtracking) 遍歷 num 所有可能的切割與運算符插入方式。\n2. 對每個子字串，檢查是否以 '0' 開頭（避免前導零），然後轉為整數 curr。\n3. 若為第一個數字，直接開始新的路徑。\n4. 否則，嘗試三種運算符 '+', '-', '*' 並遞迴計算新的值，同時追蹤最後一個運算值以處理乘法優先級。\n5. 當 index 遍歷完整個 num，若計算結果等於 target，將路徑加入結果。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

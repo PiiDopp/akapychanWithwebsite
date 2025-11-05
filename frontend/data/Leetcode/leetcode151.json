@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode151",
+  "coding_practice": [
+    {
+      "title": "Reverse Words in a String",
+      "description": "Given an input string s, reverse the order of the words.\n\nA word is defined as a sequence of non-space characters. The words in s will be separated by at least one space.\n\nReturn a string of the words in reverse order concatenated by a single space.\n\nNote that s may contain leading or trailing spaces or multiple spaces between two words. The returned string should only have a single space separating the words. Do not include any extra spaces.",
+      "examples": [
+        {
+          "input": "s = \"the sky is blue\"",
+          "output": "\"blue is sky the\""
+        },
+        {
+          "input": "s = \"  hello world  \"",
+          "output": "\"world hello\"",
+          "explanation": "Your reversed string should not contain leading or trailing spaces."
+        },
+        {
+          "input": "s = \"a good   example\"",
+          "output": "\"example good a\"",
+          "explanation": "You need to reduce multiple spaces between two words to a single space in the reversed string."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns contains English letters (upper-case and lower-case), digits, and spaces ' '.\nThere is at least one word in s.",
+      "solution": "class Solution:\n    def reverseWords(self, s):\n        # 先去除前後多餘空格，再以空格分割，過濾掉多餘空格\n        words = s.strip().split()\n        words = [word for word in words if word]\n        # 反轉單詞順序後以單空格連接\n        return ' '.join(words[::-1])",
+      "explanation": "1. 使用 strip() 去除字串前後空格。\n2. 用 split() 分割字串成單詞列表，並過濾空字串以處理連續空格。\n3. 使用切片[::-1]反轉單詞順序。\n4. 用 ' '.join(...) 將單詞列表重新組成結果字串。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

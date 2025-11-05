@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode139",
+  "coding_practice": [
+    {
+      "title": "Word Break",
+      "description": "Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.\n\nNote that the same word in the dictionary may be reused multiple times in the segmentation.",
+      "examples": [
+        {
+          "input": "s = \"leetcode\", wordDict = [\"leet\",\"code\"]",
+          "output": "true",
+          "explanation": "Return true because \"leetcode\" can be segmented as \"leet code\"."
+        },
+        {
+          "input": "s = \"applepenapple\", wordDict = [\"apple\",\"pen\"]",
+          "output": "true",
+          "explanation": "Return true because \"applepenapple\" can be segmented as \"apple pen apple\".\nNote that you are allowed to reuse a dictionary word."
+        },
+        {
+          "input": "s = \"catsandog\", wordDict = [\"cats\",\"dog\",\"sand\",\"and\",\"cat\"]",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s.length <= 300\n1 <= wordDict.length <= 1000\n1 <= wordDict[i].length <= 20\ns and wordDict[i] consist of only lowercase English letters.\nAll the strings of wordDict are unique.",
+      "solution": "class Solution:\n    def wordBreak(self, s, wordDict):\n        word_set = set(wordDict)\n        dp = [False] * (len(s) + 1)\n        dp[0] = True\n        \n        for i in range(1, len(s)+1):\n            for j in range(i):\n                if dp[j] and s[j:i] in word_set:\n                    dp[i] = True\n                    break\n        return dp[len(s)]",
+      "explanation": "1. 將 wordDict 轉成集合方便快速查詢。\n2. 使用 dp[i] 表示 s[:i] 是否可以被拆分。\n3. 遍歷所有子字串 s[j:i]，若 dp[j] 為 True 且 s[j:i] 在字典中，則 dp[i] = True。\n4. 返回 dp[len(s)] 即可。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

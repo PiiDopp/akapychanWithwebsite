@@ -1,0 +1,65 @@
+{
+  "ID": 510,
+  "Title": "for 迴圈",
+  "Intro": "\t在 Python 中，for 迴圈用來對序列 (如 list、tuple、string) 或範圍 (range) 中的每個元素進行重複操作。通常會搭配縮排區塊執行多行程式碼。",
+  "exp": {
+    "cor_exp": [
+      "for i in range(5):\n    print(i)  # 依序輸出 0,1,2,3,4",
+      "fruits = ['apple', 'banana', 'cherry']\nfor fruit in fruits:\n    print(fruit)  # 依序輸出水果名稱",
+      "for char in 'Python':\n    print(char)  # 依序輸出 P, y, t, h, o, n",
+      "total = 0\nfor i in range(1, 6):\n    total += i\nprint(total)  # 輸出 15"
+    ],
+    "mis_exp": [
+      "for i in range(5)\nprint(i)  # 錯誤：缺少冒號及縮排",
+      "for x in [1,2,3]:\nprint(x)  # 錯誤：缺少縮排",
+      "for item in 'abc'\n    print(item)  # 錯誤：缺少冒號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(1, 11):\n    print(i)",
+      "options": [
+        "A. 0 到 10",
+        "B. 1 到 10",
+        "C. 1 到 11",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "range(1, 11) 會依序產生 1 到 10 的整數，依次輸出。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnumbers = [2, 4, 6, 8, 10]\ntotal = 0\nfor num in numbers:\n    total += num\nprint(total)",
+      "options": [
+        "A. 30",
+        "B. 20",
+        "C. 2,4,6,8,10",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "將 list 中所有數字加總，2+4+6+8+10 = 30，最後輸出 total。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor char in 'Python':\n    print(char)",
+      "options": [
+        "A. Python",
+        "B. P y t h o n (每個字母換行)",
+        "C. Pyt",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "for 迴圈依序取出字串每個字母，每次 print() 換行輸出。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nfor i in range(3)\nprint(i)",
+      "options": [
+        "A. 0 1 2",
+        "B. 1 2 3",
+        "C. 程式錯誤",
+        "D. None"
+      ],
+      "answer": "C",
+      "explanation": "for 迴圈缺少冒號，且 print() 未縮排，會導致語法錯誤。"
+    }
+  ]
+
+}

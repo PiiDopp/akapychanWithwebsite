@@ -1,0 +1,23 @@
+{
+  "ID": 400,
+  "coding_practice": [
+    {
+      "title": "溫度判斷",
+      "description": "請寫一個程式，輸入一個整數代表氣溫，並依下列規則輸出：\n- 小於 0：『冰點以下』\n- 0~29：『正常範圍』\n- 30~39：『炎熱』\n- 大於等於 40：『極端高溫』",
+      "examples": {
+        "input": "35",
+        "output": "炎熱"
+      },
+      "solution": "temp = int(input())\nif temp < 0:\n    print(\"冰點以下\")\nelif temp < 30:\n    print(\"正常範圍\")\nelif temp < 40:\n    print(\"炎熱\")\nelse:\n    print(\"極端高溫\")"
+    },
+    {
+      "title": "三數最大值",
+      "description": "請寫一個程式，輸入三個整數，輸出其中最大的數字。不得使用 Python 內建 max()。",
+      "examples": {
+        "input": "12 25 7",
+        "output": "25"
+      },
+      "solution": "a, b, c = map(int, input().split())\nif a >= b and a >= c:\n    print(a)\nelif b >= a and b >= c:\n    print(b)\nelse:\n    print(c)"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "ID": 330,
+  "Title": "關係運算",
+  "Intro": "\t在 Python 中，關係運算子用來比較兩個值，結果會回傳布林值 True 或 False。常見的運算子有：== (相等)、!= (不相等)、> (大於)、< (小於)、>= (大於等於)、<= (小於等於)。這些運算常用於條件判斷 (if-else)。",
+  "exp": {
+    "cor_exp": [
+      "x = 10\ny = 20\nprint(x == y)  # False，10 不等於 20",
+      "print(x != y)  # True，10 不等於 20",
+      "print(x < y)   # True，10 小於 20",
+      "print(y > 15)  # True，20 大於 15",
+      "print(x >= 10) # True，10 大於等於 10",
+      "print(y <= 25) # True，20 小於等於 25"
+    ],
+    "mis_exp": [
+      "x = 5\nif x = 5:\n    print('ok')  # 錯誤：判斷相等必須用 ==，= 是指定運算子",
+      "print(10 <> 5)  # 錯誤：Python 不支援 <>，應改用 !=",
+      "print('5' > 3)  # 錯誤：字串和整數不能直接比較大小"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nprint(num > 100)  # 假設輸入 150",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. 150",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "輸入 150 時，判斷 150 > 100，結果為 True。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\na = 10\nb = 20\nprint(a == b)",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. 10",
+        "D. 20"
+      ],
+      "answer": "B",
+      "explanation": "10 不等於 20，因此結果為 False。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nage = 30\nprint(age >= 18 and age <= 65)",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. 30",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "30 在 18 和 65 之間，因此條件為 True。"
+    }
+  ]
+}

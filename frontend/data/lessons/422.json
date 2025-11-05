@@ -1,0 +1,51 @@
+{
+  "ID": 422,
+  "Title": "if...else 條件判斷",
+  "Intro": "\t在 Python 中，if else 用來在條件不成立時，執行另一段程式碼。當 if 條件為 True 時執行 if 區塊，否則執行 else 區塊。",
+  "exp": {
+    "cor_exp": [
+      "x = 8\nif x > 10:\n    print('x 大於 10')\nelse:\n    print('x 小於等於 10')  # 條件不成立，執行 else",
+      "y = 20\nif y == 15:\n    print('y 等於 15')\nelse:\n    print('y 不等於 15')  # 條件不成立，執行 else"
+    ],
+    "mis_exp": [
+      "n = 7\nif n > 10:\nprint('大於 10')\nelse:\nprint('小於等於 10')  # 錯誤：if/else 缺少縮排",
+      "if x > 5\n    print('x 大於 5')\nelse:\n    print('x 不大於 5')  # 錯誤：if 後面缺少冒號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nif num > 0:\n    print('正數')\nelse:\n    print('非正數')  # 假設輸入 -3\n",
+      "options": [
+        "A. 正數",
+        "B. 非正數",
+        "C. -3",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "輸入 -3，不大於 0，條件不成立，執行 else 區塊輸出『非正數』。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nscore = 55\nif score >= 60:\n    print('及格')\nelse:\n    print('不及格')",
+      "options": [
+        "A. 55",
+        "B. 及格",
+        "C. 不及格",
+        "D. 程式錯誤"
+      ],
+      "answer": "C",
+      "explanation": "score = 55，條件 score >= 60 不成立，因此執行 else，輸出『不及格』。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nx = 7\nif x > 10\n    print('大於 10')\nelse\n    print('小於等於 10')",
+      "options": [
+        "A. 大於 10",
+        "B. 小於等於 10",
+        "C. True",
+        "D. 程式錯誤"
+      ],
+      "answer": "D",
+      "explanation": "if 和 else 後面缺少冒號，會導致語法錯誤。"
+    }
+  ]
+
+}

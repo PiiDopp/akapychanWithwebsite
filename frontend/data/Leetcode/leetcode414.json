@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode414",
+  "coding_practice": [
+    {
+      "title": "Third Maximum Number",
+      "description": "Given an integer array nums, return the third distinct maximum number in this array. If the third maximum does not exist, return the maximum number.",
+      "examples": [
+        {
+          "input": "nums = [3,2,1]",
+          "output": "1",
+          "explanation": "The first distinct maximum is 3.\nThe second distinct maximum is 2.\nThe third distinct maximum is 1."
+        },
+        {
+          "input": "nums = [1,2]",
+          "output": "2",
+          "explanation": "The first distinct maximum is 2.\nThe second distinct maximum is 1.\nThe third distinct maximum does not exist, so the maximum (2) is returned instead."
+        },
+        {
+          "input": "nums = [2,2,3,1]",
+          "output": "1",
+          "explanation": "The first distinct maximum is 3.\nThe second distinct maximum is 2 (both 2's are counted together since they have the same value).\nThe third distinct maximum is 1."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-2^31 <= nums[i] <= 2^31 - 1",
+      "follow up": "Can you find an O(n) solution?",
+      "solution": "class Solution:\n    def thirdMax(self, nums):\n        first = second = third = float('-inf')\n        nums_set = set(nums)  # 去重\n        for num in nums_set:\n            if num > first:\n                third = second\n                second = first\n                first = num\n            elif num > second:\n                third = second\n                second = num\n            elif num > third:\n                third = num\n        return third if len(nums_set) >= 3 else first",
+      "explanation": "1. 將 nums 去重，避免重複數值干擾。\n2. 使用 first, second, third 三個變數追蹤前三大數字。\n3. 遍歷每個數字，根據大小更新 first, second, third。\n4. 最後判斷是否存在第三大數，若不存在返回第一大數。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

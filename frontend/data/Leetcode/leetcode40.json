@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode40",
+  "coding_practice": [
+    {
+      "title": "Combination Sum II",
+      "description": "Given a collection of candidate numbers (candidates) and a target number (target), find all unique combinations in candidates where the candidate numbers sum to target.\n\nEach number in candidates may only be used once in the combination.\n\nNote: The solution set must not contain duplicate combinations.",
+      "examples": [
+        {
+          "input": "candidates = [10,1,2,7,6,1,5], target = 8",
+          "output": "[[1,1,6],[1,2,5],[1,7],[2,6]]"
+        },
+        {
+          "input": "candidates = [2,5,2,1,2], target = 5",
+          "output": "[[1,2,2],[5]]"
+        }
+      ],
+      "constraints": "1 <= candidates.length <= 100\n1 <= candidates[i] <= 50\n1 <= target <= 30",
+      "solution": "class Solution(object):\n    def combinationSum2(self, candidates, target):\n        \"\"\"\n        :type candidates: List[int]\n        :type target: int\n        :rtype: List[List[int]]\n        \"\"\"\n        candidates.sort()\n        res = []\n\n        def backtrack(start, path, total):\n            if total == target:\n                res.append(list(path))\n                return\n            if total > target:\n                return\n            prev = -1\n            for i in range(start, len(candidates)):\n                if candidates[i] == prev:\n                    continue\n                path.append(candidates[i])\n                backtrack(i + 1, path, total + candidates[i])\n                path.pop()\n                prev = candidates[i]\n\n        backtrack(0, [], 0)\n        return res",
+      "explanation": "1. 將 candidates 排序以方便去重。\n2. 初始化空結果列表 res。\n3. 定義回溯函數 backtrack(start, path, total)：\n   3.1 如果 total == target，將 path 的副本加入 res。\n   3.2 如果 total > target，直接返回。\n   3.3 使用 prev 變數記錄前一個元素，避免重複組合。\n   3.4 遍歷 candidates[start:]：\n       3.4.1 如果 candidates[i] == prev，跳過。\n       3.4.2 將 candidates[i] 加入 path。\n       3.4.3 遞迴調用 backtrack(i + 1, path, total + candidates[i])（每個元素只能使用一次）。\n       3.4.4 回溯，移除 path 最後一個元素。\n       3.4.5 更新 prev = candidates[i]。\n4. 調用 backtrack(0, [], 0) 開始遞迴。\n5. 返回結果 res。\n6. 複雜度分析：\n   6.1 時間複雜度：O(2^N)\n   6.2 空間複雜度：O(T)（遞迴棧深度 + 當前組合）",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

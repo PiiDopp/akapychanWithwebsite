@@ -1,0 +1,52 @@
+{
+  "ID": 1021,
+  "Title": "Lambda 匿名函數",
+  "Intro": "\tLambda 是 Python 的匿名函數（Anonymous Function），能以簡潔的方式定義一個臨時使用的函數。Lambda 函數可用於簡單的運算、排序鍵或搭配 map()、filter() 等函數使用。其語法為：lambda 參數: 運算式。",
+  "exp": {
+    "cor_exp": [
+      "# 基本 lambda 用法\nadd = lambda x, y: x + y\nprint(add(3, 5))  # 8",
+      "# 搭配內建 sorted() 使用\nstudents = [('Alice', 85), ('Bob', 70), ('Cindy', 90)]\nresult = sorted(students, key=lambda s: s[1], reverse=True)\nprint(result)  # [('Cindy', 90), ('Alice', 85), ('Bob', 70)]",
+      "# lambda 作為 map() 函數參數\nnums = [1, 2, 3, 4]\nsquares = list(map(lambda n: n ** 2, nums))\nprint(squares)  # [1, 4, 9, 16]"
+    ],
+    "mis_exp": [
+      "# 錯誤：多行運算不允許\nlambda x, y: a = x + y; return a  # 錯誤：lambda 只能包含一個運算式",
+      "# 錯誤：缺少參數或冒號\nlambda x x * 2  # 語法錯誤，少了冒號",
+      "# 錯誤：混淆函數定義方式\ndef = lambda x: x + 1  # 錯誤：def 是保留字，不能這樣使用"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式結果為何？\n\ndouble = lambda x: x * 2\nprint(double(5))",
+      "options": [
+        "A. 5",
+        "B. 10",
+        "C. (5, 10)",
+        "D. 錯誤語法"
+      ],
+      "answer": "B",
+      "explanation": "lambda x: x * 2 代表回傳輸入的兩倍，輸入 5 輸出 10。"
+    },
+    {
+      "question": "若執行以下程式：\n\nnums = [3, 1, 4, 2]\nnums.sort(key=lambda n: -n)\nprint(nums)",
+      "options": [
+        "A. [1, 2, 3, 4]",
+        "B. [4, 3, 2, 1]",
+        "C. [-3, -1, -4, -2]",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "key=lambda n: -n 代表以負值排序，因此結果由大到小 [4, 3, 2, 1]。"
+    },
+    {
+      "question": "關於 lambda 函數，下列敘述何者正確？",
+      "options": [
+        "A. lambda 只能用於 map() 中",
+        "B. lambda 可以包含多行運算",
+        "C. lambda 定義後必須命名才能使用",
+        "D. lambda 是匿名函數，只能有一個運算式"
+      ],
+      "answer": "D",
+      "explanation": "lambda 是匿名函數，只能有一行運算式，常用於臨時的小型邏輯。"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode518",
+  "coding_practice": [
+    {
+      "title": "Coin Change II",
+      "description": "You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.\n\nReturn the number of combinations that make up that amount. If that amount of money cannot be made up by any combination of the coins, return 0.\n\nYou may assume that you have an infinite number of each kind of coin.\n\nThe answer is guaranteed to fit into a signed 32-bit integer.",
+      "examples": [
+        {
+          "input": "5, [1,2,5]",
+          "output": "4",
+          "explanation": "There are four ways to make up the amount:\n5=5\n5=2+2+1\n5=2+1+1+1\n5=1+1+1+1+1"
+        },
+        {
+          "input": "3, [2]",
+          "output": "0",
+          "explanation": "The amount of 3 cannot be made up just with coins of 2."
+        },
+        {
+          "input": "10, [10]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= coins.length <= 300\n1 <= coins[i] <= 5000\nAll the values of coins are unique.\n0 <= amount <= 5000",
+      "solution": "class Solution:\n    def change(self, amount, coins):\n        dp = [0] * (amount + 1)\n        dp[0] = 1\n        for coin in coins:\n            for i in range(coin, amount + 1):\n                dp[i] += dp[i - coin]\n        return dp[amount]",
+      "explanation": "1. 使用一維動態規劃 dp，其中 dp[i] 表示湊出金額 i 的組合數。\n2. 初始化 dp[0] = 1，代表湊出 0 元有一種方式。\n3. 對每個硬幣 coin，更新 dp[i] += dp[i - coin]，累計組合數。\n4. 最後返回 dp[amount]，即湊出目標金額的總組合數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

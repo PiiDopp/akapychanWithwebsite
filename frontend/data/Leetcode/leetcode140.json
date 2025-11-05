@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode140",
+  "coding_practice": [
+    {
+      "title": "Word Break II",
+      "description": "Given a string s and a dictionary of strings wordDict, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences in any order.\n\nNote that the same word in the dictionary may be reused multiple times in the segmentation.",
+      "examples": [
+        {
+          "input": "s = 'catsanddog', wordDict = ['cat','cats','and','sand','dog']",
+          "output": "['cats and dog','cat sand dog']"
+        },
+        {
+          "input": "s = 'pineapplepenapple', wordDict = ['apple','pen','applepen','pine','pineapple']",
+          "output": "['pine apple pen apple','pineapple pen apple','pine applepen apple']",
+          "explanation": "You are allowed to reuse a dictionary word."
+        },
+        {
+          "input": "s = 'catsandog', wordDict = ['cats','dog','sand','and','cat']",
+          "output": "[]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 20\n1 <= wordDict.length <= 1000\n1 <= wordDict[i].length <= 10\ns and wordDict[i] consist of only lowercase English letters.\nAll the strings of wordDict are unique.\nInput is generated in a way that the length of the answer doesn't exceed 10^5.",
+      "solution": "class Solution:\n    def wordBreak(self, s, wordDict):\n        word_set = set(wordDict)\n        memo = {}\n\n        def backtrack(start):\n            if start in memo:\n                return memo[start]\n\n            if start == len(s):\n                return [\"\"]\n\n            res = []\n            for end in range(start + 1, len(s) + 1):\n                word = s[start:end]\n                if word in word_set:\n                    for sub_sentence in backtrack(end):\n                        if sub_sentence:\n                            res.append(word + \" \" + sub_sentence)\n                        else:\n                            res.append(word)\n            memo[start] = res\n            return res\n\n        return backtrack(0)",
+      "explanation": "1. 將 wordDict 轉換成集合以加速查找。\n2. 使用回溯函數 backtrack(start) 來生成從 start 開始的所有可能句子。\n3. 如果 start 已經在 memo 中，直接返回 memo[start]，避免重複計算。\n4. 遍歷 start 到 len(s) 的子串，如果子串在集合中，則遞歸計算剩餘部分的句子，並拼接成完整句子。\n5. 記錄每個 start 對應的結果到 memo 中，以便後續使用。\n6. 返回從索引 0 開始生成的所有可能句子。",
+      "tag": "713",
+      "difficult": "hard"
+    }
+  ]
+}

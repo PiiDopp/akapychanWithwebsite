@@ -1,0 +1,23 @@
+{
+  "ID": 300,
+  "coding_practice": [
+    {
+      "title": "表達式計算",
+      "description": "請寫一個程式，輸入三個整數 a、b、c，計算並輸出結果：a + b * c 和 (a + b) * c。請觀察兩者的不同。",
+      "examples": {
+        "input": "2 3 4",
+        "output": "a + b * c = 14\n(a + b) * c = 20"
+      },
+      "solution": "a, b, c = map(int, input().split())\nexpr1 = a + b * c\nexpr2 = (a + b) * c\nprint(\"a + b * c =\", expr1)\nprint(\"(a + b) * c =\", expr2)"
+    },
+    {
+      "title": "平均分配",
+      "description": "小明有 n 顆糖果，要平均分給 m 個小朋友。請輸入 n 和 m，輸出每個小朋友分到幾顆糖果，剩下幾顆糖果沒有分完。",
+      "examples": {
+        "input": "20 6",
+        "output": "每人=3 剩下=2"
+      },
+      "solution": "n, m = map(int, input().split())\nper = n // m\nleft = n % m\nprint(\"每人=\", per, \"剩下=\", left)"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode32",
+  "coding_practice": [
+    {
+      "title": "Longest Valid Parentheses",
+      "description": "Given a string containing just the characters '(' and ')', return the length of the longest valid (well-formed) parentheses substring.",
+      "examples": [
+        {
+          "input": "s = \"(()\"",
+          "output": "2",
+          "explanation": "The longest valid parentheses substring is \"()\"."
+        },
+        {
+          "input": "s = \")()())\"",
+          "output": "4",
+          "explanation": "The longest valid parentheses substring is \"()()\"."
+        },
+        {
+          "input": "s = \"\"",
+          "output": "0"
+        }
+      ],
+      "constraints": "0 <= s.length <= 3 * 10^4\ns[i] is '(', or ')'.",
+      "solution": "class Solution(object):\n    def longestValidParentheses(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        stack = [-1]\n        max_len = 0\n\n        for i, char in enumerate(s):\n            if char == '(':\n                stack.append(i)\n            else:\n                stack.pop()\n                if not stack:\n                    stack.append(i)\n                else:\n                    max_len = max(max_len, i - stack[-1])\n\n        return max_len",
+      "explanation": "1. 初始化：\n   1.1 建立堆疊 stack 並初始化 -1 以方便計算長度。\n   1.2 設定 max_len = 0 用於記錄最大有效長度。\n2. 遍歷字串 s：\n   2.1 遇到 '('：將索引推入堆疊。\n   2.2 遇到 ')'：彈出堆疊，如果堆疊為空，將當前索引推入；否則計算 i - stack[-1] 更新 max_len。\n3. 返回 max_len。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n)\n   4.2 空間複雜度：O(n)，用於堆疊。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode127",
+  "coding_practice": [
+    {
+      "title": "Word Ladder",
+      "description": "A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s_1 -> s_2 -> ... -> s_k such that:\n\nEvery adjacent pair of words differs by a single letter.\nEvery s_i for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.\ns_k == endWord\n\nGiven two words, beginWord and endWord, and a dictionary wordList, return the number of words in the shortest transformation sequence from beginWord to endWord, or 0 if no such sequence exists.",
+      "examples": [
+        {
+          "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
+          "output": "5",
+          "explanation": "One shortest transformation sequence is \"hit\" -> \"hot\" -> \"dot\" -> \"dog\" -> \"cog\", which is 5 words long."
+        },
+        {
+          "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
+          "output": "0",
+          "explanation": "The endWord \"cog\" is not in wordList, therefore there is no valid transformation sequence."
+        }
+      ],
+      "constraints": "1 <= beginWord.length <= 10\nendWord.length == beginWord.length\n1 <= wordList.length <= 5000\nwordList[i].length == beginWord.length\nbeginWord, endWord, and wordList[i] consist of lowercase English letters.\nbeginWord != endWord\nAll the words in wordList are unique.",
+      "solution": "from collections import deque\n\nclass Solution:\n    def ladderLength(self, beginWord, endWord, wordList):\n        wordSet = set(wordList)\n        if endWord not in wordSet:\n            return 0\n        \n        queue = deque([(beginWord, 1)])  # (word, path_length)\n        \n        while queue:\n            word, length = queue.popleft()\n            if word == endWord:\n                return length\n            for i in range(len(word)):\n                for c in 'abcdefghijklmnopqrstuvwxyz':\n                    new_word = word[:i] + c + word[i+1:]\n                    if new_word in wordSet:\n                        wordSet.remove(new_word)\n                        queue.append((new_word, length + 1))\n        return 0",
+      "explanation": "1. 將 wordList 放入集合中，方便快速查找。\n2. 使用 BFS，每層表示轉換步數，從 beginWord 開始。\n3. 對每個位置替換字母 a-z，生成新單詞，如果在集合中就加入 BFS 隊列並移除。\n4. 遇到 endWord 就返回路徑長度，否則 BFS 結束返回 0。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "ID": 830,
+  "Title": "自訂模組",
+  "Intro": "\t模組 (module) 就是一個 .py 檔案，裡面可以放變數、函數、類別。除了使用 Python 內建模組（如 math、random），我們也可以 自己寫模組，讓程式更容易維護和重複使用。",
+  "exp": {
+    "cor_exp": [
+      "建立自訂模組\n建立一個檔案 mymodule.py：\n\n# mymodule.py\ndef greet(name):\n    return f\"Hello, {name}!\"\n\npi = 3.14159",
+      "在另一個程式中匯入並使用：\n\n# main.py\nimport mymodule\n\nprint(mymodule.greet(\"Alice\"))   # Hello, Alice!\nprint(mymodule.pi)               # 3.14159",
+      "# 匯入整個模組\nimport mymodule\nprint(mymodule.greet(\"Bob\"))\n\n# 匯入特定函數\nfrom mymodule import greet\nprint(greet(\"Charlie\"))\n\n# 匯入並取別名\nimport mymodule as mm\nprint(mm.pi)"
+    ],
+    "mis_exp": [
+      "1. 檔案名稱不要和內建模組衝突（例如不要取名 random.py）。\n2. 模組通常放在同資料夾裡，或用 套件 (package) 的方式組織。\n3. 若要分享模組，可以打包成 套件，讓別人用 pip install 安裝使用。"
+    ]
+  },
+  "practice": [
+    {
+      "question": "在 Python 中，什麼是自訂模組？",
+      "options": [
+        "A. 一個特別安裝的外部套件",
+        "B. 一個 .py 檔案，裡面可以放變數、函數、類別",
+        "C. Python 內建的模組",
+        "D. 一個壓縮檔，裡面包含程式碼"
+      ],
+      "answer": "B",
+      "explanation": "自訂模組就是自己寫的 .py 檔案，可以包含變數、函數、類別。"
+    },
+    {
+      "question": "假設有一個 mymodule.py，裡面有函數 greet(name)，下列哪個程式能正確呼叫它？",
+      "options": [
+        "A. greet(\"Alice\")",
+        "B. mymodule.greet(\"Alice\")",
+        "C. module.greet(\"Alice\")",
+        "D. call greet(\"Alice\")"
+      ],
+      "answer": "B",
+      "explanation": "匯入模組後要用 模組名稱.函數名稱 呼叫，例如 mymodule.greet(\"Alice\")。"
+    },
+    {
+      "question": "下列哪一個檔名不適合作為自訂模組名稱？",
+      "options": [
+        "A. mymodule.py",
+        "B. helper.py",
+        "C. random.py",
+        "D. utils.py"
+      ],
+      "answer": "C",
+      "explanation": "不應該用和 Python 內建模組相同的名稱（例如 random.py），否則會造成衝突。"
+    }
+  ]
+}

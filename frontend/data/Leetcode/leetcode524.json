@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode524",
+  "coding_practice": [
+    {
+      "title": "Longest Word in Dictionary through Deleting",
+      "description": "Given a string s and a string array dictionary, return the longest string in the dictionary that can be formed by deleting some of the given string characters. If there is more than one possible result, return the longest word with the smallest lexicographical order. If there is no possible result, return the empty string.",
+      "examples": [
+        {
+          "input": "\"abpcplea\", [\"ale\",\"apple\",\"monkey\",\"plea\"]",
+          "output": "\"apple\""
+        },
+        {
+          "input": "\"abpcplea\", [\"a\",\"b\",\"c\"]",
+          "output": "\"a\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 1000\n1 <= dictionary.length <= 1000\n1 <= dictionary[i].length <= 1000\ns and dictionary[i] consist of lowercase English letters.",
+      "solution": "class Solution:\n    def findLongestWord(self, s, dictionary):\n        dictionary.sort(key=lambda x: (-len(x), x))\n        for word in dictionary:\n            it = iter(s)\n            if all(c in it for c in word):\n                return word\n        return \"\"",
+      "explanation": "1. 將 dictionary 按字串長度降序排序，長度相同則按字典順序排序。\n2. 對每個字串 word，使用迭代器 it 遍歷 s，檢查 word 是否可以通過刪除 s 的部分字元形成。\n3. 若可以，返回該 word。\n4. 若遍歷所有字串仍未找到，返回空字串。",
+      "tag": "723",
+      "difficult": "medium"
+    }
+  ]
+}

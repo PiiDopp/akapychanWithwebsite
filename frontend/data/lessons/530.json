@@ -1,0 +1,76 @@
+{
+  "ID": 530,
+  "Title": "迴圈控制",
+  "Intro": "\t在 Python 迴圈中，可以使用 `break`、`continue` 和 `pass` 來控制迴圈的執行流程：\n- `break`：立即跳出迴圈。\n- `continue`：跳過本次迴圈，進入下一次迴圈。\n- `pass`：不做任何動作，通常用於占位。",
+  "exp": {
+    "cor_exp": [
+      "for i in range(5):\n    if i == 3:\n        break\n    print(i)  # 輸出 0,1,2",
+      "for i in range(5):\n    if i == 2:\n        continue\n    print(i)  # 輸出 0,1,3,4",
+      "for i in range(3):\n    pass  # 迴圈什麼都不做，只是占位",
+      "i = 0\nwhile i < 5:\n    i += 1\n    if i == 4:\n        break\n    print(i)  # 輸出 1,2,3"
+    ],
+    "mis_exp": [
+      "for i in range(5):\n    if i == 3\n        break  # 錯誤：缺少冒號",
+      "i = 0\nwhile i < 5\n    continue  # 錯誤：缺少冒號，且無更新條件會造成無限迴圈",
+      "for i in range(5):\n    break print(i)  # 錯誤：break 不能帶其他語句在同一行"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(10):\n    if i == 5:\n        break\n    print(i)",
+      "options": [
+        "A. 0 到 4",
+        "B. 0 到 5",
+        "C. 5 到 9",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "當 i == 5 時，break 會跳出迴圈，因此只輸出 0~4。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(6):\n    if i % 2 == 0:\n        continue\n    print(i)",
+      "options": [
+        "A. 0,2,4",
+        "B. 1,3,5",
+        "C. 0,1,2,3,4,5",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "遇到偶數 i 使用 continue 跳過，只有奇數會被 print，輸出 1,3,5。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\ni = 0\nwhile True:\n    i += 1\n    if i == 4:\n        break\n    print(i)",
+      "options": [
+        "A. 1,2,3",
+        "B. 1,2,3,4",
+        "C. 無限迴圈",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "i 從 1 開始，每次加 1，當 i == 4 時 break，輸出 1,2,3。"
+    },
+    {
+      "question": "下列程式碼會輸出什麼？\n\nfor i in range(3):\n    pass\nprint('完成')",
+      "options": [
+        "A. 0,1,2",
+        "B. 完成",
+        "C. 無限迴圈",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "pass 什麼都不做，只是占位，最後印出 '完成'。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nfor i in range(5):\n    if i == 3\n        break",
+      "options": [
+        "A. 正常輸出 0,1,2",
+        "B. 無限迴圈",
+        "C. 程式錯誤",
+        "D. 不輸出任何東西"
+      ],
+      "answer": "C",
+      "explanation": "if 後面缺少冒號，Python 會報 SyntaxError。"
+    }
+  ]
+
+}

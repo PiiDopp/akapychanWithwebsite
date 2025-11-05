@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode205",
+  "coding_practice": [
+    {
+      "title": "Isomorphic Strings",
+      "description": "Given two strings s and t, determine if they are isomorphic.\n\nTwo strings s and t are isomorphic if the characters in s can be replaced to get t.\n\nAll occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character, but a character may map to itself.",
+      "examples": [
+        {
+          "input": "s = \"egg\", t = \"add\"",
+          "output": "true",
+          "explanation": "The strings s and t can be made identical by: Mapping 'e' to 'a'; Mapping 'g' to 'd'."
+        },
+        {
+          "input": "s = \"foo\", t = \"bar\"",
+          "output": "false",
+          "explanation": "The strings s and t can not be made identical as 'o' needs to be mapped to both 'a' and 'r'."
+        },
+        {
+          "input": "s = \"paper\", t = \"title\"",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= s.length <= 5 * 10^4; t.length == s.length; s and t consist of any valid ascii character.",
+      "solution": "class Solution:\n    def isIsomorphic(self, s, t):\n        if len(s) != len(t):\n            return False\n        mapping_s_t = {}\n        mapping_t_s = {}\n        for c1, c2 in zip(s, t):\n            if c1 in mapping_s_t and mapping_s_t[c1] != c2:\n                return False\n            if c2 in mapping_t_s and mapping_t_s[c2] != c1:\n                return False\n            mapping_s_t[c1] = c2\n            mapping_t_s[c2] = c1\n        return True",
+      "explanation": "1. 如果 s 和 t 長度不同，直接返回 False。\n2. 建立兩個字典 mapping_s_t 和 mapping_t_s 分別記錄 s->t 和 t->s 的映射。\n3. 遍歷每對字符，如果映射不一致則返回 False。\n4. 更新映射字典，最後返回 True，表示兩個字串同構。",
+      "tag": "722",
+      "difficult": "easy"
+    }
+  ]
+}

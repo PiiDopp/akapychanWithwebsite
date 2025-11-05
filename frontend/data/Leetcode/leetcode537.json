@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode537",
+  "coding_practice": [
+    {
+      "title": "Complex Number Multiplication",
+      "description": "A complex number can be represented as a string on the form \"real+imaginaryi\" where:\n\nreal is the real part and is an integer in the range [-100, 100].\nimaginary is the imaginary part and is an integer in the range [-100, 100].\ni^2 == -1.\nGiven two complex numbers num1 and num2 as strings, return a string of the complex number that represents their multiplications.",
+      "examples": [
+        {
+          "input": "\"1+1i\", \"1+1i\"",
+          "output": "\"0+2i\"",
+          "explanation": "(1 + i) * (1 + i) = 1 + i2 + 2 * i = 2i, and you need convert it to the form of 0+2i."
+        },
+        {
+          "input": "\"1+-1i\", \"1+-1i\"",
+          "output": "\"0+-2i\"",
+          "explanation": "(1 - i) * (1 - i) = 1 + i2 - 2 * i = -2i, and you need convert it to the form of 0+-2i."
+        }
+      ],
+      "constraints": "num1 and num2 are valid complex numbers.",
+      "solution": "class Solution:\n    def complexNumberMultiply(self, a, b):\n        def parse(s):\n            real, imag = s.split('+')\n            return int(real), int(imag[:-1])\n        \n        a_real, a_imag = parse(a)\n        b_real, b_imag = parse(b)\n        \n        real_part = a_real * b_real - a_imag * b_imag\n        imag_part = a_real * b_imag + a_imag * b_real\n        \n        return str(real_part) + '+' + str(imag_part) + 'i'",
+      "explanation": "1. 解析字串 num1 和 num2，分別取得實部和虛部。\n2. 使用複數乘法公式：(a+bi)*(c+di) = (ac-bd) + (ad+bc)i。\n3. 計算實部和虛部。\n4. 將結果組成 \"real+imaginaryi\" 的字串並返回。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

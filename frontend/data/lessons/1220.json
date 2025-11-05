@@ -1,0 +1,52 @@
+{
+  "ID": 1220,
+  "Title": "API 串接與資料解析",
+  "Intro": "\tAPI（Application Programming Interface）是讓應用程式之間交換資料的介面。許多網站或服務會提供開放 API，讓開發者能以程式取得即時資料（如天氣、匯率、股價等）。在 Python 中可使用 requests 模組向 API 發送請求（request），並使用 json 模組解析回傳的 JSON 格式資料。",
+  "exp": {
+    "cor_exp": [
+      "# 取得公開 API 資料\nimport requests\nimport json\n\nurl = 'https://api.exchangerate-api.com/v4/latest/USD'\nresponse = requests.get(url)\n\ndata = response.json()  # 將回傳的 JSON 字串轉為 Python 物件\nprint('基準貨幣：', data['base'])\nprint('台幣匯率：', data['rates']['TWD'])",
+      "# 解析巢狀 JSON 結構\nimport requests\n\nurl = 'https://api.github.com/users/octocat'\nresponse = requests.get(url)\nuser = response.json()\n\nprint('使用者名稱：', user['login'])\nprint('公開倉庫數：', user['public_repos'])",
+      "# 加入錯誤處理\nimport requests\n\nurl = 'https://api.open-meteo.com/v1/forecast?latitude=25.04&longitude=121.52&current_weather=true'\ntry:\n    r = requests.get(url)\n    data = r.json()\n    print('目前氣溫：', data['current_weather']['temperature'], '°C')\nexcept Exception as e:\n    print('資料取得失敗：', e)"
+    ],
+    "mis_exp": [
+      "# 錯誤：未導入 requests 模組\nurl = 'https://api.exchangerate-api.com/v4/latest/USD'\nresponse = get(url)  # NameError：get 未定義",
+      "# 錯誤：未將回傳資料轉換為 JSON\nimport requests\nurl = 'https://api.github.com/users/octocat'\nresponse = requests.get(url)\nprint(response['login'])  # TypeError：response 不是字典",
+      "# 錯誤：網址錯誤\nimport requests\nurl = 'https://wrong-api-url.com'\nresponse = requests.get(url)\nprint(response.json())  # 可能引發 requests.exceptions.ConnectionError"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一段程式能正確取得匯率 API 並解析為 Python 物件？",
+      "options": [
+        "A. data = json.load('https://api.exchangerate-api.com/v4/latest/USD')",
+        "B. data = requests.get('https://api.exchangerate-api.com/v4/latest/USD')",
+        "C. response = requests.get('https://api.exchangerate-api.com/v4/latest/USD'); data = response.json()",
+        "D. json.dumps(requests.get('https://api.exchangerate-api.com/v4/latest/USD'))"
+      ],
+      "answer": "C",
+      "explanation": "requests.get() 用於取得 API 回應，.json() 方法將回傳內容轉為 Python 物件。"
+    },
+    {
+      "question": "若要取得 API 回傳資料中的 'base' 欄位值，以下哪一種寫法正確？\n\ndata = {'base': 'USD', 'rates': {'TWD': 32.5, 'JPY': 148.1}}",
+      "options": [
+        "A. print(data.base)",
+        "B. print(data['base'])",
+        "C. print(data->base)",
+        "D. print(data('base'))"
+      ],
+      "answer": "B",
+      "explanation": "API 解析後會成為字典，必須使用中括號索引 key 名稱。"
+    },
+    {
+      "question": "執行下列程式結果為何？（假設 API 可正常回應）\n\nimport requests\nurl = 'https://api.github.com/users/octocat'\nresponse = requests.get(url)\ndata = response.json()\nprint(type(data))",
+      "options": [
+        "A. <class 'dict'>",
+        "B. <class 'str'>",
+        "C. <class 'list'>",
+        "D. <class 'Response'>"
+      ],
+      "answer": "A",
+      "explanation": "response.json() 回傳的是 Python 字典物件，包含 API 回傳的所有資料欄位。"
+    }
+  ]
+}

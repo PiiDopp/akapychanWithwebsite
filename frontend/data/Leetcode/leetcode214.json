@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode214",
+  "coding_practice": [
+    {
+      "title": "Shortest Palindrome",
+      "description": "You are given a string s. You can convert s to a palindrome by adding characters in front of it.\n\nReturn the shortest palindrome you can find by performing this transformation.",
+      "examples": [
+        {
+          "input": "s = 'aacecaaa'",
+          "output": "'aaacecaaa'"
+        },
+        {
+          "input": "s = 'abcd'",
+          "output": "'dcbabcd'"
+        }
+      ],
+      "constraints": "0 <= s.length <= 5 * 10^4\ns consists of lowercase English letters only.",
+      "solution": "class Solution:\n    def shortestPalindrome(self, s):\n        if not s:\n            return \"\"\n        temp = s + '#' + s[::-1]\n        n = len(temp)\n        lps = [0] * n\n        for i in range(1, n):\n            length = lps[i-1]\n            while length > 0 and temp[i] != temp[length]:\n                length = lps[length-1]\n            if temp[i] == temp[length]:\n                length += 1\n            lps[i] = length\n        to_add = s[lps[-1]:][::-1]\n        return to_add + s",
+      "explanation": "1. 將字串 s 與其反轉串接，中間加上分隔符號，形成 temp = s + '#' + reversed(s)。\n2. 建立 LPS 陣列，記錄每個位置的最大相同前綴與後綴長度。\n3. LPS 最後一個值表示 s 的最大回文前綴長度。\n4. 將剩餘的後綴 reversed 加到 s 前面，即可得到最短回文。",
+      "tag": "722",
+      "difficult": "hard"
+    }
+  ]
+}

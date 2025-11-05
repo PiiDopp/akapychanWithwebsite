@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode378",
+  "coding_practice": [
+    {
+      "title": "K^th Smallest Element in a Sorted Matrix",
+      "description": "Given an n x n matrix where each of the rows and columns is sorted in ascending order, return the k^th smallest element in the matrix.\n\nNote that it is the k^th smallest element in the sorted order, not the k^th distinct element.\n\nYou must find a solution with a memory complexity better than O(n^2).",
+      "examples": [
+        {
+          "input": "matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8",
+          "output": "13",
+          "explanation": "The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13"
+        },
+        {
+          "input": "matrix = [[-5]], k = 1",
+          "output": "-5"
+        }
+      ],
+      "constraints": "n == matrix.length == matrix[i].length\n1 <= n <= 300\n-10^9 <= matrix[i][j] <= 10^9\nAll the rows and columns of matrix are guaranteed to be sorted in non-decreasing order.\n1 <= k <= n^2",
+      "follow up": "Could you solve the problem with a constant memory (i.e., O(1) memory complexity)?\n\nCould you solve the problem in O(n) time complexity? The solution may be too advanced for an interview but you may find reading this paper(http://www.cse.yorku.ca/~andy/pubs/X+Y.pdf) fun.",
+      "solution": "import heapq\n\nclass Solution:\n    def kthSmallest(self, matrix, k):\n        n = len(matrix)\n        # 使用最小堆儲存 (數值, 行, 列)\n        heap = [(matrix[i][0], i, 0) for i in range(n)]\n        heapq.heapify(heap)\n        \n        # 提取 k-1 次最小元素\n        for _ in range(k - 1):\n            val, r, c = heapq.heappop(heap)\n            if c + 1 < n:\n                heapq.heappush(heap, (matrix[r][c + 1], r, c + 1))\n        \n        return heapq.heappop(heap)[0]",
+      "explanation": "1. 將每一行的第一個元素加入最小堆，堆中元素為 (值, 行索引, 列索引)。\n2. 執行 k-1 次彈出操作，每次彈出堆頂最小值。\n3. 若彈出的元素所在列還有下一個元素，將其加入堆中。\n4. 最後彈出的元素即為第 k 小元素。\n5. 這種方法利用了行列排序特性，內存消耗僅為 O(n)。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

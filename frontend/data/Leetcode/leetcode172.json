@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode172",
+  "coding_practice": [
+    {
+      "title": "Factorial Trailing Zeroes",
+      "description": "Given an integer n, return the number of trailing zeroes in n!. \n\nNote that n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1.",
+      "examples": [
+        {
+          "input": "n = 3",
+          "output": "0",
+          "explanation": "3! = 6, no trailing zero."
+        },
+        {
+          "input": "n = 5",
+          "output": "1",
+          "explanation": "5! = 120, one trailing zero."
+        },
+        {
+          "input": "n = 0",
+          "output": "0"
+        }
+      ],
+      "constraints": "0 <= n <= 10^4",
+      "follow up": "Could you write a solution that works in logarithmic time complexity?",
+      "solution": "class Solution:\n    def trailingZeroes(self, n):\n        count = 0\n        while n > 0:\n            n //= 5\n            count += n\n        return count",
+      "explanation": "1. Trailing zeros in n! come from factors of 10, which are made from pairs of 2 and 5.\n2. There are always more 2s than 5s, so count the number of 5s in the factorial decomposition.\n3. Divide n by 5 repeatedly and sum the quotients to count all multiples of 5, 25, 125, etc.",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

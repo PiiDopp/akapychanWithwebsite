@@ -1,0 +1,65 @@
+{
+  "ID": 512,
+  "Title": "巢狀 for 迴圈",
+  "Intro": "\t巢狀 for 迴圈指在一個 for 迴圈內再寫另一個 for 迴圈。外層迴圈每執行一次，內層迴圈就會完整執行一次，常用於矩陣、表格或多維資料的處理。",
+  "exp": {
+    "cor_exp": [
+      "for i in range(3):\n    for j in range(2):\n        print(f'i={i}, j={j}')\n# 輸出 i=0,j=0 ... i=2,j=1",
+      "for row in range(1, 4):\n    for col in range(1, 4):\n        print(row * col, end=' ')\n    print()  # 3x3 乘法表",
+      "matrix = [[1,2,3],[4,5,6],[7,8,9]]\nfor row in matrix:\n    for num in row:\n        print(num, end=' ')\n    print()  # 依序輸出矩陣元素",
+      "for i in range(2):\n    for j in range(3):\n        for k in range(2):\n            print(f'i={i}, j={j}, k={k}')  # 三層巢狀迴圈"
+    ],
+    "mis_exp": [
+      "for i in range(3):\nfor j in range(2):\n    print(i,j)  # 錯誤：內層迴圈缺少縮排",
+      "for i in range(3):\n    for j in range(2)\n        print(i,j)  # 錯誤：缺少冒號",
+      "for i in range(2):\nfor j in range(2):\nprint(i,j)  # 錯誤：全部缺少縮排"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(3):\n    for j in range(3):\n        print('*', end=' ')\n    print()",
+      "options": [
+        "A. 三行三列的星號方陣",
+        "B. 三個星號在同一行",
+        "C. 連續九個星號在一行",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "外層迴圈控制行數，內層迴圈控制每行的星號數，最後 print() 換行，形成 3x3 方陣。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nfor i in range(1, 10):\n    for j in range(1, i+1):\n        print(f'{i}*{j}={i*j}', end=' ')\n    print()",
+      "options": [
+        "A. 九九乘法表",
+        "B. 1 到 9 的數字表",
+        "C. 1 到 i 的乘積總和",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "外層迴圈控制被乘數，內層迴圈控制乘數，每行依序輸出乘法結果，形成九九乘法表。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nmatrix = [[1,2,3],[4,5,6]]\nfor row in matrix:\n    for num in row:\n        print(num, end=' ')\n    print()",
+      "options": [
+        "A. 1 2 3 4 5 6 (一行)",
+        "B. 1 2 3 (換行) 4 5 6",
+        "C. 依序輸出每個元素在單行",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "外層迴圈每列一行，內層迴圈依序輸出該列元素，最後 print() 換行。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nfor i in range(3):\nfor j in range(2):\n    print(i,j)",
+      "options": [
+        "A. 依序輸出 0~2 與 0~1 的組合",
+        "B. 程式錯誤",
+        "C. 只輸出 0,0",
+        "D. None"
+      ],
+      "answer": "B",
+      "explanation": "內層迴圈缺少縮排，Python 會報 IndentationError。"
+    }
+  ]
+
+}

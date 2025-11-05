@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode3",
+  "coding_practice": [
+    {
+      "title": "Longest Substring Without Repeating Characters",
+      "description": "Given a string s, find the length of the longest substring without duplicate characters.",
+      "examples": [
+        {
+          "input": "s = \"abcabcbb\"",
+          "output": "3",
+          "explanation": "The answer is \"abc\", with the length of 3. Note that \"bca\" and \"cab\" are also correct answers."
+        },
+        {
+          "input": "s = \"bbbbb\"",
+          "output": "1",
+          "explanation": "The answer is \"b\", with the length of 1."
+        },
+        {
+          "input": "s = \"pwwkew\"",
+          "output": "3",
+          "explanation": "The answer is \"wke\", with the length of 3.\nNotice that the answer must be a substring, \"pwke\" is a subsequence and not a substring."
+        }
+      ],
+      "constraints": "0 <= s.length <= 5 * 10^4\ns consists of English letters, digits, symbols and spaces.",
+      "solution": "class Solution(object):\n    def lengthOfLongestSubstring(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        char_set = set()\n        left = 0\n        max_len = 0\n\n        for right in range(len(s)):\n            while s[right] in char_set:\n                char_set.remove(s[left])\n                left += 1\n            char_set.add(s[right])\n            max_len = max(max_len, right - left + 1)\n        return max_len",
+      "explanation": "1. 使用集合 char_set 來儲存當前不重複子字串中的字元。\n2. 設定兩個指標 left 與 right，代表滑動視窗的起點與終點。\n3. 當 s[right] 已存在於集合中，代表有重複字元，則移除左端字元並右移 left。\n4. 持續更新 max_len 為目前子字串的最大長度。\n5. 當遍歷整個字串後，max_len 即為最長不重複子字串的長度。",
+      "tag": "612",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "ID": 350,
+  "Title": "運算子優先順序",
+  "Intro": "\t在 Python 中，運算子有優先順序 (Precedence)，決定不同運算子同時出現時的計算先後順序。括號最高，其次為指數、乘除、加減等。",
+  "exp": {
+    "cor_exp": [
+      "result = 2 + 3 * 4\nprint(result)  # 輸出 14，乘法優先於加法",
+      "result = (2 + 3) * 4\nprint(result)  # 輸出 20，括號先計算",
+      "result = 2 ** 3 * 4\nprint(result)  # 輸出 32，指數優先於乘法",
+      "result = 10 / 2 + 3\nprint(result)  # 輸出 8.0，除法優先於加法"
+    ],
+    "mis_exp": [
+      "result = 2 + * 3  # 錯誤：運算順序不正確，語法錯誤",
+      "result = 4 / / 2  # 錯誤：不合法運算符號",
+      "result = 2 + 3 *  # 錯誤：缺少運算對象"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nprint(5 + 2 * 3)",
+      "options": [
+        "A. 21",
+        "B. 11",
+        "C. 16",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "乘法優先於加法，2*3=6，再加上5，結果為 11。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nprint((5 + 2) * 3)",
+      "options": [
+        "A. 11",
+        "B. 21",
+        "C. 16",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "括號先計算，5+2=7，再乘以3，結果為 21。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nprint(2 ** 3 * 2)",
+      "options": [
+        "A. 16",
+        "B. 12",
+        "C. 64",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "指數優先於乘法，2**3=8，再乘以2，結果為 16。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nresult = 2 + * 3\nprint(result)",
+      "options": [
+        "A. 5",
+        "B. 6",
+        "C. 程式錯誤",
+        "D. 2*3"
+      ],
+      "answer": "C",
+      "explanation": "程式語法錯誤，運算符號不正確，無法執行。"
+    }
+  ]
+
+}

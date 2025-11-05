@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+
+    "lc:index": "node tools/build-leetcode-index.mjs",
+    "lc:index:simple": "MODE=simple node tools/build-leetcode-index.mjs",
+    "lc:watch": "nodemon -e json --watch data/Leetcode --exec \"node tools/build-leetcode-index.mjs\"",
+    "lc:cleanname": "node tools/rename-remove-difficulty.mjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "ID": 900,
+  "coding_practice": [
+    {
+      "title": "安全除法",
+      "description": "請寫一個程式，讓使用者輸入兩個整數 a 與 b，輸出 a / b 的結果。若輸入的資料非整數或除數為 0，請顯示錯誤提示『輸入錯誤或除數為 0』。程式必須使用 try / except 結構。",
+      "examples": {
+        "input": "10 0",
+        "output": "輸入錯誤或除數為 0"
+      },
+      "solution": "try:\n    a, b = map(int, input('請輸入兩個整數（以空格分隔）: ').split())\n    print('結果為:', a / b)\nexcept (ValueError, ZeroDivisionError):\n    print('輸入錯誤或除數為 0')"
+    },
+    {
+      "title": "統計文字行數",
+      "description": "請寫一個程式，開啟名為 data.txt 的檔案，讀取內容並輸出總共有幾行文字。若檔案不存在，請顯示『找不到檔案！』。請使用 with 語法搭配 try / except。",
+      "examples": {
+        "input": "（假設 data.txt 內容如下）\\nHello\\nPython\\nWorld",
+        "output": "檔案共有 3 行"
+      },
+      "solution": "try:\n    with open('data.txt', 'r', encoding='utf-8') as f:\n        lines = f.readlines()\n        print('檔案共有', len(lines), '行')\nexcept FileNotFoundError:\n    print('找不到檔案！')"
+    }
+  ]
+}

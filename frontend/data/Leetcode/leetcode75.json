@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode75",
+  "coding_practice": [
+    {
+      "title": "Sort Colors",
+      "description": "Given an array nums with n objects colored red, white, or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white, and blue.\n\nWe will use the integers 0, 1, and 2 to represent the color red, white, and blue, respectively.\n\nYou must solve this problem without using the library's sort function.",
+      "examples": [
+        {
+          "input": "nums = [2,0,2,1,1,0]",
+          "output": "[0,0,1,1,2,2]"
+        },
+        {
+          "input": "nums = [2,0,1]",
+          "output": "[0,1,2]"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 300\nnums[i] is either 0, 1, or 2",
+      "follow up": "Could you come up with a one-pass algorithm using only constant extra space?",
+      "solution": "class Solution(object):\n    def sortColors(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: None Do not return anything, modify nums in-place instead.\n        \"\"\"\n        low, mid, high = 0, 0, len(nums) - 1\n        \n        while mid <= high:\n            if nums[mid] == 0:\n                nums[low], nums[mid] = nums[mid], nums[low]\n                low += 1\n                mid += 1\n            elif nums[mid] == 1:\n                mid += 1\n            else:  # nums[mid] == 2\n                nums[mid], nums[high] = nums[high], nums[mid]\n                high -= 1",
+      "explanation": "使用三指標法(low, mid, high)進行荷蘭國旗排序:\n1. 初始化 low = 0, mid = 0, high = len(nums)-1\n2. 遍歷陣列:\n   a. nums[mid] == 0: 與 nums[low] 交換，low和mid各加1\n   b. nums[mid] == 1: mid加1\n   c. nums[mid] == 2: 與 nums[high] 交換，high減1\n3. 結束後陣列即排序完成，時間複雜度O(n)，空間複雜度O(1)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

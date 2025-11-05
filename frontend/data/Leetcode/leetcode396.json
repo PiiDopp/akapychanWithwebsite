@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode396",
+  "coding_practice": [
+    {
+      "title": "Rotate Function",
+      "description": "You are given an integer array nums of length n.\n\nAssume arrk to be an array obtained by rotating nums by k positions clock-wise. We define the rotation function F on nums as follow:\n\nF(k) = 0 * arrk[0] + 1 * arrk[1] + ... + (n - 1) * arrk[n - 1].\nReturn the maximum value of F(0), F(1), ..., F(n-1).\n\nThe test cases are generated so that the answer fits in a 32-bit integer.",
+      "examples": [
+        {
+          "input": "nums = [4,3,2,6]",
+          "output": "26",
+          "explanation": "F(0) = (0 * 4) + (1 * 3) + (2 * 2) + (3 * 6) = 0 + 3 + 4 + 18 = 25\nF(1) = (0 * 6) + (1 * 4) + (2 * 3) + (3 * 2) = 0 + 4 + 6 + 6 = 16\nF(2) = (0 * 2) + (1 * 6) + (2 * 4) + (3 * 3) = 0 + 6 + 8 + 9 = 23\nF(3) = (0 * 3) + (1 * 2) + (2 * 6) + (3 * 4) = 0 + 2 + 12 + 12 = 26\nSo the maximum value of F(0), F(1), F(2), F(3) is F(3) = 26."
+        },
+        {
+          "input": "nums = [100]",
+          "output": "0"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 10^5\n-100 <= nums[i] <= 100",
+      "solution": "class Solution:\n    def maxRotateFunction(self, A):\n        n = len(A)\n        if n == 0:\n            return 0\n        total = sum(A)\n        F = sum(i * num for i, num in enumerate(A))\n        max_val = F\n        for i in range(n-1, 0, -1):\n            F = F + total - n * A[i]\n            max_val = max(max_val, F)\n        return max_val",
+      "explanation": "1. 計算陣列總和 total 與 F(0) 的初始值。\n2. 使用公式 F(k) = F(k-1) + total - n * A[n-k] 計算每次旋轉後的值。\n3. 遍歷更新 max_val，最終返回最大值。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

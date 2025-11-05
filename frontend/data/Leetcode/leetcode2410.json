@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode2410",
+  "coding_practice": [
+    {
+      "title": "Maximum Matching of Players With Trainers",
+      "description": "You are given a 0-indexed integer array players, where players[i] represents the ability of the i^th player. You are also given a 0-indexed integer array trainers, where trainers[j] represents the training capacity of the j^th trainer.\n\nThe ith player can match with the j^th trainer if the player's ability is less than or equal to the trainer's training capacity. Additionally, the ith player can be matched with at most one trainer, and the j^th trainer can be matched with at most one player.\n\nReturn the maximum number of matchings between players and trainers that satisfy these conditions.",
+      "examples": [
+        {
+          "input": "players = [4,7,9], trainers = [8,2,5,8]",
+          "output": "2",
+          "explanation": "One of the ways we can form two matchings is as follows:\n- players[0] can be matched with trainers[0] since 4 <= 8.\n- players[1] can be matched with trainers[3] since 7 <= 8. \nIt can be proven that 2 is the maximum number of matchings that can be formed."
+        },
+        {
+          "input": "players = [1,1,1], trainers = [10]",
+          "output": "1",
+          "explanation": "The trainer can be matched with any of the 3 players.\nEach player can only be matched with one trainer, so the maximum answer is 1."
+        }
+      ],
+      "constraints": "1 <= players.length, trainers.length <= 10^5\n1 <= players[i], trainers[j] <= 10^9",
+      "note": " This question is the same as 445: Assign Cookies.",
+      "solution": "class Solution:\n    def matchPlayersAndTrainers(self, players, trainers):\n        players.sort()\n        trainers.sort()\n        i = j = matches = 0\n        while i < len(players) and j < len(trainers):\n            if players[i] <= trainers[j]:\n                matches += 1\n                i += 1\n            j += 1\n        return matches",
+      "explanation": "1. 將 players 和 trainers 都排序。\n2. 使用雙指針 i, j 遍歷兩個陣列。\n3. 如果 players[i] <= trainers[j]，匹配成功，i 前進，matches 加 1。\n4. j 無論如何前進。\n5. 返回 matches，表示最大匹配數。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode402",
+  "coding_practice": [
+    {
+      "title": "Remove K Digits",
+      "description": "Given string num representing a non-negative integer num, and an integer k, return the smallest possible integer after removing k digits from num.",
+      "examples": [
+        {
+          "input": "num = \"1432219\", k = 3",
+          "output": "\"1219\"",
+          "explanation": "Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest."
+        },
+        {
+          "input": "num = \"10200\", k = 1",
+          "output": "\"200\"",
+          "explanation": "Remove the leading 1 and the number is 200. Note that the output must not contain leading zeroes."
+        },
+        {
+          "input": "num = \"10\", k = 2",
+          "output": "\"0\"",
+          "explanation": "Remove all the digits from the number and it is left with nothing which is 0."
+        }
+      ],
+      "constraints": "1 <= k <= num.length <= 10^5\nnum consists of only digits.\nnum does not have any leading zeros except for the zero itself.",
+      "solution": "class Solution:\n    def removeKdigits(self, num, k):\n        stack = []\n        for digit in num:\n            while k > 0 and stack and stack[-1] > digit:\n                stack.pop()\n                k -= 1\n            stack.append(digit)\n        \n        while k > 0:\n            stack.pop()\n            k -= 1\n        \n        result = ''.join(stack).lstrip('0')\n        return result if result else \"0\"",
+      "explanation": "1. 使用單調遞增棧來構建最小數字。\n2. 遍歷 num，若當前數字小於棧頂且 k > 0，則彈出棧頂元素，減少 k。\n3. 若 k 還有剩餘，從尾部刪除對應數字。\n4. 移除前導零。\n5. 返回結果，如果結果為空，返回 \"0\"。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode7",
+  "coding_practice": [
+    {
+      "title": "Reverse Integer",
+      "description": "Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer range [-2^31, 2^31 - 1], then return 0.\n\nAssume the environment does not allow you to store 64-bit integers (signed or unsigned).",
+      "examples": [
+        {
+          "input": "x = 123",
+          "output": "321"
+        },
+        {
+          "input": "x = -123",
+          "output": "-321"
+        },
+        {
+          "input": "x = 120",
+          "output": "21"
+        }
+      ],
+      "constraints": "-2^31 <= x <= 2^31 - 1",
+      "solution": "class Solution(object):\n    def reverse(self, x):\n        \"\"\"\n        :type x: int\n        :rtype: int\n        \"\"\"\n        sign = -1 if x < 0 else 1\n        x_abs = abs(x)\n        reversed_num = 0\n\n        while x_abs != 0:\n            digit = x_abs % 10\n            reversed_num = reversed_num * 10 + digit\n            x_abs //= 10\n\n        reversed_num *= sign\n\n        if reversed_num < -2**31 or reversed_num > 2**31 - 1:\n            return 0\n        return reversed_num",
+      "explanation": "1. 判斷原數字的正負號，並取絕對值處理。\n2. 使用 while 迴圈逐位提取數字並構造反轉整數。\n3. 乘回符號得到最終結果。\n4. 檢查反轉後數字是否超出 32-bit 整數範圍，若溢位返回 0。\n5. 返回最終反轉整數。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

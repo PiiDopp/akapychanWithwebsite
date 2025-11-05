@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode392",
+  "coding_practice": [
+    {
+      "title": "Is Subsequence",
+      "description": "Given two strings s and t, return true if s is a subsequence of t, or false otherwise.\n\nA subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., \"ace\" is a subsequence of \"abcde\" while \"aec\" is not).",
+      "examples": [
+        {
+          "input": "s = \"abc\", t = \"ahbgdc\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"axc\", t = \"ahbgdc\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "0 <= s.length <= 100\n0 <= t.length <= 10^4\ns and t consist only of lowercase English letters.",
+      "follow up": "Suppose there are lots of incoming s, say s_1, s_2, ..., s_k where k >= 10^9, and you want to check one by one to see if t has its subsequence. In this scenario, how would you change your code?",
+      "solution": "class Solution:\n    def isSubsequence(self, s, t):\n        if not s:\n            return True\n        index_s = 0\n        for char in t:\n            if char == s[index_s]:\n                index_s += 1\n                if index_s == len(s):\n                    return True\n        return False",
+      "explanation": "1. 若 s 為空，直接返回 True。\n2. 使用 index_s 遍歷 s。\n3. 遍歷 t，若當前字母等於 s[index_s]，index_s 加一。\n4. 當 index_s 等於 s 的長度時，說明 s 是 t 的子序列，返回 True。\n5. 若遍歷完 t 仍未完成 s，返回 False。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

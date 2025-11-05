@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode43",
+  "coding_practice": [
+    {
+      "title": "Multiply Strings",
+      "description": "Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.\n\nNote: You must not use any built-in BigInteger library or convert the inputs to integer directly.",
+      "examples": [
+        {
+          "input": "num1 = '2', num2 = '3'",
+          "output": "'6'"
+        },
+        {
+          "input": "num1 = '123', num2 = '456'",
+          "output": "'56088'"
+        }
+      ],
+      "constraints": "1 <= num1.length, num2.length <= 200\nnum1 and num2 consist of digits only.\nBoth num1 and num2 do not contain any leading zero, except the number 0 itself.",
+      "solution": "class Solution(object):\n    def multiply(self, num1, num2):\n        \"\"\"\n        :type num1: str\n        :type num2: str\n        :rtype: str\n        \"\"\"\n        if num1 == '0' or num2 == '0':\n            return '0'\n\n        m, n = len(num1), len(num2)\n        pos = [0] * (m + n)\n\n        for i in range(m-1, -1, -1):\n            for j in range(n-1, -1, -1):\n                mul = int(num1[i]) * int(num2[j])\n                p1, p2 = i + j, i + j + 1\n                sum_ = mul + pos[p2]\n\n                pos[p1] += sum_ // 10\n                pos[p2] = sum_ % 10\n\n        result = ''.join(map(str, pos))\n        return result.lstrip('0')",
+      "explanation": "1. 如果 num1 或 num2 為 '0'，直接返回 '0'。\n2. 建立長度為 m+n 的陣列 pos 存放每位乘積結果。\n3. 從右至左遍歷 num1 和 num2，計算每一位的乘積並加到 pos 的對應位置。\n4. 處理進位：pos[p1] += sum_ // 10，pos[p2] = sum_ % 10。\n5. 將 pos 轉換為字串，去掉前導零。\n6. 複雜度分析：\n   6.1 時間複雜度：O(m*n)\n   6.2 空間複雜度：O(m+n)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode397",
+  "coding_practice": [
+    {
+      "title": "Integer Replacement",
+      "description": "Given a positive integer n, you can apply one of the following operations:\n\n1. If n is even, replace n with n / 2.\n2. If n is odd, replace n with either n + 1 or n - 1.\nReturn the minimum number of operations needed for n to become 1.",
+      "examples": [
+        {
+          "input": "n = 8",
+          "output": "3",
+          "explanation": "8 -> 4 -> 2 -> 1"
+        },
+        {
+          "input": "n = 7",
+          "output": "4",
+          "explanation": "7 -> 8 -> 4 -> 2 -> 1\nor 7 -> 6 -> 3 -> 2 -> 1"
+        },
+        {
+          "input": "n = 4",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= n <= 2^31 - 1",
+      "solution": "class Solution:\n    def integerReplacement(self, n):\n        count = 0\n        while n != 1:\n            if n % 2 == 0:\n                n //= 2\n            else:\n                if n == 3 or ((n >> 1) & 1) == 0:\n                    n -= 1\n                else:\n                    n += 1\n            count += 1\n        return count",
+      "explanation": "1. 當 n 為偶數時，直接除以 2。\n2. 當 n 為奇數時，根據 n 的低兩位決定加 1 或減 1，以最小化操作次數。\n3. 使用計數器 count 記錄操作次數，直到 n 變為 1。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

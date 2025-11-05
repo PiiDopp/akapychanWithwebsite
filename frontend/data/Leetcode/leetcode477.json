@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode477",
+  "coding_practice": [
+    {
+      "title": "Total Hamming Distance",
+      "description": "The Hamming distance between two integers is the number of positions at which the corresponding bits are different.\n\nGiven an integer array nums, return the sum of Hamming distances between all the pairs of the integers in nums.",
+      "examples": [
+        {
+          "input": "nums = [4,14,2]",
+          "output": "6",
+          "explanation": "In binary representation, the 4 is 0100, 14 is 1110, and 2 is 0010.\nThe answer will be:\nHammingDistance(4, 14) + HammingDistance(4, 2) + HammingDistance(14, 2) = 2 + 2 + 2 = 6."
+        },
+        {
+          "input": "nums = [4,14,4]",
+          "output": "4"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n0 <= nums[i] <= 10^9\nThe answer for the given input will fit in a 32-bit integer.",
+      "solution": "class Solution:\n    def totalHammingDistance(self, nums):\n        total = 0\n        n = len(nums)\n        for i in range(32):  # 因為整數最多 32 位\n            count_ones = sum((num >> i) & 1 for num in nums)\n            count_zeros = n - count_ones\n            total += count_ones * count_zeros\n        return total",
+      "explanation": "1. 對每一位 (0~31) 計算該位為 1 的數量 count_ones。\n2. 該位為 0 的數量為 count_zeros = n - count_ones。\n3. 該位對 Hamming distance 的貢獻為 count_ones * count_zeros，因為每個 1 與每個 0 組成一對。\n4. 對 32 位累加得到總 Hamming distance。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

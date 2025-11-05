@@ -1,0 +1,23 @@
+{
+  "ID": 1100,
+  "coding_practice": [
+    {
+      "title": "學生資料類別設計",
+      "description": "請定義一個 Student 類別，具有屬性 name（姓名）與 score（分數）。\n1. 於 __init__() 建構子中初始化這兩個屬性。\n2. 定義方法 show_info()，輸出『XXX 的分數是 YYY』。\n3. 建立兩個 Student 物件並分別呼叫 show_info()。",
+      "examples": {
+        "input": "無（程式內建立）",
+        "output": "Alice 的分數是 90\\nBob 的分數是 80"
+      },
+      "solution": "class Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\n    def show_info(self):\n        print(f'{self.name} 的分數是 {self.score}')\n\ns1 = Student('Alice', 90)\ns2 = Student('Bob', 80)\ns1.show_info()\ns2.show_info()"
+    },
+    {
+      "title": "動物類別繼承",
+      "description": "請設計一個父類別 Animal，包含方法 make_sound()，印出『動物發出聲音』。\n建立子類別 Dog 與 Cat：\n1. Dog 覆寫 make_sound()，輸出『汪汪！』。\n2. Cat 覆寫 make_sound()，輸出『喵～』。\n建立這兩個物件並呼叫各自的 make_sound()。",
+      "examples": {
+        "input": "無（程式內建立）",
+        "output": "汪汪！\\n喵～"
+      },
+      "solution": "class Animal:\n    def make_sound(self):\n        print('動物發出聲音')\n\nclass Dog(Animal):\n    def make_sound(self):\n        print('汪汪！')\n\nclass Cat(Animal):\n    def make_sound(self):\n        print('喵～')\n\nd = Dog()\nc = Cat()\nd.make_sound()\nc.make_sound()"
+    }
+  ]
+}

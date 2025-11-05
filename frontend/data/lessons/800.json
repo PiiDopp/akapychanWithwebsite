@@ -1,0 +1,23 @@
+{
+  "ID": 800,
+  "coding_practice": [
+    {
+      "title": "模擬擲骰子遊戲",
+      "description": "請使用 random 模組，寫一個函數 roll_dice(n)，模擬擲 n 次六面骰，並回傳所有結果的串列。",
+      "examples": {
+        "input": "print(roll_dice(5))",
+        "output": "[3, 6, 1, 4, 2]   # (結果會隨機，每次可能不同)"
+      },
+      "solution": "import random\n\ndef roll_dice(n):\n    results = []\n    for _ in range(n):\n        results.append(random.randint(1, 6))\n    return results\n\n# 測試\nprint(roll_dice(5))"
+    },
+    {
+      "title": "計算程式執行時間",
+      "description": "請使用 time 模組，寫一個函數 measure_time(func, *args)，用來測量函數 func 執行所需的秒數，並回傳結果 (四捨五入到小數點 3 位)。",
+      "examples": {
+        "input": "import time\n\ndef slow_add(a, b):\n    time.sleep(2)\n    return a + b\n\nprint(measure_time(slow_add, 3, 5))",
+        "output": "約 2.0 秒 (依電腦執行環境略有差異)"
+      },
+      "solution": "import time\n\ndef measure_time(func, *args):\n    start = time.time()\n    func(*args)\n    end = time.time()\n    return round(end - start, 3)\n\n# 測試\nimport time\n\ndef slow_add(a, b):\n    time.sleep(2)\n    return a + b\n\nprint(measure_time(slow_add, 3, 5))  # 約 2.0"
+    }
+  ]
+}

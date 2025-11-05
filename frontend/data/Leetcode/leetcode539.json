@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode539",
+  "coding_practice": [
+    {
+      "title": "Minimum Time Difference",
+      "description": "Given a list of 24-hour clock time points in \"HH:MM\" format, return the minimum minutes difference between any two time-points in the list.",
+      "examples": [
+        {
+          "input": "[\"23:59\",\"00:00\"]",
+          "output": "1"
+        },
+        {
+          "input": "[\"00:00\",\"23:59\",\"00:00\"]",
+          "output": "0"
+        }
+      ],
+      "constraints": "2 <= timePoints.length <= 2 * 10^4\ntimePoints[i] is in the format \"HH:MM\".",
+      "solution": "class Solution:\n    def findMinDifference(self, timePoints):\n        minutes = []\n        for t in timePoints:\n            h, m = map(int, t.split(':'))\n            minutes.append(h * 60 + m)\n        minutes.sort()\n        min_diff = float('inf')\n        for i in range(1, len(minutes)):\n            min_diff = min(min_diff, minutes[i] - minutes[i - 1])\n        min_diff = min(min_diff, 1440 - (minutes[-1] - minutes[0]))\n        return min_diff",
+      "explanation": "1. 將每個時間字串轉換成分鐘數。\n2. 對所有分鐘數排序。\n3. 計算相鄰分鐘差的最小值。\n4. 特別處理跨越午夜的差值：1440 - (最後一個 - 第一個分鐘數)。\n5. 返回最小分鐘差。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

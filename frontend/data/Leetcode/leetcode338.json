@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode338",
+  "coding_practice": [
+    {
+      "title": "Counting Bits",
+      "description": "Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.",
+      "examples": [
+        {
+          "input": "n = 2",
+          "output": "[0,1,1]",
+          "explanation": "0 --> 0\n1 --> 1\n2 --> 10"
+        },
+        {
+          "input": "n = 5",
+          "output": "[0,1,1,2,1,2]",
+          "explanation": "0 --> 0\n1 --> 1\n2 --> 10\n3 --> 11\n4 --> 100\n5 --> 101"
+        }
+      ],
+      "constraints": "0 <= n <= 10^5",
+      "follow up": "It is very easy to come up with a solution with a runtime of O(n log n). Can you do it in linear time O(n) and possibly in a single pass?\nCan you do it without using any built-in function (i.e., like __builtin_popcount in C++)?",
+      "solution": "class Solution:\n    def countBits(self, n):\n        res = [0] * (n + 1)\n        for i in range(1, n + 1):\n            res[i] = res[i >> 1] + (i & 1)\n        return res",
+      "explanation": "1. 初始化長度為 n+1 的結果數組 res，res[0] = 0。\n2. 對於每個 i (1 到 n)，使用位運算計算 1 的個數：res[i] = res[i >> 1] + (i & 1)。\n3. res[i >> 1] 表示去掉最低位後的 1 的數量，(i & 1) 判斷最低位是否為 1。\n4. 返回 res 作為答案。",
+      "tag": "711",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "ID": 421,
+  "Title": "if 條件判斷",
+  "Intro": "\t在 Python 中，if 條件判斷用來決定是否執行某段程式碼。當條件成立 (結果為 True) 時，對應的縮排程式碼會被執行；若不成立，則會跳過該區塊。",
+  "exp": {
+    "cor_exp": [
+      "x = 10\nif x > 5:\n    print('x 大於 5')  # 條件成立，會輸出",
+      "y = 3\nif y == 3:\n    print('y 等於 3')  # 條件成立，會輸出"
+    ],
+    "mis_exp": [
+      "n = 7\nif n > 10:\nprint('大於 10')  # 錯誤：少了縮排，會導致 IndentationError",
+      "if a = 100:\n    print('ok')  # 錯誤：= 是指定運算子，判斷相等必須用 =="
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nif num > 0:\n    print('正數')  # 假設輸入 5",
+      "options": [
+        "A. 正數",
+        "B. 負數",
+        "C. 0",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "輸入 5，大於 0，因此 if 條件成立，會輸出『正數』。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nscore = 75\nif score >= 60:\n    print('及格')",
+      "options": [
+        "A. 75",
+        "B. 及格",
+        "C. 不及格",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "score >= 60 條件成立，因此會輸出『及格』。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nx = 5\nif x = 5:\n    print('x 等於 5')",
+      "options": [
+        "A. x 等於 5",
+        "B. True",
+        "C. 程式錯誤",
+        "D. None"
+      ],
+      "answer": "C",
+      "explanation": "判斷相等必須使用 ==，程式中使用 = 會導致語法錯誤。"
+    }
+  ]
+
+}

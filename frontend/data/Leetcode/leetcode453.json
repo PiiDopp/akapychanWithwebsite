@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode453",
+  "coding_practice": [
+    {
+      "title": "Minimum Moves to Equal Array Elements",
+      "description": "Given an integer array nums of size n, return the minimum number of moves required to make all array elements equal.\n\nIn one move, you can increment n - 1 elements of the array by 1.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "3",
+          "explanation": "Only three moves are needed (remember each move increments two elements): [1,2,3] => [2,3,3] => [3,4,3] => [4,4,4]"
+        },
+        {
+          "input": "nums = [1,1,1]",
+          "output": "0"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= nums.length <= 10^5\n-10^9 <= nums[i] <= 10^9\nThe answer is guaranteed to fit in a 32-bit integer.",
+      "solution": "class Solution:\n    def minMoves(self, nums):\n        return sum(nums) - min(nums) * len(nums)",
+      "explanation": "1. 注意到每次增加 n-1 個元素相當於減少最大元素以外的元素。\n2. 計算總和 sum(nums) 減去最小值乘以元素個數 min(nums) * len(nums)，即可得到最少移動次數。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

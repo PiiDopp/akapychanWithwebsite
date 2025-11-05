@@ -1,0 +1,50 @@
+{
+  "ID": 930,
+  "Title": "raise 主動拋出例外",
+  "Intro": "\t除了被動地捕捉錯誤之外，Python 也允許開發者使用 raise 主動拋出例外，以提醒或中斷不合理的程式狀況。此作法常用於輸入檢查、函式驗證或自訂錯誤機制。",
+  "exp": {
+    "cor_exp": [
+      "# 基本 raise 使用\nx = int(input('請輸入年齡: '))\nif x < 0:\n    raise ValueError('年齡不能為負數')\nelse:\n    print('你的年齡是', x)",
+      "# 搭配 try / except 捕捉自訂例外\ntry:\n    score = int(input('請輸入分數: '))\n    if score > 100:\n        raise ValueError('分數不得超過 100')\n    elif score < 0:\n        raise ValueError('分數不得小於 0')\n    print('分數有效')\nexcept ValueError as e:\n    print('輸入錯誤：', e)"
+    ],
+    "mis_exp": [
+      "# 錯誤：直接 raise 未指定錯誤類型\nx = -5\nif x < 0:\n    raise  # 錯誤：未指定例外物件或類型",
+      "# 錯誤：例外拋出但未處理\nx = -1\nif x < 0:\n    raise ValueError('輸入錯誤！')  # 若未使用 try/except，程式會中斷"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列程式若輸入 -3，會輸出什麼？\n\nx = int(input('輸入整數: '))\nif x < 0:\n    raise ValueError('不得輸入負數')\nelse:\n    print('輸入正確')",
+      "options": [
+        "A. 輸入正確",
+        "B. 不得輸入負數",
+        "C. ValueError: 不得輸入負數",
+        "D. 程式錯誤"
+      ],
+      "answer": "C",
+      "explanation": "程式未使用 try/except，因此會直接顯示系統錯誤訊息 ValueError。"
+    },
+    {
+      "question": "執行下列程式時，若輸入 120，會輸出什麼？\n\ntry:\n    score = int(input('請輸入分數: '))\n    if score > 100:\n        raise ValueError('分數超出範圍')\n    print('分數為', score)\nexcept ValueError as e:\n    print('錯誤：', e)",
+      "options": [
+        "A. 分數為 120",
+        "B. 錯誤： 分數超出範圍",
+        "C. 錯誤： ValueError",
+        "D. 程式中斷"
+      ],
+      "answer": "B",
+      "explanation": "輸入 120 會觸發 raise，except 捕捉錯誤並輸出訊息『錯誤： 分數超出範圍』。"
+    },
+    {
+      "question": "關於 raise 的敘述，下列何者正確？",
+      "options": [
+        "A. raise 只能用在 except 區塊中",
+        "B. raise 可主動拋出例外，用來提醒或中斷不合法狀況",
+        "C. raise 不會造成程式中斷",
+        "D. raise 只能拋出 ValueError 類型"
+      ],
+      "answer": "B",
+      "explanation": "raise 可以主動拋出任何例外類型，如 ValueError、TypeError 等，用於檢查或警告。"
+    }
+  ]
+}

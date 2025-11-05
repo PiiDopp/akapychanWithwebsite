@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode318",
+  "coding_practice": [
+    {
+      "title": "Maximum Product of Word Lengths",
+      "description": "Given a string array words, return the maximum value of length(word[i]) * length(word[j]) where the two words do not share common letters. If no such two words exist, return 0.",
+      "examples": [
+        {
+          "input": "words = [\"abcw\",\"baz\",\"foo\",\"bar\",\"xtfn\",\"abcdef\"]",
+          "output": "16",
+          "explanation": "The two words can be \"abcw\", \"xtfn\"."
+        },
+        {
+          "input": "words = [\"a\",\"ab\",\"abc\",\"d\",\"cd\",\"bcd\",\"abcd\"]",
+          "output": "4",
+          "explanation": "The two words can be \"ab\", \"cd\"."
+        },
+        {
+          "input": "words = [\"a\",\"aa\",\"aaa\",\"aaaa\"]",
+          "output": "0",
+          "explanation": "No such pair of words."
+        }
+      ],
+      "constraints": "2 <= words.length <= 1000\n1 <= words[i].length <= 1000\nwords[i] consists only of lowercase English letters.",
+      "solution": "class Solution:\n    def maxProduct(self, words):\n        n = len(words)\n        masks = [0]*n\n        for i, word in enumerate(words):\n            mask = 0\n            for ch in word:\n                mask |= 1 << (ord(ch) - ord('a'))\n            masks[i] = mask\n        \n        max_prod = 0\n        for i in range(n):\n            for j in range(i+1, n):\n                if masks[i] & masks[j] == 0:\n                    max_prod = max(max_prod, len(words[i]) * len(words[j]))\n        return max_prod",
+      "explanation": "1. 將每個單詞轉換為 26 位二進制掩碼，代表包含的字母。\n2. 遍歷所有單詞對，檢查掩碼是否有重疊。\n3. 若沒有重疊，計算兩單詞長度乘積，更新最大值。\n4. 返回最大乘積作為結果。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

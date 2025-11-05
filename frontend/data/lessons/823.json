@@ -1,0 +1,55 @@
+{
+  "ID": 823,
+  "Title": "datetime 模組",
+  "Intro": "\tdatetime 模組比 time 更強大，提供 日期 (date)、時間 (time)、日期時間 (datetime) 等物件。適合用來處理 日期計算、格式化輸出、時間差運算。",
+  "exp": {
+    "cor_exp": [
+      "import datetime",
+      "取得現在時間\nnow = datetime.datetime.now()\nprint(now)  # 2025-09-14 22:30:45.123456",
+      "建立指定日期時間\nd = datetime.datetime(2025, 12, 25, 10, 30, 0)\nprint(d)  # 2025-12-25 10:30:00",
+      "日期物件與時間物件\ntoday = datetime.date.today()\nprint(today)        # 2025-09-14\nprint(today.year)   # 2025\nprint(today.month)  # 9\nprint(today.day)    # 14\n\nt = datetime.time(14, 20, 30)\nprint(t)            # 14:20:30",
+      "日期運算（timedelta）\ntoday = datetime.date.today()\ntomorrow = today + datetime.timedelta(days=1)\nyesterday = today - datetime.timedelta(days=1)\nprint(\"今天:\", today, \"明天:\", tomorrow, \"昨天:\", yesterday)",
+      "格式化輸出（strftime）\nnow = datetime.datetime.now()\nprint(now.strftime(\"%Y-%m-%d %H:%M:%S\"))  # 2025-09-14 22:35:00",
+      "解析字串成日期（strptime）\ntime_str = \"2025-09-14 22:35:00\"\ndt = datetime.datetime.strptime(time_str, \"%Y-%m-%d %H:%M:%S\")\nprint(dt)  # 2025-09-14 22:35:00",
+      "取得 UTC 時間\nutc_now = datetime.datetime.utcnow()\nprint(\"UTC:\", utc_now)"
+    ],
+    "mis_exp": [
+      "1. date / time / datetime：三種物件分別處理「日期」、「時間」、「日期+時間」。\n2. timedelta：非常適合做「日期加減運算」，例如「N 天後」、「一週前」。\n3. strftime / strptime：strftime → datetime → 字串；strptime → 字串 → datetime。\n4. 時區處理：進階用法可以搭配 pytz 或 zoneinfo。"
+    ]
+  },
+   "practice": [
+    {
+      "question": "在 Python 中，執行下列程式碼會輸出什麼型別？\n\nimport datetime\nnow = datetime.datetime.now()\nprint(type(now))",
+      "options": [
+        "A. <class 'time'>",
+        "B. <class 'date'>",
+        "C. <class 'datetime.datetime'>",
+        "D. <class 'str'>"
+      ],
+      "answer": "C",
+      "explanation": "datetime.now() 會回傳 datetime.datetime 物件。"
+    },
+    {
+      "question": "下列哪一個可以正確取得今天的日期（不包含時間）？",
+      "options": [
+        "A. datetime.datetime.today()",
+        "B. datetime.date.today()",
+        "C. datetime.time.today()",
+        "D. datetime.now().date"
+      ],
+      "answer": "B",
+      "explanation": "datetime.date.today() 會回傳當天的日期，只有年月日。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nimport datetime\ndt = datetime.datetime.strptime(\"2025-09-14 22:35:00\", \"%Y-%m-%d %H:%M:%S\")\nprint(dt.year, dt.month, dt.day)",
+      "options": [
+        "A. 2025 9 14",
+        "B. 2025 14 9",
+        "C. '2025-09-14'",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "strptime() 會把字串轉換成 datetime 物件，因此可以分別取得 year=2025、month=9、day=14。"
+    }
+  ]
+}

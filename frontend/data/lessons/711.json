@@ -1,0 +1,50 @@
+{
+  "ID": 711,
+  "Title": "自訂函數",
+  "Intro": "\t在程式設計裡，函數就像是一個「小工具」或「小機器」，可以把程式碼包裝起來，等需要時再呼叫。\n它可以：\n\n1. 減少重複程式碼（寫一次，多次使用）。\n2. 讓程式更有結構（分工明確，容易維護）。\n3. 提高程式的可讀性與可重用性。\n\n在 Python 中，除了使用內建函數（例如 print()、len()），我們也可以自己定義新的函數，來完成特定的任務。這樣可以讓程式更有結構、重複使用，減少一再撰寫相同的程式碼。",
+  "exp": {
+    "cor_exp": [
+      "def 函數名稱(參數1, 參數2, ...):\n    # 這裡是要執行的程式\n    return 結果  # 可以選擇回傳值",
+      "# 定義一個函數，計算兩數的和\ndef add_numbers(a, b):\n    return a + b\n\n# 呼叫函數\nresult = add_numbers(3, 5)\nprint(result)  # 輸出 8"
+    ],
+    "mis_exp": [
+      "def add(a, b):\n    return a + b\n\nprint(add(3))        # 少一個參數\nprint(add(3, 4, 5))  # 多了一個參數\n\n# 錯誤 : 呼叫時傳入的參數數量，必須跟函數定義一致。",
+      "def sum(a, b):\n    return a + b\n\nprint(sum([1, 2, 3]))  # 會出錯，因為把 Python 內建的 sum() 蓋掉了\n\n# 錯誤 : 建議避免用 Python 內建函數名稱（如 sum、len、list）。"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個是正確自訂函數的語法？",
+      "options": [
+        "A. function add(a, b): return a + b",
+        "B. def add(a, b): return a + b",
+        "C. add def(a, b): return a + b",
+        "D. define add(a, b): return a + b"
+      ],
+      "answer": "B",
+      "explanation": "在 Python 中自訂函數必須用 def 關鍵字。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ndef greet():\n    return \"Hello\"\n\nprint(greet())",
+      "options": [
+        "A. greet",
+        "B. Hello",
+        "C. None",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "呼叫 greet() 時會回傳字串 \"Hello\"，再由 print() 輸出。"
+    },
+    {
+      "question": "以下哪個程式碼會造成錯誤？",
+      "options": [
+        "A. def add(a, b): return a + b\n\nprint(add(3, 5))",
+        "B. def say_hi(name):\n    print(\"Hi,\", name)\n\nsay_hi(\"Alice\")",
+        "C. def add(a, b): return a + b\n\nprint(add(10))",
+        "D. def hello():\n    print(\"Hello, World!\")\n\nhello()"
+      ],
+      "answer": "C",
+      "explanation": "函數 add(a, b) 需要兩個參數，呼叫時只傳一個 10，會造成缺少參數的錯誤。"
+    }
+  ]
+}

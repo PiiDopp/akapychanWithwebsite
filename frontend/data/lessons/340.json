@@ -1,0 +1,54 @@
+{
+  "ID": 340,
+  "Title": "邏輯運算",
+  "Intro": "\t在 Python 中，邏輯運算子用來結合多個條件，運算結果為布林值 (True 或 False)。常見的邏輯運算子有：and（且，兩者都為真才為真）、or（或，只要有一個為真即為真）、not（非，將布林值反轉）。",
+  "exp": {
+    "cor_exp": [
+      "x = 10\ny = 20\nprint(x > 5 and y > 15)  # True，兩個條件都成立",
+      "print(x > 15 and y > 15)  # False，左邊條件不成立",
+      "print(x > 5 or y < 10)  # True，只要有一個條件成立",
+      "print(x < 5 or y < 10)  # False，兩個條件都不成立",
+      "print(not (x > 5))  # False，原本為 True，加上 not 變成 False"
+    ],
+    "mis_exp": [
+      "x = 10\ny = 5\nprint(x && y)  # 錯誤：Python 沒有 &&，應該用 and",
+      "print(x || y)  # 錯誤：Python 沒有 ||，應該用 or",
+      "print(!x > 5)  # 錯誤：Python 沒有 !，應該用 not"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nprint(num > 0 and num < 100)  # 假設輸入 50",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. 50",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "50 同時大於 0 且小於 100，因此運算結果為 True。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nage = 70\nprint(age < 18 or age >= 65)",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. 70",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "age = 70，大於等於 65，因此 or 運算結果為 True。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nflag = True\nprint(not flag)",
+      "options": [
+        "A. True",
+        "B. False",
+        "C. None",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "flag 原本是 True，加上 not 後變為 False。"
+    }
+  ]
+}

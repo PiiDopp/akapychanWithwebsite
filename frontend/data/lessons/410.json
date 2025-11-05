@@ -1,0 +1,65 @@
+{
+  "ID": 410,
+  "Title": "順序結構",
+  "Intro": "\t順序結構是程式的基本結構之一，指程式碼會依照書寫順序從上到下依次執行。每一行程式碼都會被依序執行，沒有分支或迴圈。",
+  "exp": {
+    "cor_exp": [
+      "print('Hello')\nprint('World')  # 輸出：Hello 然後 World",
+      "x = 5\ny = 10\nsum = x + y\nprint(sum)  # 輸出 15",
+      "a = 3\nb = 4\nc = a * b\nprint(c)  # 輸出 12",
+      "name = input('請輸入名字: ')\nprint('你好', name)  # 依序執行輸入與輸出"
+    ],
+    "mis_exp": [
+      "print('Hello'  # 錯誤：缺少右括號",
+      "x = 5 +  # 錯誤：運算不完整",
+      "a = 3\nb = 4\nc = a *\nprint(c)  # 錯誤：運算符號後缺少數值"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nprint('姓名')\nprint('年齡')",
+      "options": [
+        "A. 姓名年齡",
+        "B. 姓名\n年齡",
+        "C. '姓名' '年齡'",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "程式依序執行，每個 print() 換行輸出，因此結果為兩行：姓名 然後 年齡。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nx = 5\ny = 10\nsum = x + y\nprint(sum)",
+      "options": [
+        "A. 510",
+        "B. 15",
+        "C. 5+10",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "順序執行計算 sum = x + y，5 + 10 = 15，再輸出。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nprint(num**2)  # 假設輸入 4",
+      "options": [
+        "A. 8",
+        "B. 16",
+        "C. 4",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "輸入 4，計算平方 4**2=16，再輸出。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nprint('Hello' \nprint('World'))",
+      "options": [
+        "A. Hello World",
+        "B. 'Hello' 'World'",
+        "C. 程式錯誤",
+        "D. Hello\nWorld"
+      ],
+      "answer": "C",
+      "explanation": "第一個 print() 缺少右括號，會導致語法錯誤。"
+    }
+  ]
+
+}

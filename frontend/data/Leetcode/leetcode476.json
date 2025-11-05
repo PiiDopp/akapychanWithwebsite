@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode476",
+  "coding_practice": [
+    {
+      "title": "Number Complement",
+      "description": "The complement of an integer is the integer you get when you flip all the 0's to 1's and all the 1's to 0's in its binary representation.\n\nFor example, The integer 5 is \"101\" in binary and its complement is \"010\" which is the integer 2.\nGiven an integer num, return its complement.",
+      "examples": [
+        {
+          "input": "num = 5",
+          "output": "2",
+          "explanation": "The binary representation of 5 is 101 (no leading zero bits), and its complement is 010. So you need to output 2."
+        },
+        {
+          "input": "num = 1",
+          "output": "0",
+          "explanation": "The binary representation of 1 is 1 (no leading zero bits), and its complement is 0. So you need to output 0."
+        }
+      ],
+      "constraints": "1 <= num < 2^31",
+      "note": "This question is the same as 1009. Complement of Base 10 Integer",
+      "solution": "class Solution:\n    def findComplement(self, num):\n        # 計算 num 的二進位長度\n        bit_length = num.bit_length()\n        # 全 1 掩碼\n        mask = (1 << bit_length) - 1\n        # 反相 num 並與掩碼做 AND\n        return num ^ mask",
+      "explanation": "1. 先計算 num 的二進位長度 bit_length。\n2. 建立全 1 掩碼 mask = (1 << bit_length) - 1，掩碼的每一位都是 1，與 num 的二進位長度一致。\n3. 對 num 執行 XOR 運算 num ^ mask，可以將每一位反轉得到補數。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

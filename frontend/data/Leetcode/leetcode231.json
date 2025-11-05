@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode231",
+  "coding_practice": [
+    {
+      "title": "Power of Two",
+      "description": "Given an integer n, return true if it is a power of two. Otherwise, return false.\n\nAn integer n is a power of two, if there exists an integer x such that n == 2^x.",
+      "examples": [
+        {
+          "input": "n = 1",
+          "output": "true",
+          "explanation": "2^0 = 1"
+        },
+        {
+          "input": "n = 16",
+          "output": "true",
+          "explanation": "2^4 = 16"
+        },
+        {
+          "input": "n = 3",
+          "output": "false"
+        }
+      ],
+      "constraints": "-2^31 <= n <= 2^31 - 1",
+      "follow up": "Could you solve it without loops/recursion?",
+      "solution": "class Solution:\n    def isPowerOfTwo(self, n):\n        if n <= 0:\n            return False\n        return (n & (n - 1)) == 0",
+      "explanation": "1. 負數和 0 不可能是 2 的冪。\n2. 2 的冪的二進位表示中只有一個 1，例如 1(1), 2(10), 4(100) 等。\n3. 使用 n & (n-1) 方法可以快速判斷是否只有一個 1。\n4. 返回判斷結果。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

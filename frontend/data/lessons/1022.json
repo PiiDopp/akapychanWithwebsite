@@ -1,0 +1,52 @@
+{
+  "ID": 1022,
+  "Title": "map() / filter() / reduce() 函數應用",
+  "Intro": "\tmap()、filter()、reduce() 是 Python 常用的高階函數，可搭配 lambda 進行資料處理。map() 用來對序列中的每個元素做轉換，filter() 用來篩選符合條件的元素，而 reduce() 用於將序列中的值逐步累加或合併（需搭配 functools 模組）。",
+  "exp": {
+    "cor_exp": [
+      "# map() 對每個元素做運算\nnums = [1, 2, 3, 4, 5]\nsquares = list(map(lambda x: x ** 2, nums))\nprint(squares)  # [1, 4, 9, 16, 25]",
+      "# filter() 篩選符合條件的資料\nnums = [10, 15, 20, 25, 30]\neven_nums = list(filter(lambda n: n % 2 == 0, nums))\nprint(even_nums)  # [10, 20, 30]",
+      "# reduce() 累積運算\nfrom functools import reduce\nnums = [1, 2, 3, 4, 5]\nsum_all = reduce(lambda a, b: a + b, nums)\nprint(sum_all)  # 15"
+    ],
+    "mis_exp": [
+      "# 錯誤：map 結果未轉為 list\nnums = [1, 2, 3]\nsquares = map(lambda x: x ** 2, nums)\nprint(squares)  # 輸出 <map object>，未顯示內容",
+      "# 錯誤：reduce 未匯入模組\nnums = [1, 2, 3]\nresult = reduce(lambda a, b: a + b, nums)  # NameError: reduce 未定義",
+      "# 錯誤：filter 條件錯誤\nnums = [1, 2, 3, 4]\nevens = list(filter(lambda x: x, nums))  # 錯誤邏輯：未判斷條件，會保留全部元素"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式結果為何？\n\nnums = [1, 2, 3]\nresult = list(map(lambda x: x * 3, nums))\nprint(result)",
+      "options": [
+        "A. [1, 2, 3]",
+        "B. [3, 6, 9]",
+        "C. [x * 3, x * 3, x * 3]",
+        "D. 錯誤語法"
+      ],
+      "answer": "B",
+      "explanation": "map() 會將每個元素乘以 3，結果為 [3, 6, 9]。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nnums = [5, 8, 11, 14]\nresult = list(filter(lambda x: x % 2 == 0, nums))\nprint(result)",
+      "options": [
+        "A. [5, 11]",
+        "B. [8, 14]",
+        "C. [5, 8, 11, 14]",
+        "D. []"
+      ],
+      "answer": "B",
+      "explanation": "filter() 會保留偶數元素，因此結果為 [8, 14]。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nfrom functools import reduce\nnums = [2, 3, 4]\nresult = reduce(lambda a, b: a * b, nums)\nprint(result)",
+      "options": [
+        "A. 9",
+        "B. 24",
+        "C. 20",
+        "D. 錯誤語法"
+      ],
+      "answer": "B",
+      "explanation": "reduce() 依序計算 2×3×4 = 24。"
+    }
+  ]
+}

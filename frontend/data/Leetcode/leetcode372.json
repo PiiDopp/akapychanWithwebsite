@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode372",
+  "coding_practice": [
+    {
+      "title": "Super Pow",
+      "description": "Your task is to calculate a^b mod 1337 where a is a positive integer and b is an extremely large positive integer given in the form of an array.",
+      "examples": [
+        {
+          "input": "a = 2, b = [3]",
+          "output": "8"
+        },
+        {
+          "input": "a = 2, b = [1,0]",
+          "output": "1024"
+        },
+        {
+          "input": "a = 1, b = [4,3,3,8,5,2]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= a <= 2^31 - 1\n1 <= b.length <= 2000\n0 <= b[i] <= 9\nb does not contain leading zeros.",
+      "solution": "class Solution:\n    def superPow(self, a, b):\n        MOD = 1337\n        result = 1\n        for digit in b:\n            result = pow(result, 10, MOD) * pow(a, digit, MOD) % MOD\n        return result",
+      "explanation": "1. 初始化結果 result 為 1，並設定 MOD 為 1337。\n2. 遍歷 b 陣列中的每一個數字。\n3. 對每個數字，先將當前結果 result 提到 10 次方再對 MOD 取餘，然後乘上 a 的該數字次方再對 MOD 取餘。\n4. 每次乘法後都對 1337 取餘，以避免數值溢位。\n5. 返回最終結果。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

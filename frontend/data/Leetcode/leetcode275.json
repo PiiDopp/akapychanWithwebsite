@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode275",
+  "coding_practice": [
+    {
+      "title": "H-Index II",
+      "description": "Given an array of integers citations where citations[i] is the number of citations a researcher received for their ith paper and citations is sorted in non-descending order, return the researcher's h-index. \n\nAccording to the definition of h-index on Wikipedia: The h-index is defined as the maximum value of h such that the given researcher has published at least h papers that have each been cited at least h times.\n\nYou must write an algorithm that runs in logarithmic time.",
+      "examples": [
+        {
+          "input": "citations = [0,1,3,5,6]",
+          "output": "3",
+          "explanation": "[0,1,3,5,6] means the researcher has 5 papers in total and each of them had received 0, 1, 3, 5, 6 citations respectively.\nSince the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, their h-index is 3."
+        },
+        {
+          "input": "citations = [1,2,100]",
+          "output": "2"
+        }
+      ],
+      "constraints": "n == citations.length\n1 <= n <= 10^5\n0 <= citations[i] <= 1000\ncitations is sorted in ascending order.",
+      "solution": "class Solution:\n    def hIndex(self, citations):\n        n = len(citations)\n        left, right = 0, n - 1\n        while left <= right:\n            mid = (left + right) // 2\n            if citations[mid] == n - mid:\n                return n - mid\n            elif citations[mid] < n - mid:\n                left = mid + 1\n            else:\n                right = mid - 1\n        return n - left",
+      "explanation": "1. 使用二分搜尋法在排序好的 citations 陣列中查找符合 h-index 條件的最小索引。\n2. 如果 citations[mid] 等於剩餘論文數 n - mid，則直接返回 n - mid。\n3. 如果 citations[mid] 小於 n - mid，代表需要更多引用，向右搜索。\n4. 如果 citations[mid] 大於 n - mid，向左搜索。\n5. 返回 n - left 作為最終的 h-index。",
+      "tag": "530",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode312",
+  "coding_practice": [
+    {
+      "title": "Burst Balloons",
+      "description": "You are given n balloons, indexed from 0 to n - 1. Each balloon is painted with a number on it represented by an array nums. You are asked to burst all the balloons.\n\nIf you burst the ith balloon, you will get nums[i - 1] * nums[i] * nums[i + 1] coins. If i - 1 or i + 1 goes out of bounds of the array, then treat it as if there is a balloon with a 1 painted on it.\n\nReturn the maximum coins you can collect by bursting the balloons wisely.",
+      "examples": [
+        {
+          "input": "nums = [3,1,5,8]",
+          "output": "167",
+          "explanation": "nums = [3,1,5,8] --> [3,5,8] --> [3,8] --> [8] --> []\ncoins = 3*1*5 + 3*5*8 + 1*3*8 + 1*8*1 = 167"
+        },
+        {
+          "input": "nums = [1,5]",
+          "output": "10"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 300\n0 <= nums[i] <= 100",
+      "solution": "class Solution:\n    def maxCoins(self, nums):\n        # 在前後加 1 方便計算\n        nums = [1] + nums + [1]\n        n = len(nums)\n        dp = [[0]*n for _ in range(n)]\n        \n        # 遍歷所有長度\n        for length in range(2, n):\n            for left in range(0, n - length):\n                right = left + length\n                # i 為最後一個被戳破的氣球\n                for i in range(left + 1, right):\n                    dp[left][right] = max(dp[left][right],\n                                          nums[left]*nums[i]*nums[right] + dp[left][i] + dp[i][right])\n        return dp[0][n-1]",
+      "explanation": "1. 在 nums 前後加 1，以方便計算邊界情況。\n2. 使用 DP，dp[left][right] 表示開區間 (left, right) 中能獲得的最大硬幣數。\n3. 遍歷所有可能的區間長度，並嘗試每個區間內的氣球作為最後一個戳破的氣球。\n4. dp[left][right] = max(dp[left][right], nums[left]*nums[i]*nums[right] + dp[left][i] + dp[i][right])。\n5. 返回 dp[0][n-1] 作為最終答案。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

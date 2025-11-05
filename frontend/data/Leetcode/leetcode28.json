@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode28",
+  "coding_practice": [
+    {
+      "title": "Implement strStr()",
+      "description": "Given two strings needle and haystack, return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.",
+      "examples": [
+        {
+          "input": "haystack = \"sadbutsad\", needle = \"sad\"",
+          "output": "0",
+          "explanation": "\"sad\" occurs at index 0 and 6.\nThe first occurrence is at index 0, so we return 0."
+        },
+        {
+          "input": "haystack = \"leetcode\", needle = \"leeto\"",
+          "output": "-1",
+          "explanation": "\"leeto\" did not occur in \"leetcode\", so we return -1."
+        }
+      ],
+      "constraints": "1 <= haystack.length, needle.length <= 10^4\nhaystack and needle consist of only lowercase English characters.",
+      "solution": "class Solution(object):\n    def strStr(self, haystack, needle):\n        \"\"\"\n        :type haystack: str\n        :type needle: str\n        :rtype: int\n        \"\"\"\n        if not needle:\n            return 0\n        \n        n, m = len(haystack), len(needle)\n        for i in range(n - m + 1):\n            if haystack[i:i+m] == needle:\n                return i\n        return -1",
+      "explanation": "1. 若 needle 為空字串，返回 0。\n2. 遍歷 haystack 的每個起始位置，檢查長度為 len(needle) 的子字串是否等於 needle。\n3. 找到匹配返回索引，未找到返回 -1。\n4. 時間複雜度 O((n-m+1)*m)，空間複雜度 O(1)。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

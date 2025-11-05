@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode383",
+  "coding_practice": [
+    {
+      "title": "Ransom Note",
+      "description": "Given two strings ransomNote and magazine, return true if ransomNote can be constructed by using the letters from magazine and false otherwise.\n\nEach letter in magazine can only be used once in ransomNote.",
+      "examples": [
+        {
+          "input": "ransomNote = \"a\", magazine = \"b\"",
+          "output": "false"
+        },
+        {
+          "input": "ransomNote = \"aa\", magazine = \"ab\"",
+          "output": "false"
+        },
+        {
+          "input": "ransomNote = \"aa\", magazine = \"aab\"",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= ransomNote.length, magazine.length <= 10^5\nransomNote and magazine consist of lowercase English letters.",
+      "solution": "import collections\n\nclass Solution:\n    def canConstruct(self, ransomNote, magazine):\n        ransom_count = collections.Counter(ransomNote)\n        magazine_count = collections.Counter(magazine)\n        \n        for char in ransom_count:\n            if ransom_count[char] > magazine_count.get(char, 0):\n                return False\n        return True",
+      "explanation": "1. 使用 Counter 計算 ransomNote 和 magazine 中每個字母出現的次數。\n2. 遍歷 ransomNote 的字母，檢查 magazine 中相應字母是否足夠。\n3. 若有任何字母不足，返回 False。\n4. 若所有字母數量足夠，返回 True。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

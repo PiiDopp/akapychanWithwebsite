@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode215",
+  "coding_practice": [
+    {
+      "title": "Kth Largest Element in an Array",
+      "description": "Given an integer array nums and an integer k, return the k^th largest element in the array.\n\nNote that it is the k^th largest element in the sorted order, not the k^th distinct element.\nCan you solve it without sorting?",
+      "examples": [
+        {
+          "input": "nums = [3,2,1,5,6,4], k = 2",
+          "output": "5"
+        },
+        {
+          "input": "nums = [3,2,3,1,2,4,5,5,6], k = 4",
+          "output": "4"
+        }
+      ],
+      "constraints": "1 <= k <= nums.length <= 10^5\n-10^4 <= nums[i] <= 10^4",
+      "solution": "import heapq\n\nclass Solution:\n    def findKthLargest(self, nums, k):\n        heap = nums[:k]\n        heapq.heapify(heap)\n        for num in nums[k:]:\n            if num > heap[0]:\n                heapq.heappop(heap)\n                heapq.heappush(heap, num)\n        return heap[0]",
+      "explanation": "1. 建立一個大小為 k 的小頂堆，初始放入前 k 個元素。\n2. 遍歷剩餘元素，如果比堆頂大，則彈出堆頂並加入該元素，保持堆大小為 k。\n3. 最後堆頂就是第 k 大元素。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

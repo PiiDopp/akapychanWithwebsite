@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode442",
+  "coding_practice": [
+    {
+      "title": "Find All Duplicates in an Array",
+      "description": "Given an integer array nums of length n where all the integers of nums are in the range [1, n] and each integer appears at most twice, return an array of all the integers that appears twice.\n\nYou must write an algorithm that runs in O(n) time and uses only constant auxiliary space, excluding the space needed to store the output.",
+      "examples": [
+        {
+          "input": "nums = [4,3,2,7,8,2,3,1]",
+          "output": "[2,3]"
+        },
+        {
+          "input": "nums = [1,1,2]",
+          "output": "[1]"
+        },
+        {
+          "input": "nums = [1]",
+          "output": "[]"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 10^5\n1 <= nums[i] <= n\nEach element in nums appears once or twice.",
+      "solution": "class Solution:\n    def findDuplicates(self, nums):\n        res = []\n        for num in nums:\n            index = abs(num) - 1\n            if nums[index] < 0:\n                res.append(abs(num))\n            else:\n                nums[index] = -nums[index]\n        return res",
+      "explanation": "1. 遍歷 nums，每個數字 num 對應索引 index = abs(num) - 1。\n2. 如果 nums[index] 已經為負數，表示 num 重複，加入結果。\n3. 否則將 nums[index] 取負，標記該數字已出現過。\n4. 返回所有重複數字的列表。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

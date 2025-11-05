@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode201",
+  "coding_practice": [
+    {
+      "title": "Bitwise AND of Numbers Range",
+      "description": "Given two integers left and right that represent the range [left, right], return the bitwise AND of all numbers in this range, inclusive.",
+      "examples": [
+        {
+          "input": "left = 5, right = 7",
+          "output": "4"
+        },
+        {
+          "input": "left = 0, right = 0",
+          "output": "0"
+        },
+        {
+          "input": "left = 1, right = 2147483647",
+          "output": "0"
+        }
+      ],
+      "constraints": "0 <= left <= right <= 2^31 - 1",
+      "solution": "class Solution:\n    def rangeBitwiseAnd(self, left, right):\n        shift = 0\n        while left < right:\n            left >>= 1\n            right >>= 1\n            shift += 1\n        return left << shift",
+      "explanation": "1. 將 left 和 right 向右位移，直到兩者相等。\n2. 每位移一次，計數 shift。\n3. 將相等的 left 左移回原位，得到整個區間的 AND 結果。",
+      "tag": "723",
+      "difficult": "medium"
+    }
+  ]
+}

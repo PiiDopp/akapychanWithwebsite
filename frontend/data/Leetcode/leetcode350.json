@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode350",
+  "coding_practice": [
+    {
+      "title": "Intersection of Two Arrays II",
+      "description": "Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must appear as many times as it shows in both arrays and you may return the result in any order.",
+      "examples": [
+        {
+          "input": "nums1 = [1,2,2,1], nums2 = [2,2]",
+          "output": "[2,2]"
+        },
+        {
+          "input": "nums1 = [4,9,5], nums2 = [9,4,9,8,4]",
+          "output": "[4,9]",
+          "explanation": "[9,4] is also accepted."
+        }
+      ],
+      "constraints": "1 <= nums1.length, nums2.length <= 1000\n0 <= nums1[i], nums2[i] <= 1000",
+      "follow up": "What if the given array is already sorted? How would you optimize your algorithm?\nWhat if nums1's size is small compared to nums2's size? Which algorithm is better?\nWhat if elements of nums2 are stored on disk, and the memory is limited such that you cannot load all elements into the memory at once?",
+      "solution": "class Solution:\n    def intersect(self, nums1, nums2):\n        from collections import Counter\n        c1, c2 = Counter(nums1), Counter(nums2)\n        res = []\n        for num in c1:\n            if num in c2:\n                res.extend([num] * min(c1[num], c2[num]))\n        return res",
+      "explanation": "1. 使用 Counter 統計 nums1 和 nums2 中每個數字出現的次數。\n2. 遍歷 nums1 的元素，若該元素在 nums2 中也存在，則將其最小出現次數加入結果。\n3. 返回結果列表。",
+      "tag": "631",
+      "difficult": "easy"
+    }
+  ]
+}

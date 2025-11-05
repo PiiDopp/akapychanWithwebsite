@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode521",
+  "coding_practice": [
+    {
+      "title": "Longest Uncommon Subsequence I",
+      "description": "Given two strings a and b, return the length of the longest uncommon subsequence between a and b. If no such uncommon subsequence exists, return -1.\n\nAn uncommon subsequence between two strings is a string that is a subsequence of exactly one of them.",
+      "examples": [
+        {
+          "input": "\"aba\", \"cdc\"",
+          "output": "3",
+          "explanation": "One longest uncommon subsequence is \"aba\" because \"aba\" is a subsequence of \"aba\" but not \"cdc\". Note that \"cdc\" is also a longest uncommon subsequence."
+        },
+        {
+          "input": "\"aaa\", \"bbb\"",
+          "output": "3",
+          "explanation": "The longest uncommon subsequences are \"aaa\" and \"bbb\"."
+        },
+        {
+          "input": "\"aaa\", \"aaa\"",
+          "output": "-1",
+          "explanation": "Every subsequence of string a is also a subsequence of string b. Similarly, every subsequence of string b is also a subsequence of string a. So the answer would be -1."
+        }
+      ],
+      "constraints": "1 <= a.length, b.length <= 100\na and b consist of lower-case English letters.",
+      "solution": "class Solution:\n    def findLUSlength(self, a, b):\n        if a == b:\n            return -1\n        return max(len(a), len(b))",
+      "explanation": "1. 若 a 與 b 完全相同，則不存在不相同的子序列，返回 -1。\n2. 若 a 與 b 不同，則較長的字串本身就是不相同的子序列，直接返回 max(len(a), len(b))。",
+      "tag": "723",
+      "difficult": "easy"
+    }
+  ]
+}

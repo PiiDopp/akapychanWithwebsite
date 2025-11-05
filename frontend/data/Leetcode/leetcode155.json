@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode155",
+  "coding_practice": [
+    {
+      "title": "Min Stack",
+      "description": "Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.\n\nImplement the MinStack class:\n\nMinStack() initializes the stack object.\nvoid push(int val) pushes the element val onto the stack.\nvoid pop() removes the element on the top of the stack.\nint top() gets the top element of the stack.\nint getMin() retrieves the minimum element in the stack.\nYou must implement a solution with O(1) time complexity for each function.",
+      "examples": [
+        {
+          "input": "[\"MinStack\",\"push\",\"push\",\"push\",\"getMin\",\"pop\",\"top\",\"getMin\"],[[],[-2],[0],[-3],[],[],[],[]]",
+          "output": "[null,null,null,null,-3,null,0,-2]",
+          "explanation": "MinStack minStack = new MinStack();\nminStack.push(-2);\nminStack.push(0);\nminStack.push(-3);\nminStack.getMin(); // return -3\nminStack.pop();\nminStack.top();    // return 0\nminStack.getMin(); // return -2"
+        }
+      ],
+      "constraints": "-2^31 <= val <= 2^31 - 1\nMethods pop, top and getMin operations will always be called on non-empty stacks.\nAt most 3 * 10^4 calls will be made to push, pop, top, and getMin.",
+      "solution": "class MinStack:\n\n    def __init__(self):\n        self.stack = []\n        self.min_stack = []\n\n    def push(self, val):\n        self.stack.append(val)\n        if not self.min_stack or val <= self.min_stack[-1]:\n            self.min_stack.append(val)\n\n    def pop(self):\n        if self.stack:\n            val = self.stack.pop()\n            if val == self.min_stack[-1]:\n                self.min_stack.pop()\n\n    def top(self):\n        if self.stack:\n            return self.stack[-1]\n\n    def getMin(self):\n        if self.min_stack:\n            return self.min_stack[-1]",
+      "explanation": "1. 使用兩個 stack: 一個存原始元素 stack，另一個維護目前最小值 min_stack。\n2. push 時，如果 val <= min_stack 最上層元素，push 到 min_stack。\n3. pop 時，如果 pop 出的元素等於 min_stack 最上層元素，也 pop min_stack。\n4. top() 回傳 stack 最上層元素；getMin() 回傳 min_stack 最上層元素。\n5. 所有操作都是 O(1) 時間。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

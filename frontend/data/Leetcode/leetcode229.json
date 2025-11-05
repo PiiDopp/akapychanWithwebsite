@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode229",
+  "coding_practice": [
+    {
+      "title": "Majority Element II",
+      "description": "Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.",
+      "examples": [
+        {
+          "input": "nums = [3,2,3]",
+          "output": "[3]"
+        },
+        {
+          "input": "nums = [1]",
+          "output": "[1]"
+        },
+        {
+          "input": "nums = [1,2]",
+          "output": "[1,2]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5 * 10^4\n-10^9 <= nums[i] <= 10^9",
+      "follow up": "Could you solve the problem in linear time and in O(1) space?",
+      "solution": "class Solution:\n    def majorityElement(self, nums):\n        if not nums:\n            return []\n        candidate1, candidate2 = None, None\n        count1, count2 = 0, 0\n        for num in nums:\n            if candidate1 == num:\n                count1 += 1\n            elif candidate2 == num:\n                count2 += 1\n            elif count1 == 0:\n                candidate1, count1 = num, 1\n            elif count2 == 0:\n                candidate2, count2 = num, 1\n            else:\n                count1 -= 1\n                count2 -= 1\n        result = []\n        n = len(nums)\n        count1 = count2 = 0\n        for num in nums:\n            if num == candidate1:\n                count1 += 1\n            elif num == candidate2:\n                count2 += 1\n        if count1 > n // 3:\n            result.append(candidate1)\n        if count2 > n // 3:\n            result.append(candidate2)\n        return result",
+      "explanation": "1. 使用 Boyer-Moore 多數投票算法的擴展版，最多可能有兩個元素出現超過 n/3 次。\n2. 第一輪遍歷找到最多兩個候選元素。\n3. 第二輪遍歷驗證候選元素的出現次數是否大於 n/3。\n4. 返回符合條件的元素列表。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

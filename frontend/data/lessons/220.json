@@ -1,0 +1,65 @@
+{
+  "ID": 220,
+  "Title": "資料型態介紹",
+  "Intro": "\t在 Python 中，常見的資料型態包含數值 (int, float)、字串 (string) 等。字串可以透過索引或切片取得子串；使用跳脫字元（ 例如: \\n、\\t ）來控制輸出格式；不同型態之間也能進行轉換，例如字串轉數字。",
+  "exp": {
+    "cor_exp": [
+      "x = 42\nprint(type(x))  # 整數型態 int",
+      "text = 'Python'\nprint(text[0:3])  # 子串：輸出 'Pyt'",
+      "print('Hello\\nWorld')  # 使用跳脫字元換行",
+      "num_str = '123'\nnum = int(num_str)\nprint(num + 1)  # 型態轉換：字串轉整數"
+    ],
+    "mis_exp": [
+      "x = '100'\ny = x + 20  # 錯誤：字串不能直接和整數相加",
+      "text = 'Python'\nprint(text[10])  # 錯誤：索引超出範圍",
+      "print('It\\'s OK)  # 錯誤：缺少引號或跳脫字元",
+      "num = int('abc')  # 錯誤：字串 'abc' 無法轉換成整數"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nx = 42\nprint(type(x))",
+      "options": [
+        "A. <class 'str'>",
+        "B. <class 'float'>",
+        "C. <class 'int'>",
+        "D. <class 'bool'>"
+      ],
+      "answer": "C",
+      "explanation": "變數 x 被指定為 42，屬於整數型態 int。"
+    },
+    {
+      "question": "下列程式碼的輸出結果是什麼？\n\ntext = 'programming'\nprint(text[3:7])",
+      "options": [
+        "A. gram",
+        "B. prog",
+        "C. ming",
+        "D. ggra"
+      ],
+      "answer": "A",
+      "explanation": "索引 3 到 6 對應 'gram'。"
+    },
+    {
+      "question": "下列哪個程式碼能正確輸出兩行文字：第一行 'Hello'，第二行 'Python'？",
+      "options": [
+        "A. print('Hello Python')",
+        "B. print('Hello\\tPython')",
+        "C. print('Hello\\nPython')",
+        "D. print('Hello'); print('Python')"
+      ],
+      "answer": "C",
+      "explanation": "使用跳脫字元 \\n 可換行，因此 C 輸出符合題意。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum_str = '456'\nnum = int(num_str)\nprint(num + 10)",
+      "options": [
+        "A. 45610",
+        "B. 466",
+        "C. '466'",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "字串 '456' 轉換成整數 456，再加上 10，結果是 466。"
+    }
+  ]
+}

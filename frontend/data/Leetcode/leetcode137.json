@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode137",
+  "coding_practice": [
+    {
+      "title": "Single Number II",
+      "description": "Given an integer array nums where every element appears three times except for one, which appears exactly once. Find the single element and return it.\n\nYou must implement a solution with a linear runtime complexity and use only constant extra space.",
+      "examples": [
+        {
+          "input": "nums = [2,2,3,2]",
+          "output": "3"
+        },
+        {
+          "input": "nums = [0,1,0,1,0,1,99]",
+          "output": "99"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 3 * 10^4\n-2^31 <= nums[i] <= 2^31 - 1\nEach element in nums appears exactly three times except for one element which appears once.",
+      "solution": "class Solution:\n    def singleNumber(self, nums):\n        ones, twos = 0, 0\n        for num in nums:\n            ones = (ones ^ num) & ~twos\n            twos = (twos ^ num) & ~ones\n        return ones",
+      "explanation": "1. 使用位運算追蹤每個數字出現的次數。\n2. ones 保存出現一次的位，twos 保存出現兩次的位。\n3. 對每個數字做 XOR 並更新 ones 和 twos，出現三次的位會被清零。\n4. 最終 ones 就是只出現一次的數字。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

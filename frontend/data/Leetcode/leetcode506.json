@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode506",
+  "coding_practice": [
+    {
+      "title": "Relative Ranks",
+      "description": "You are given an integer array score of size n, where score[i] is the score of the i_th athlete in a competition. All the scores are guaranteed to be unique.\n\nThe athletes are placed based on their scores, where the 1st place athlete has the highest score, the 2nd place athlete has the 2nd highest score, and so on. The placement of each athlete determines their rank:\n\nThe 1st place athlete's rank is \"Gold Medal\".\nThe 2nd place athlete's rank is \"Silver Medal\".\nThe 3rd place athlete's rank is \"Bronze Medal\".\nFor the 4th place to the n_th place athlete, their rank is their placement number (i.e., the x_th place athlete's rank is \"x\").\nReturn an array answer of size n where answer[i] is the rank of the i_th athlete.",
+      "examples": [
+        {
+          "input": "[5,4,3,2,1]",
+          "output": "[\"Gold Medal\",\"Silver Medal\",\"Bronze Medal\",\"4\",\"5\"]",
+          "explanation": "The placements are [1st, 2nd, 3rd, 4th, 5th]."
+        },
+        {
+          "input": "[10,3,8,9,4]",
+          "output": "[\"Gold Medal\",\"5\",\"Bronze Medal\",\"Silver Medal\",\"4\"]",
+          "explanation": "The placements are [1st, 5th, 3rd, 2nd, 4th]."
+        }
+      ],
+      "constraints": "n == score.length\n1 <= n <= 10^4\n0 <= score[i] <= 10^6\nAll the values in score are unique.",
+      "solution": "class Solution:\n    def findRelativeRanks(self, score):\n        if not score:\n            return []\n        sorted_scores = sorted(score, reverse=True)\n        rank_map = {}\n        for i, s in enumerate(sorted_scores):\n            if i == 0:\n                rank_map[s] = \"Gold Medal\"\n            elif i == 1:\n                rank_map[s] = \"Silver Medal\"\n            elif i == 2:\n                rank_map[s] = \"Bronze Medal\"\n            else:\n                rank_map[s] = str(i + 1)\n        return [rank_map[s] for s in score]",
+      "explanation": "1. 將 score 陣列從大到小排序，得到排名順序。\n2. 建立 rank_map 字典，將前三名對應到 \"Gold Medal\"、\"Silver Medal\"、\"Bronze Medal\"，其餘名次對應數字字符串。\n3. 遍歷原始 score 陣列，依照 rank_map 返回每個運動員的名次。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

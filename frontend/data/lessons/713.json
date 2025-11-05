@@ -1,0 +1,50 @@
+{
+  "ID": 713,
+  "Title": "位置參數與關鍵字參數",
+  "Intro": "\t呼叫函數時，依照順序傳入的參數，稱為 位置參數。呼叫函數時，可以用 參數名稱 = 值 的形式傳入，稱為 關鍵字參數。",
+  "exp": {
+    "cor_exp": [
+      "def introduce(name, age):\n    print(\"我叫\", name, \"，今年\", age, \"歲\")\n\n# 使用位置參數\nintroduce(\"Alice\", 20)  # 輸出：我叫 Alice ，今年 20 歲",
+      "def introduce(name, age):\n    print(\"我叫\", name, \"，今年\", age, \"歲\")\n\n# 使用關鍵字參數\nintroduce(age=20, name=\"Alice\")  # 輸出：我叫 Alice ，今年 20 歲",
+      "# 混合使用\ndef greet(greeting, name):\n    print(greeting, name)\n\ngreet(\"Hello\", name=\"Bob\")   # 正確\ngreet(greeting=\"Hello\", \"Bob\")  # 錯誤：位置參數不能在關鍵字參數後面"
+    ],
+    "mis_exp": [
+      "def test(a, b):\n    print(a, b)\n\ntest(1, a=2)  # 錯誤 : 重複傳入同一個參數"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪個屬於位置參數 (positional arguments)？",
+      "options": [
+        "A. greet(name=\"Alice\")",
+        "B. greet(\"Alice\")",
+        "C. greet(age=20, name=\"Alice\")",
+        "D. greet(message=\"Hi\")"
+      ],
+      "answer": "B",
+      "explanation": "依照順序直接傳入的 \"Alice\" 屬於位置參數。"
+    },
+    {
+      "question": "下列哪個屬於關鍵字參數 (keyword arguments)？",
+      "options": [
+        "A. introduce(\"Alice\", 20)",
+        "B. introduce(age=20, name=\"Alice\")",
+        "C. introduce(\"Alice\")",
+        "D. introduce(20, \"Alice\")"
+      ],
+      "answer": "B",
+      "explanation": "使用 參數名稱=值 的形式傳入，屬於關鍵字參數。"
+    },
+    {
+      "question": "執行下列程式碼會發生什麼情況？\n\ndef greet(greeting, name):\n    print(greeting, name)\n\ngreet(greeting=\"Hello\", \"Bob\")",
+      "options": [
+        "A. 輸出：Hello Bob",
+        "B. 輸出：Bob Hello",
+        "C. 程式錯誤：位置參數不能在關鍵字參數後面",
+        "D. 輸出：Hello, greeting Bob"
+      ],
+      "answer": "C",
+      "explanation": "Python 規定：位置參數必須在關鍵字參數之前，否則會發生錯誤。"
+    }
+  ]
+}

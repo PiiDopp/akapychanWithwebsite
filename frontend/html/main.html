@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="no-trans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AkaPyChan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="../css/main.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script type="module" src="../js/main/main.js" ></script>
+    <script type="module" src="../js/ai-chat/main.js"></script>
+    <script src="../js/viewTransitions.js" defer></script>
+    
+  </head>
+  <body>
+    <div class="main">
+      <div class="leftSideBar">
+        <button class="leftsideBtn"><img src="../img/leftsideBtn.png" alt=""></button>
+        <div class="menuSelectionMeun scroll-area">
+          <h1 style="margin: 12px">單元選擇</h1>
+          <hr style="margin: 12px" />
+          <ul class="unitContenter" id="unitContenter">
+            <ul class="L-Unit">
+              <div>一、Python簡介</div>
+              <li class="M-Unit" data-id="100">1-1 Python介紹</li>
+            </ul>
+            <ul class="L-Unit">
+              <div>二、認識資料處理</div>
+              <li class="M-Unit" data-id="210">2-1 變數基礎</li>
+              <li class="M-Unit" data-id="220">2-2 資料型態介紹</li>
+              <li class="M-Unit" data-id="230">2-3 輸入與輸出</li>
+              <li class="M-Unit" data-id="200"><a href="python.html?set=200"># 第二單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>三、運算式與運算子</div>
+              <li class="M-Unit" data-id="310">3-1 算術運算</li>
+              <li class="M-Unit" data-id="320">3-2 指定與複合指定</li>
+              <li class="M-Unit" data-id="330">3-3 關係運算</li>
+              <li class="M-Unit" data-id="340">3-4 邏輯運算</li>
+              <li class="M-Unit" data-id="350">3-5 運算子優先順序</li>
+              <li class="M-Unit" data-id="300"><a href="python.html?set=300"># 第三單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>四、流程控制與選擇結構</div>
+              <li class="M-Unit" data-id="410">4-1 順序結構</li>
+              <ul class="M-Unit">
+                4-2 判斷結構
+                <li class="S-Unit" data-id="421">4-2-1 if 條件判斷</li>
+                <li class="S-Unit" data-id="422">4-2-2 if...else 判斷</li>
+                <li class="S-Unit" data-id="423">4-2-3 if..elif..else 多重判斷</li>
+              </ul>
+              <li class="M-Unit" data-id="400"><a href="python.html?set=400"># 第四單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>五、重複結構（迴圈）</div>
+              <ul class="M-Unit">
+                5-1 for 迴圈
+                <li class="S-Unit" data-id="511">5-1-1 range() 基本用法</li>
+                <li class="S-Unit" data-id="512">5-1-2 巢狀 for 迴圈</li>
+              </ul>
+              <li class="M-Unit" data-id="520">5-2 while 迴圈</li>
+              <li class="M-Unit" data-id="530">5-3 迴圈控制</li>
+              <li class="M-Unit" data-id="500"><a href="python.html?set=500"># 第五單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>六、複合式資料型態</div>
+              <ul class="M-Unit">
+                6-1 串列 (List)
+                <li class="S-Unit" data-id="611">6-1-1 串列介紹</li>
+                <li class="S-Unit" data-id="612">6-1-2 刪除串列元素</li>
+                <li class="S-Unit" data-id="613">6-1-3 常用函數</li>
+              </ul>
+              <ul class="M-Unit">
+                6-2 元組 (Tuple)
+                <li class="S-Unit" data-id="621">6-2-1 元組介紹</li>
+                <li class="S-Unit" data-id="622">6-2-2 常用函數</li>
+              </ul>
+              <ul class="M-Unit">
+                6-3 字典 (Dict)
+                <li class="S-Unit" data-id="631">6-3-1 字典介紹</li>
+                <li class="S-Unit" data-id="632">6-3-2 常用函數</li>
+              </ul>
+              <ul class="M-Unit">
+                6-4 集合 (Set)
+                <li class="S-Unit" data-id="641">6-4-1 集合介紹</li>
+                <li class="S-Unit" data-id="642">6-4-2 集合運算</li>
+                <li class="S-Unit" data-id="643">6-4-3 常用函數</li>
+              </ul>
+              <li class="M-Unit" data-id="600"><a href="python.html?set=600"># 第六單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>七、函數</div>
+              <ul class="M-Unit">
+                7-1 函數基礎
+                <li class="S-Unit" data-id="711">7-1-1 自訂函數</li>
+                <li class="S-Unit" data-id="712">7-1-2 參數傳遞</li>
+                <li class="S-Unit" data-id="713">7-1-3 位置參數與關鍵字參數</li>
+              </ul>
+              <ul class="M-Unit">
+                7-2 常見 Python 內建函數
+                <li class="S-Unit" data-id="721">7-2-1 數值函數</li>
+                <li class="S-Unit" data-id="722">7-2-2 字串函數</li>
+                <li class="S-Unit" data-id="723">7-2-3 序列函數</li>
+              </ul>
+              <li class="M-Unit" data-id="700"><a href="python.html?set=700"># 第七單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>八、模組與套件</div>
+              <li class="M-Unit" data-id="810">8-1 模組基礎</li>
+              <ul class="M-Unit">
+                8-2 常見內建模組
+                <li class="S-Unit" data-id="821">8-2-1 random 模組</li>
+                <li class="S-Unit" data-id="822">8-2-2 time 模組</li>
+                <li class="S-Unit" data-id="823">8-2-3 datetime 模組</li>
+              </ul>
+              <li class="M-Unit" data-id="830">8-3 自訂模組</li>
+              <li class="M-Unit" data-id="800"><a href="python.html?set=800"># 第八單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>九、例外處理與檔案操作</div>
+              <li class="M-Unit" data-id="910">9-1 try / except 例外處理</li>
+              <li class="M-Unit" data-id="920">9-2 多重例外與 finally</li>
+              <li class="M-Unit" data-id="930">9-3 raise 主動拋出例外</li>
+              <li class="M-Unit" data-id="940">9-4 檔案開啟與寫入</li>
+              <li class="M-Unit" data-id="950">9-5 with 語法與自動關閉檔案</li>
+              <li class="M-Unit" data-id="900"><a href="python.html?set=900"># 第九單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>十、進階資料處理</div>
+              <ul class="M-Unit">
+                10-1 Comprehension 生成式
+                <li class="S-Unit" data-id="1011">10-1-1 列表生成式</li>
+                <li class="S-Unit" data-id="1012">10-1-2 字典與集合生成式</li>
+              </ul>
+              <ul class="M-Unit">
+                10-2 Lambda 與高階函數
+                <li class="S-Unit" data-id="1021">10-2-1 Lambda 匿名函數</li>
+                <li class="S-Unit" data-id="1022">10-2-2 map() / filter() / reduce() 函數應用</li>
+              </ul>
+              <li class="M-Unit" data-id="1030">10-3 其他實用函數</li>
+              <li class="M-Unit" data-id="1000"><a href="python.html?set=1000"># 第十單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>十一、物件導向程式設計（OOP）</div>
+              <li class="M-Unit" data-id="1110">11-1 類別與物件</li>
+              <li class="M-Unit" data-id="1120">11-2 建構子與屬性</li>
+              <li class="M-Unit" data-id="1130">11-3 方法與行為</li>
+              <li class="M-Unit" data-id="1140">11-4 繼承與多型</li>
+              <li class="M-Unit" data-id="1100"><a href="python.html?set=1100"># 第十一單元總複習</a></li>
+            </ul>
+            <ul class="L-Unit">
+              <div>十二、應用實作與延伸：JSON / API / GUI</div>
+              <li class="M-Unit" data-id="1210">12-1 JSON 資料讀寫</li>
+              <li class="M-Unit" data-id="1220">12-2 API 串接與資料解析</li>
+              <li class="M-Unit" data-id="1230">12-3 tkinter 視窗應用</li>
+              <li class="M-Unit" data-id="1200"><a href="python.html?set=1200"># 第十二單元總複習</a></li>
+            </ul>
+          </ul>
+        </div>
+        <div class="mainBtn">
+          <a href="/html/welcome.html" class="backBtn"
+            ><img src="../img/home.png"
+          /></a>
+          <a href="/html/python.html" class="changeBtn"><b>練習模式</b></a>
+        </div>
+      </div>
+      <div class="textContent">
+        <h1 class="title"></h1>
+        <p class="intro"></p>
+        <div class="expContenter">
+          <div class="corExp">
+            <p><b># 範例:</b></p>
+            <ul>
+              <li class="exp"></li>
+            </ul>
+          </div>
+          <div class="misExp">
+            <p><b># 錯誤範例:</b></p>
+            <ul>
+              <li class="exp"></li>
+            </ul>
+          </div>
+          <section class="practice" aria-label="練習題">
+            <p><b># 練習題: </b></p>
+            <ol class="practice-list"><li></li></ol>
+          </section>
+        </div>
+      </div>
+      <div class="chatbot">
+        <ul class="chatbox">
+          <li class="chat-incoming" data-typewriter>
+            <i class="fas fa-robot"></i>
+            <div class="ai-rich-content">
+<p>您好，我是 AkaPyChan 的專屬助教，很高興為您解答任何與 Python 相關的問題。
+
+請選擇以下模式：
+模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）
+模式 2｜程式驗證（貼上你的 Python 程式碼）
+模式 3｜程式解釋（貼上要解釋的 Python 程式碼）
+
+**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。
+</p>
+</div>
+          </li>
+        </ul>
+        <div class="toolbar"></div>
+        <div class="chatinput">
+          <textarea placeholder="Enter a message..." required></textarea>
+          <i class="fas fa-paper-plane"></i>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode464",
+  "coding_practice": [
+    {
+      "title": "Can I Win",
+      "description": "In the \"100 game\" two players take turns adding, to a running total, any integer from 1 to 10. The player who first causes the running total to reach or exceed 100 wins.\n\nWhat if we change the game so that players cannot re-use integers?\n\nFor example, two players might take turns drawing from a common pool of numbers from 1 to maxChoosableInteger without replacement until they reach a total >= desiredTotal.\n\nGiven two integers maxChoosableInteger and desiredTotal, return true if the first player to move can force a win, otherwise, return false. Assume both players play optimally.",
+      "examples": [
+        {
+          "input": "maxChoosableInteger = 10, desiredTotal = 11",
+          "output": "false",
+          "explanation": "No matter which integer the first player choose, the first player will lose. \nThe first player can choose an integer from 1 up to 10. \nIf the first player choose 1, the second player can only choose integers from 2 up to 10. \nThe second player will win by choosing 10 and get a total = 11, which is >= desiredTotal. \nSame with other integers chosen by the first player, the second player will always win."
+        },
+        {
+          "input": "maxChoosableInteger = 10, desiredTotal = 0",
+          "output": "true"
+        },
+        {
+          "input": "maxChoosableInteger = 10, desiredTotal = 1",
+          "output": "true"
+        }
+      ],
+      "constraints": "1 <= maxChoosableInteger <= 20\n0 <= desiredTotal <= 300",
+      "solution": "class Solution:\n    def canIWin(self, maxChoosableInteger, desiredTotal):\n        if desiredTotal <= 0:\n            return True\n        if (maxChoosableInteger * (maxChoosableInteger + 1)) // 2 < desiredTotal:\n            return False\n        \n        memo = {}\n        \n        def can_win(used, total):\n            if used in memo:\n                return memo[used]\n            \n            for i in range(maxChoosableInteger):\n                if not (used & (1 << i)):\n                    if total <= i + 1 or not can_win(used | (1 << i), total - (i + 1)):\n                        memo[used] = True\n                        return True\n            \n            memo[used] = False\n            return False\n        \n        return can_win(0, desiredTotal)",
+      "explanation": "1. 若 desiredTotal <= 0，先手自動勝利。\n2. 若所有數字總和 < desiredTotal，先手不可能勝利。\n3. 使用位元表示已使用的數字，透過遞迴與 memo 記錄狀態。\n4. 遍歷每個未使用的數字，若選擇該數字能立即達到目標或讓對手無法勝利，則當前玩家勝利。\n5. 若所有選擇都無法勝利，當前玩家輸。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

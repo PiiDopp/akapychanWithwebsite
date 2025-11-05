@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode228",
+  "coding_practice": [
+    {
+      "title": "Summary Ranges",
+      "description": "You are given a sorted unique integer array nums.\n\nA range [a,b] is the set of all integers from a to b (inclusive).\n\nReturn the smallest sorted list of ranges that cover all the numbers in the array exactly. That is, each element of nums is covered by exactly one of the ranges, and there is no integer x such that x is in one of the ranges but not in nums.\n\nEach range [a,b] in the list should be output as:\n\n\"a->b\" if a != b\n\"a\" if a == b",
+      "examples": [
+        {
+          "input": "nums = [0,1,2,4,5,7]",
+          "output": "[\"0->2\",\"4->5\",\"7\"]",
+          "explanation": "The ranges are: [0,2] --> \"0->2\"; [4,5] --> \"4->5\"; [7,7] --> \"7\""
+        },
+        {
+          "input": "nums = [0,2,3,4,6,8,9]",
+          "output": "[\"0\",\"2->4\",\"6\",\"8->9\"]",
+          "explanation": "The ranges are: [0,0] --> \"0\"; [2,4] --> \"2->4\"; [6,6] --> \"6\"; [8,9] --> \"8->9\""
+        }
+      ],
+      "constraints": "0 <= nums.length <= 20\n-2^31 <= nums[i] <= 2^31 - 1\nAll the values of nums are unique.\nnums is sorted in ascending order.",
+      "solution": "class Solution:\n    def summaryRanges(self, nums):\n        if not nums:\n            return []\n        res = []\n        start = end = nums[0]\n        for n in nums[1:]:\n            if n == end + 1:\n                end = n\n            else:\n                if start == end:\n                    res.append(str(start))\n                else:\n                    res.append(\"{}->{}\".format(start, end))\n                start = end = n\n        if start == end:\n            res.append(str(start))\n        else:\n            res.append(\"{}->{}\".format(start, end))\n        return res",
+      "explanation": "1. 初始化 start 和 end 為 nums 的第一個元素。\n2. 遍歷 nums，如果當前數字 n 等於 end+1，延伸範圍，將 end 更新為 n。\n3. 如果 n 不連續，將上一個範圍加入結果：單個元素直接 str(start)，多元素使用 \"start->end\"。\n4. 更新 start 和 end 為 n。\n5. 遍歷結束後，把最後一個範圍加入結果。\n6. 返回結果列表。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

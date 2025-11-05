@@ -1,0 +1,52 @@
+{
+  "ID": 230,
+  "Title": "輸入與輸出",
+  "Intro": "\t在 Python 中，使用 input() 可以從使用者讀取輸入，讀進來的資料預設為字串型態。使用 print() 可以將結果輸出到螢幕上。常見的應用是結合輸入與輸出，完成互動式程式。",
+  "exp": {
+    "cor_exp": [
+      "name = input('請輸入你的名字: ')\nprint('你好, ' + name)  # 讀取字串輸入並輸出",
+      "age = int(input('請輸入年齡: '))\nprint('明年你將會', age + 1, '歲')  # 型態轉換",
+      "x = 5\ny = 10\nprint('x =', x, ', y =', y)  # 多值輸出"
+    ],
+    "mis_exp": [
+      "age = input('請輸入年齡: ')\nprint(age + 1)  # 錯誤：input() 讀入的是字串，不能直接和整數相加",
+      "print 'Hello'  # 錯誤：缺少括號，Python 3 print 必須使用 ()",
+      "name = input('請輸入名字: ') \nprint('你好, ' name)  # 錯誤：少了 + 號或逗號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個程式能正確讀取使用者輸入名字並輸出 Hello 訊息？",
+      "options": [
+        "A. name = input('請輸入名字: ')\nprint('Hello, ' + name)",
+        "B. name = input('請輸入名字: ')\nprint('Hello, ' name)",
+        "C. name = input('請輸入名字: ')\nprint 'Hello, ', name",
+        "D. name = input()\nprint('Hello' + name + '!')"
+      ],
+      "answer": "A",
+      "explanation": "A 的語法正確，能讀入名字並輸出訊息。B 缺少 +，C 的 print 用法錯誤，D 雖然可執行但不會提示輸入。"
+    },
+    {
+      "question": "執行下列程式碼時，若輸入 3 和 7，輸出會是什麼？\n\nnum1 = int(input('輸入第一個數字: '))\nnum2 = int(input('輸入第二個數字: '))\nprint(num1 + num2)",
+      "options": [
+        "A. 10",
+        "B. 37",
+        "C. '3' + '7'",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "input 讀進來的是字串，但透過 int() 轉換為整數，相加結果是 10。"
+    },
+    {
+      "question": "下列程式碼的輸出會是什麼？\n\nsentence = input('請輸入一句話: ')\nprint(len(sentence))\n\n若輸入 'Python'。",
+      "options": [
+        "A. 5",
+        "B. 6",
+        "C. 'Python'",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "字串 'Python' 的長度是 6，因此 len(sentence) 輸出 6。"
+    }
+  ]
+}

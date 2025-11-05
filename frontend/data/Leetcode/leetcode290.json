@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode290",
+  "coding_practice": [
+    {
+      "title": "Word Pattern",
+      "description": "Given a pattern and a string s, find if s follows the same pattern.\n\nHere follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in s. Specifically:\n\nEach letter in pattern maps to exactly one unique word in s.\nEach unique word in s maps to exactly one letter in pattern.\nNo two letters map to the same word, and no two words map to the same letter.",
+      "examples": [
+        {
+          "input": "pattern = \"abba\", s = \"dog cat cat dog\"",
+          "output": "true",
+          "explanation": "The bijection can be established as:\n'a' maps to \"dog\".\n'b' maps to \"cat\"."
+        },
+        {
+          "input": "pattern = \"abba\", s = \"dog cat cat fish\"",
+          "output": "false"
+        },
+        {
+          "input": "pattern = \"aaaa\", s = \"dog cat cat dog\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= pattern.length <= 300\npattern contains only lower-case English letters.\n1 <= s.length <= 3000\ns contains only lowercase English letters and spaces ' '.\ns does not contain any leading or trailing spaces.\nAll the words in s are separated by a single space.",
+      "solution": "class Solution:\n    def wordPattern(self, pattern, s):\n        words = s.split()\n        if len(pattern) != len(words):\n            return False\n        \n        char_to_word = {}\n        word_to_char = {}\n        \n        for c, w in zip(pattern, words):\n            if c in char_to_word:\n                if char_to_word[c] != w:\n                    return False\n            else:\n                char_to_word[c] = w\n            \n            if w in word_to_char:\n                if word_to_char[w] != c:\n                    return False\n            else:\n                word_to_char[w] = c\n        \n        return True",
+      "explanation": "1. 將 s 用空格拆分成單詞列表，檢查長度是否與 pattern 相同。\n2. 建立兩個映射字典：char_to_word 和 word_to_char，用於雙向映射檢查。\n3. 遍歷 pattern 與 words，同時更新映射，若有衝突則返回 False。\n4. 若整個遍歷完成且無衝突，返回 True。",
+      "tag": "631",
+      "difficult": "easy"
+    }
+  ]
+}

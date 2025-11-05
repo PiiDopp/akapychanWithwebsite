@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode540",
+  "coding_practice": [
+    {
+      "title": "Single Element in a Sorted Array",
+      "description": "You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once.\n\nReturn the single element that appears only once.\n\nYour solution must run in O(log n) time and O(1) space.",
+      "examples": [
+        {
+          "input": "[1,1,2,3,3,4,4,8,8]",
+          "output": "2"
+        },
+        {
+          "input": "[3,3,7,7,10,11,11]",
+          "output": "10"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n0 <= nums[i] <= 10^5",
+      "solution": "class Solution:\n    def singleNonDuplicate(self, nums):\n        left, right = 0, len(nums) - 1\n        while left < right:\n            mid = (left + right) // 2\n            if mid % 2 == 1:\n                mid -= 1\n            if nums[mid] == nums[mid + 1]:\n                left = mid + 2\n            else:\n                right = mid\n        return nums[left]",
+      "explanation": "1. 使用二分搜尋來保持 O(log n) 時間複雜度。\n2. 確保 mid 是偶數索引，以便檢查成對元素。\n3. 若 nums[mid] == nums[mid+1]，表示單元素在右側，移動 left。\n4. 否則，單元素在左側或就是 mid，移動 right。\n5. 最終 left 指向單一元素，返回 nums[left]。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

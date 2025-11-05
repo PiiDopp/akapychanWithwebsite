@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode376",
+  "coding_practice": [
+    {
+      "title": "Wiggle Subsequence",
+      "description": "A wiggle sequence is a sequence where the differences between successive numbers strictly alternate between positive and negative. The first difference (if one exists) may be either positive or negative. A sequence with one element and a sequence with two non-equal elements are trivially wiggle sequences.\n\nFor example, [1, 7, 4, 9, 2, 5] is a wiggle sequence because the differences (6, -3, 5, -7, 3) alternate between positive and negative.\nIn contrast, [1, 4, 7, 2, 5] and [1, 7, 4, 5, 5] are not wiggle sequences. The first is not because its first two differences are positive, and the second is not because its last difference is zero.\nA subsequence is obtained by deleting some elements (possibly zero) from the original sequence, leaving the remaining elements in their original order.\n\nGiven an integer array nums, return the length of the longest wiggle subsequence of nums.",
+      "examples": [
+        {
+          "input": "nums = [1,7,4,9,2,5]",
+          "output": "6",
+          "explanation": "The entire sequence is a wiggle sequence with differences (6, -3, 5, -7, 3)."
+        },
+        {
+          "input": "nums = [1,17,5,10,13,15,10,5,16,8]",
+          "output": "7",
+          "explanation": "There are several subsequences that achieve this length.\nOne of the subsequences achieving this length is [1, 17, 10, 13, 10, 16, 8] with differences (16, -7, 3, -3, 6, -8)."
+        },
+        {
+          "input": "nums = [1,2,3,4,5,6,7,8,9]",
+          "output": "2"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n0 <= nums[i] <= 1000",
+      "follow up": "Could you solve this in O(n) time?",
+
+      "solution": "class Solution:\n    def wiggleMaxLength(self, nums):\n        if not nums:\n            return 0\n        up = down = 1\n        for i in range(1, len(nums)):\n            if nums[i] > nums[i - 1]:\n                up = down + 1\n            elif nums[i] < nums[i - 1]:\n                down = up + 1\n        return max(up, down)",
+      "explanation": "1. 初始化 up 和 down 為 1，分別表示以最後一個元素為上升或下降的搖擺序列長度。\n2. 遍歷 nums，若當前元素比前一個大，則 up = down + 1；若比前一個小，則 down = up + 1。\n3. 最後返回 max(up, down) 作為搖擺序列的最大長度。\n4. 此方法時間複雜度為 O(n)，空間複雜度為 O(1)。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

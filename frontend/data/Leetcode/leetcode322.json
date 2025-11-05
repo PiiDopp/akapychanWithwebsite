@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode322",
+  "coding_practice": [
+    {
+      "title": "Coin Change",
+      "description": "You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.\n\nYou may assume that you have an infinite number of each kind of coin.",
+      "examples": [
+        {
+          "input": "coins = [1,2,5], amount = 11",
+          "output": "3",
+          "explanation": "11 = 5 + 5 + 1"
+        },
+        {
+          "input": "coins = [2], amount = 3",
+          "output": "-1"
+        },
+        {
+          "input": "coins = [1], amount = 0",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= coins.length <= 12\n1 <= coins[i] <= 2^31 - 1\n0 <= amount <= 10^4",
+      "solution": "class Solution:\n    def coinChange(self, coins, amount):\n        # 初始化 dp 陣列，dp[i] 表示湊成金額 i 所需最少硬幣數\n        dp = [float('inf')] * (amount + 1)\n        dp[0] = 0\n        \n        for coin in coins:\n            for x in range(coin, amount + 1):\n                dp[x] = min(dp[x], dp[x - coin] + 1)\n        \n        return dp[amount] if dp[amount] != float('inf') else -1",
+      "explanation": "1. 使用 dp 陣列，dp[i] 表示湊成金額 i 所需最少硬幣數。\n2. 初始化 dp[0] = 0，其餘為無限大。\n3. 對於每種硬幣 coin，更新 dp[x] = min(dp[x], dp[x - coin] + 1)。\n4. 最終返回 dp[amount]，若仍為無限大，表示無法湊成，返回 -1。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

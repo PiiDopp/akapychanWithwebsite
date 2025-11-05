@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode38",
+  "coding_practice": [
+    {
+      "title": "Count and Say",
+      "description": "The count-and-say sequence is a sequence of digit strings defined by the recursive formula:\n\ncountAndSay(1) = \"1\"\ncountAndSay(n) is the run-length encoding of countAndSay(n - 1).\nRun-length encoding (RLE) is a string compression method that works by replacing consecutive identical characters (repeated 2 or more times) with the concatenation of the character and the number marking the count of the characters (length of the run). For example, to compress the string \"3322251\" we replace \"33\" with \"23\", replace \"222\" with \"32\", replace \"5\" with \"15\" and replace \"1\" with \"11\". Thus the compressed string becomes \"23321511\".\n\nGiven a positive integer n, return the nth element of the count-and-say sequence.",
+      "examples": [
+        {
+          "input": "n = 4",
+          "output": "\"1211\"",
+          "explanation": "countAndSay(1) = \"1\"\ncountAndSay(2) = RLE of \"1\" = \"11\"\ncountAndSay(3) = RLE of \"11\" = \"21\"\ncountAndSay(4) = RLE of \"21\" = \"1211\""
+        },
+        {
+          "input": "n = 1",
+          "output": "\"1\"",
+          "explanation": "This is the base case."
+        }
+      ],
+      "constraints": "1 <= n <= 30",
+      "follow up": "Could you solve it iteratively?",
+      "solution": "class Solution(object):\n    def countAndSay(self, n):\n        \"\"\"\n        :type n: int\n        :rtype: str\n        \"\"\"\n        if n == 1:\n            return \"1\"\n\n        prev = self.countAndSay(n - 1)\n        result = \"\"\n        count = 1\n        for i in range(1, len(prev)):\n            if prev[i] == prev[i - 1]:\n                count += 1\n            else:\n                result += str(count) + prev[i - 1]\n                count = 1\n        result += str(count) + prev[-1]\n        return result",
+      "explanation": "1. 初始化：\n   1.1 若 n == 1，直接返回 \"1\"。\n2. 遞迴求前一項：\n   2.1 prev = countAndSay(n - 1)\n3. 遍歷 prev：\n   3.1 用 count 記錄連續相同字符的出現次數。\n   3.2 若字符改變，將 count + 字符 加入結果 result。\n4. 處理最後一組字符，將其加入結果。\n5. 返回 result。\n6. 複雜度分析：\n   6.1 時間複雜度：O(2^n)\n   6.2 空間複雜度：O(2^n)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

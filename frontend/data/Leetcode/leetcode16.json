@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode16",
+  "coding_practice": [
+    {
+      "title": "3Sum Closest",
+      "description": "Given an integer array nums of length n and an integer target, find three integers in nums such that the sum is closest to target.\n\nReturn the sum of the three integers.\n\nYou may assume that each input would have exactly one solution.",
+      "examples": [
+        {
+          "input": "nums = [-1,2,1,-4], target = 1",
+          "output": "2",
+          "explanation": "Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2)."
+        },
+        {
+          "input": "nums = [0,0,0], target = 1",
+          "output": "0",
+          "explanation": "The sum that is closest to the target is 0. (0 + 0 + 0 = 0)."
+        }
+      ],
+      "constraints": "3 <= nums.length <= 500\n-1000 <= nums[i] <= 1000\n-10^4 <= target <= 10^4",
+      "solution": "class Solution(object):\n    def threeSumClosest(self, nums, target):\n        \"\"\"\n        :type nums: List[int]\n        :type target: int\n        :rtype: int\n        \"\"\"\n        nums.sort()\n        n = len(nums)\n        closest_sum = float('inf')\n        \n        for i in range(n):\n            left, right = i + 1, n - 1\n            while left < right:\n                total = nums[i] + nums[left] + nums[right]\n                if abs(total - target) < abs(closest_sum - target):\n                    closest_sum = total\n                if total < target:\n                    left += 1\n                elif total > target:\n                    right -= 1\n                else:\n                    return total\n        return closest_sum",
+      "explanation": "1. 將數組排序，方便使用雙指針策略。\n2. 遍歷每個元素作為三元組的第一個數。\n3. 使用雙指針 left 和 right 搜索最接近目標值的三數之和。\n4. 每次計算總和，更新與目標最接近的結果。\n5. 若總和等於目標，直接返回；否則返回最接近的總和。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

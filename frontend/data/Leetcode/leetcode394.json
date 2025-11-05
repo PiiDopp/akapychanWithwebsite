@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode394",
+  "coding_practice": [
+    {
+      "title": "Decode String",
+      "description": "Given an encoded string, return its decoded string.\n\nThe encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.\n\nYou may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].\n\nThe test cases are generated so that the length of the output will never exceed 10^5.",
+      "examples": [
+        {
+          "input": "s = \"3[a]2[bc]\"",
+          "output": "\"aaabcbc\""
+        },
+        {
+          "input": "s = \"3[a2[c]]\"",
+          "output": "\"accaccacc\""
+        },
+        {
+          "input": "s = \"2[abc]3[cd]ef\"",
+          "output": "\"abcabccdcdcdef\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 30\ns consists of lowercase English letters, digits, and square brackets '[]'.\ns is guaranteed to be a valid input.\nAll the integers in s are in the range [1, 300].",
+      "solution": "class Solution:\n    def decodeString(self, s):\n        stack = []\n        current_num = 0\n        current_str = ''\n        \n        for char in s:\n            if char.isdigit():\n                current_num = current_num * 10 + int(char)\n            elif char == '[':\n                stack.append((current_str, current_num))\n                current_str = ''\n                current_num = 0\n            elif char == ']':\n                last_str, num = stack.pop()\n                current_str = last_str + current_str * num\n            else:\n                current_str += char\n        return current_str",
+      "explanation": "1. 使用堆疊來處理嵌套結構。\n2. 遇到數字，累計構成重複次數 current_num。\n3. 遇到 '['，將當前字符串和 current_num 壓入堆疊，重置 current_str 和 current_num。\n4. 遇到 ']'，從堆疊彈出上一層字符串與重複次數，更新 current_str。\n5. 普通字母直接加入 current_str，最後返回結果。",
+      "tag": "632",
+      "difficult": "medium"
+    }
+  ]
+}

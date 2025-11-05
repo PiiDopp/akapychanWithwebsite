@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode703",
+  "coding_practice": [
+    {
+      "title": "Kth Largest Element in a Stream",
+      "description": "You are part of a university admissions office and need to keep track of the kth highest test score from applicants in real-time. This helps to determine cut-off marks for interviews and admissions dynamically as new applicants submit their scores.\n\nYou are tasked to implement a class which, for a given integer k, maintains a stream of test scores and continuously returns the kth highest test score after a new score has been submitted. More specifically, we are looking for the kth highest score in the sorted list of all scores.\n\nImplement the KthLargest class:\n\nKthLargest(int k, int[] nums) Initializes the object with the integer k and the stream of test scores nums.\nint add(int val) Adds a new test score val to the stream and returns the element representing the k^th largest element in the pool of test scores so far.",
+      "examples": [
+        {
+          "input": "[\"KthLargest\", \"add\", \"add\", \"add\", \"add\", \"add\"], [[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]",
+          "output": "[null, 4, 5, 5, 8, 8]",
+          "explanation": "KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);\nkthLargest.add(3); // return 4\nkthLargest.add(5); // return 5\nkthLargest.add(10); // return 5\nkthLargest.add(9); // return 8\nkthLargest.add(4); // return 8"
+        },
+        {
+          "input": "[\"KthLargest\", \"add\", \"add\", \"add\", \"add\"], [[4, [7, 7, 7, 7, 8, 3]], [2], [10], [9], [9]]",
+          "output": "[null, 7, 7, 7, 8]",
+          "explanation": "KthLargest kthLargest = new KthLargest(4, [7, 7, 7, 7, 8, 3]);\nkthLargest.add(2); // return 7\nkthLargest.add(10); // return 7\nkthLargest.add(9); // return 7\nkthLargest.add(9); // return 8"
+        }
+      ],
+      "constraints": "0 <= nums.length <= 10^4\n1 <= k <= nums.length + 1\n-10^4 <= nums[i] <= 10^4\n-10^4 <= val <= 10^4\nAt most 10^4 calls will be made to add.",
+      "solution": "import heapq\n\nclass KthLargest:\n\n    def __init__(self, k, nums):\n        self.k = k\n        self.min_heap = []\n        for num in nums:\n            self.add(num)\n\n    def add(self, val):\n        heapq.heappush(self.min_heap, val)\n        if len(self.min_heap) > self.k:\n            heapq.heappop(self.min_heap)\n        return self.min_heap[0]",
+      "explanation": "1. 使用最小堆維護前 k 大的元素，堆頂就是第 k 大。\n2. 初始化時，把 nums 中的每個元素加入堆中，保持堆大小不超過 k。\n3. 每次 add(val) 將 val 推入堆中，若堆大小 > k，彈出堆頂最小值。\n4. 返回堆頂，即第 k 大元素。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode532",
+  "coding_practice": [
+    {
+      "title": "K-diff Pairs in an Array",
+      "description": "Given an array of integers nums and an integer k, return the number of unique k-diff pairs in the array.\n\nA k-diff pair is an integer pair (nums[i], nums[j]), where the following are true:\n\n0 <= i, j < nums.length\ni != j\n|nums[i] - nums[j]| == k\nNotice that |val| denotes the absolute value of val.",
+      "examples": [
+        {
+          "input": "[3,1,4,1,5], 2",
+          "output": "2",
+          "explanation": "There are two 2-diff pairs in the array, (1, 3) and (3, 5). Although we have two 1s in the input, we should only return the number of unique pairs."
+        },
+        {
+          "input": "[1,2,3,4,5], 1",
+          "output": "4",
+          "explanation": "There are four 1-diff pairs in the array, (1, 2), (2, 3), (3, 4) and (4, 5)."
+        },
+        {
+          "input": "[1,3,1,5,4], 0",
+          "output": "1",
+          "explanation": "There is one 0-diff pair in the array, (1, 1)."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n-10^7 <= nums[i] <= 10^7\n0 <= k <= 10^7",
+      "solution": "class Solution:\n    def findPairs(self, nums, k):\n        if k < 0:\n            return 0\n        from collections import Counter\n        count = Counter(nums)\n        if k == 0:\n            return sum(v > 1 for v in count.values())\n        return sum(n + k in count for n in count)",
+      "explanation": "1. 若 k < 0，無法形成差值為負數的對，直接返回 0。\n2. 使用 Counter 統計 nums 中每個數字出現的次數。\n3. 若 k == 0，計算出現次數大於 1 的數字，因為它們可以形成 0-diff 對。\n4. 若 k > 0，對每個數字 n，檢查 n+k 是否在數組中，累加總數即為結果。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

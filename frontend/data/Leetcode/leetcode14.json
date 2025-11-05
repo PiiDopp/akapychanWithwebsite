@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode14",
+  "coding_practice": [
+    {
+      "title": "Longest Common Prefix",
+      "description": "Write a function to find the longest common prefix string amongst an array of strings.\n\nIf there is no common prefix, return an empty string \"\".",
+      "examples": [
+        {
+          "input": "strs = [\"flower\",\"flow\",\"flight\"]",
+          "output": "\"fl\""
+        },
+        {
+          "input": "strs = [\"dog\",\"racecar\",\"car\"]",
+          "output": "\"\"",
+          "explanation": "There is no common prefix among the input strings."
+        }
+      ],
+      "constraints": "1 <= strs.length <= 200\n0 <= strs[i].length <= 200\nstrs[i] consists of only lowercase English letters if it is non-empty.",
+      "solution": "class Solution(object):\n    def longestCommonPrefix(self, strs):\n        \"\"\"\n        :type strs: List[str]\n        :rtype: str\n        \"\"\"\n        if not strs:\n            return \"\"\n        prefix = strs[0]\n        for s in strs[1:]:\n            while not s.startswith(prefix):\n                prefix = prefix[:-1]\n                if not prefix:\n                    return \"\"\n        return prefix",
+      "explanation": "1. 如果輸入列表為空，返回空字串。\n2. 以第一個字串作為初始前綴。\n3. 遍歷其餘字串，若當前字串不以前綴開頭，逐步縮短前綴直到匹配。\n4. 若前綴變成空，則表示無公共前綴。\n5. 返回最終匹配的前綴。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

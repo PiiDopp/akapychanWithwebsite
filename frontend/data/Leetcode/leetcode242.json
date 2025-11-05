@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode242",
+  "coding_practice": [
+    {
+      "title": "Valid Anagram",
+      "description": "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
+      "examples": [
+        {
+          "input": "s = \"anagram\", t = \"nagaram\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"rat\", t = \"car\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s.length, t.length <= 5 * 10^4\ns and t consist of lowercase English letters.",
+      "follow up": "What if the inputs contain Unicode characters? How would you adapt your solution to such a case?",
+      "solution": "class Solution:\n    def isAnagram(self, s, t):\n        from collections import Counter\n        return Counter(s) == Counter(t)",
+      "explanation": "1. 使用 Counter 計算 s 和 t 中各字母出現的頻率。\n2. 比較兩個 Counter 是否相等，若相等則 t 是 s 的 anagram，否則不是。",
+      "tag": "613",
+      "difficult": "easy"
+    }
+  ]
+}

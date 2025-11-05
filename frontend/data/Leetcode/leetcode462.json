@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode462",
+  "coding_practice": [
+    {
+      "title": "Minimum Moves to Equal Array Elements II",
+      "description": "Given an integer array nums of size n, return the minimum number of moves required to make all array elements equal.\n\nIn one move, you can increment or decrement an element of the array by 1.\n\nTest cases are designed so that the answer will fit in a 32-bit integer.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3]",
+          "output": "2",
+          "explanation": "Only two moves are needed (remember each move increments or decrements one element): \n[1,2,3]  =>  [2,2,3]  =>  [2,2,2]"
+        },
+        {
+          "input": "nums = [1,10,2,9]",
+          "output": "16"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= nums.length <= 10^5\n-10^9 <= nums[i] <= 10^9",
+      "solution": "class Solution:\n    def minMoves2(self, nums):\n        # 將所有數字移動到中位數可使總步數最小\n        nums.sort()\n        median = nums[len(nums)//2]\n        moves = 0\n        for num in nums:\n            moves += abs(num - median)\n        return moves",
+      "explanation": "1. 將 nums 排序。\n2. 找到中位數，因為將所有元素移動到中位數可使總步數最小。\n3. 遍歷 nums，累加每個元素與中位數的距離。\n4. 返回總步數。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}
+

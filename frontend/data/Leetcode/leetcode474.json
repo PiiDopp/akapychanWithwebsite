@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode474",
+  "coding_practice": [
+    {
+      "title": "Ones and Zeroes",
+      "description": "You are given an array of binary strings strs and two integers m and n.\n\nReturn the size of the largest subset of strs such that there are at most m 0's and n 1's in the subset.\n\nA set x is a subset of a set y if all elements of x are also elements of y.",
+      "examples": [
+        {
+          "input": "strs = [\"10\",\"0001\",\"111001\",\"1\",\"0\"], m = 5, n = 3",
+          "output": "4",
+          "explanation": "The largest subset with at most 5 0's and 3 1's is {\"10\", \"0001\", \"1\", \"0\"}, so the answer is 4.\nOther valid but smaller subsets include {\"0001\", \"1\"} and {\"10\", \"1\", \"0\"}.\n{\"111001\"} is an invalid subset because it contains 4 1's, greater than the maximum of 3."
+        },
+        {
+          "input": "strs = [\"10\",\"0\",\"1\"], m = 1, n = 1",
+          "output": "2",
+          "explanation": "The largest subset is {\"0\", \"1\"}, so the answer is 2."
+        }
+      ],
+      "constraints": "1 <= strs.length <= 600\n1 <= strs[i].length <= 100\nstrs[i] consists only of digits '0' and '1'.\n1 <= m, n <= 100",
+      "solution": "class Solution:\n    def findMaxForm(self, strs, m, n):\n        # dp[i][j] 表示使用 i 個 0 和 j 個 1 能形成的最大字串數\n        dp = [[0] * (n + 1) for _ in range(m + 1)]\n        \n        for s in strs:\n            zeros = s.count('0')\n            ones = s.count('1')\n            # 逆序遍歷，避免重複使用同一個字串\n            for i in range(m, zeros - 1, -1):\n                for j in range(n, ones - 1, -1):\n                    dp[i][j] = max(dp[i][j], dp[i - zeros][j - ones] + 1)\n        return dp[m][n]",
+      "explanation": "1. 使用二維 DP dp[i][j] 表示使用 i 個 0 和 j 個 1 能形成的最大子集大小。\n2. 對每個字串計算其中的 0 和 1 的數量。\n3. 逆序遍歷 DP 陣列，更新 dp[i][j] 為 max(dp[i][j], dp[i - zeros][j - ones] + 1)，確保每個字串只使用一次。\n4. 遍歷完成後，dp[m][n] 即為可形成的最大子集大小。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

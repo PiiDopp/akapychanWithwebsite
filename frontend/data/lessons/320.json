@@ -1,0 +1,65 @@
+{
+  "ID": 320,
+  "Title": "指定與複合運算",
+  "Intro": "\t在 Python 中，`=` 是指定運算子，用來將右邊的值賦予左邊的變數。除了單純指定，也可以使用複合指定運算子（如 +=、-=、*=、/= 等），能在原有變數值的基礎上直接進行運算並更新結果。",
+  "exp": {
+    "cor_exp": [
+      "x = 10\nprint(x)  # 指定變數，輸出 10",
+      "x = 5\nx += 3\nprint(x)  # 等同於 x = x + 3，輸出 8",
+      "y = 20\ny -= 4\nprint(y)  # 等同於 y = y - 4，輸出 16",
+      "z = 7\nz *= 2\nprint(z)  # 等同於 z = z * 2，輸出 14",
+      "a = 9\na /= 3\nprint(a)  # 等同於 a = a / 3，輸出 3.0"
+    ],
+    "mis_exp": [
+      "10 = x  # 錯誤：不能將值指定給數字常數",
+      "x = 5\nx ++ 1  # 錯誤：Python 沒有 ++ 運算子",
+      "y = 7\ny =+ 2\nprint(y)  # 容易誤會，這其實是 y = (+2)，結果為 2，而不是累加"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nscore = 50\nscore += 10\nprint(score)",
+      "options": [
+        "A. 50",
+        "B. 60",
+        "C. 510",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "score += 10 等同於 score = score + 10，因此結果是 60。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ncount = 20\ncount -= 5\nprint(count)",
+      "options": [
+        "A. 25",
+        "B. 15",
+        "C. -5",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "count -= 5 等同於 count = count - 5，因此結果是 15。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\ntotal = 100\ntotal *= 3\nprint(total)",
+      "options": [
+        "A. 103",
+        "B. 300",
+        "C. 100*3",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "total *= 3 等同於 total = total * 3，因此結果是 300。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nprice = 80\nprice /= 4\nprint(price)",
+      "options": [
+        "A. 20",
+        "B. 20.0",
+        "C. 0",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "在 Python 中 / 運算會得到浮點數，因此輸出是 20.0。"
+    }
+  ]
+}

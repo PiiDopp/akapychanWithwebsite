@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode365",
+  "coding_practice": [
+    {
+      "title": "Water and Jug Problem",
+      "description": "You are given two jugs with capacities x liters and y liters. You have an infinite water supply. Return whether the total amount of water in both jugs may reach target using the following operations:\nFill either jug completely with water.\nCompletely empty either jug.\nPour water from one jug into another until the receiving jug is full, or the transferring jug is empty.",
+      "examples": [
+        {
+          "input": "x = 3, y = 5, target = 4",
+          "output": "true",
+          "explanation": "Follow these steps to reach a total of 4 liters:\nFill the 5-liter jug (0, 5).\nPour from the 5-liter jug into the 3-liter jug, leaving 2 liters (3, 2).\nEmpty the 3-liter jug (0, 2).\nTransfer the 2 liters from the 5-liter jug to the 3-liter jug (2, 0).\nFill the 5-liter jug again (2, 5).\nPour from the 5-liter jug into the 3-liter jug until the 3-liter jug is full. This leaves 4 liters in the 5-liter jug (3, 4).\nEmpty the 3-liter jug. Now, you have exactly 4 liters in the 5-liter jug (0, 4).\nReference: The Die Hard example."
+        },
+        {
+          "input": "x = 2, y = 6, target = 5",
+          "output": "false"
+        },
+        {
+          "input": "x = 1, y = 2, target = 3",
+          "output": "true",
+          "explanation": "Fill both jugs. The total amount of water in both jugs is equal to 3 now."
+        }
+      ],
+      "constraints": "1 <= x, y, target <= 10^3",
+      "solution": "class Solution:\n    def canMeasureWater(self, x, y, target):\n        def gcd(a, b):\n            while b != 0:\n                a, b = b, a % b\n            return a\n        if target > x + y:\n            return False\n        return target % gcd(x, y) == 0",
+      "explanation": "1. 使用歐幾里得算法求出兩個水壺容量的最大公因數 gcd。\n2. 如果 target 超過兩個水壺總和，返回 False。\n3. 根據貝祖定理，target 必須是 gcd(x, y) 的倍數才能被達到。\n4. 返回 target % gcd(x, y) == 0 的布林值作為答案。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

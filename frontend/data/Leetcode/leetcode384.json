@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode384",
+  "coding_practice": [
+    {
+      "title": "Shuffle an Array",
+      "description": "Given an integer array nums, design an algorithm to randomly shuffle the array. All permutations of the array should be equally likely as a result of the shuffling.\n\nImplement the Solution class:\n\nSolution(int[] nums) Initializes the object with the integer array nums.\nint[] reset() Resets the array to its original configuration and returns it.\nint[] shuffle() Returns a random shuffling of the array.",
+      "examples": [
+        {
+          "input": "[\"Solution\", \"shuffle\", \"reset\", \"shuffle\"], [[[1, 2, 3]], [], [], []]",
+          "output": "[null, [3, 1, 2], [1, 2, 3], [1, 3, 2]]",
+          "explanation": "Solution solution = new Solution([1, 2, 3]);\nsolution.shuffle();    // Shuffle the array [1,2,3] and return its result.\nsolution.reset();      // Resets the array back to its original configuration [1,2,3].\nsolution.shuffle();    // Returns the random shuffling of array [1,2,3].Example: return [1, 3, 2]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 50\n-10^6 <= nums[i] <= 10^6\nAll the elements of nums are unique.\nAt most 10^4 calls in total will be made to reset and shuffle.",
+      "solution": "import random\n\nclass Solution:\n\n    def __init__(self, nums):\n        self.nums = list(nums)  # 原始陣列\n\n    def reset(self):\n        # 返回原始陣列\n        return self.nums\n\n    def shuffle(self):\n        # 使用 Fisher-Yates 洗牌算法\n        shuffled = list(self.nums)\n        n = len(shuffled)\n        for i in range(n):\n            j = random.randint(i, n - 1)\n            shuffled[i], shuffled[j] = shuffled[j], shuffled[i]\n        return shuffled",
+      "explanation": "1. 使用一個副本 shuffled 保存當前洗牌結果。\n2. 使用 Fisher-Yates 算法：從 i 到 n-1 選擇一個隨機索引 j 並交換 shuffled[i] 與 shuffled[j]。\n3. reset 方法返回原始陣列。\n4. shuffle 方法返回打亂後的副本，保證所有排列等概率出現。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

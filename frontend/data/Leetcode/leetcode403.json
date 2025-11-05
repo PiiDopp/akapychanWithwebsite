@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode403",
+  "coding_practice": [
+    {
+      "title": "Frog Jump",
+      "description": "A frog is crossing a river. The river is divided into some number of units, and at each unit, there may or may not exist a stone. The frog can jump on a stone, but it must not jump into the water.\n\nGiven a list of stones positions (in units) in sorted ascending order, determine if the frog can cross the river by landing on the last stone. Initially, the frog is on the first stone and assumes the first jump must be 1 unit.\n\nIf the frog's last jump was k units, its next jump must be either k - 1, k, or k + 1 units. The frog can only jump in the forward direction.",
+      "examples": [
+        {
+          "input": "stones = [0,1,3,5,6,8,12,17]",
+          "output": "true",
+          "explanation": "The frog can jump to the last stone by jumping 1 unit to the 2nd stone, then 2 units to the 3rd stone, then 2 units to the 4th stone, then 3 units to the 6th stone, 4 units to the 7th stone, and 5 units to the 8th stone."
+        },
+        {
+          "input": "stones = [0,1,2,3,4,8,9,11]",
+          "output": "false",
+          "explanation": "There is no way to jump to the last stone as the gap between the 5th and 6th stone is too large."
+        }
+      ],
+      "constraints": "2 <= stones.length <= 2000\n0 <= stones[i] <= 2^31 - 1\nstones[0] == 0\nstones is sorted in a strictly increasing order.",
+      "solution": "class Solution:\n    def canCross(self, stones):\n        stone_set = set(stones)\n        last_stone = stones[-1]\n        jumps = {stone: set() for stone in stones}\n        jumps[0].add(0)\n        \n        for stone in stones:\n            for k in jumps[stone]:\n                for step in [k - 1, k, k + 1]:\n                    if step > 0 and stone + step in stone_set:\n                        jumps[stone + step].add(step)\n        \n        return bool(jumps[last_stone])",
+      "explanation": "1. 建立一個字典 jumps，紀錄每個石頭可到達的跳躍長度。\n2. 初始位置為 stone 0，跳躍長度為 0。\n3. 對於每個 stone 的每個可能跳躍長度 k，嘗試 k-1, k, k+1 的下一步。\n4. 若下一步石頭存在，將該跳躍長度加入該石頭的 jumps 集合。\n5. 最後檢查最後一塊石頭的 jumps 集合是否非空，若非空則可到達。",
+      "tag": "530",
+      "difficult": "hard"
+    }
+  ]
+}

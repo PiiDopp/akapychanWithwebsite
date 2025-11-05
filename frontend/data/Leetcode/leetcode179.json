@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode179",
+  "coding_practice": [
+    {
+      "title": "Largest Number",
+      "description": "Given a list of non-negative integers nums, arrange them such that they form the largest number and return it. \n\nSince the result may be very large, so you need to return a string instead of an integer.",
+      "examples": [
+        {
+          "input": "nums = [10,2]",
+          "output": "\"210\""
+        },
+        {
+          "input": "nums = [3,30,34,5,9]",
+          "output": "\"9534330\""
+        }
+      ],
+      "constraints": "1 <= nums.length <= 100\n0 <= nums[i] <= 10^9",
+      "solution": "from functools import cmp_to_key\n\nclass Solution:\n    def largestNumber(self, nums):\n        nums_str = list(map(str, nums))\n        def compare(x, y):\n            if x + y > y + x:\n                return -1\n            elif x + y < y + x:\n                return 1\n            else:\n                return 0\n        nums_str.sort(key=cmp_to_key(compare))\n        result = ''.join(nums_str)\n        return '0' if result[0] == '0' else result",
+      "explanation": "1. Convert all integers in nums to strings to facilitate concatenation comparisons.\n2. Sort the strings using a custom comparator: for two strings x and y, compare x+y vs y+x to decide order.\n3. Join all strings to form the largest number.\n4. Handle the edge case where the result starts with '0', meaning all numbers are zero.",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

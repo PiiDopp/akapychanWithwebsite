@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode344",
+  "coding_practice": [
+    {
+      "title": "Reverse String",
+      "description": "Write a function that reverses a string. The input string is given as an array of characters s.\n\nYou must do this by modifying the input array in-place with O(1) extra memory.",
+      "examples": [
+        {
+          "input": "s = [\"h\",\"e\",\"l\",\"l\",\"o\"]",
+          "output": "[\"o\",\"l\",\"l\",\"e\",\"h\"]"
+        },
+        {
+          "input": "s = [\"H\",\"a\",\"n\",\"n\",\"a\",\"h\"]",
+          "output": "[\"h\",\"a\",\"n\",\"n\",\"a\",\"H\"]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns[i] is a printable ascii character.",
+      "solution": "class Solution:\n    def reverseString(self, s):\n        left, right = 0, len(s) - 1\n        while left < right:\n            s[left], s[right] = s[right], s[left]\n            left += 1\n            right -= 1",
+      "explanation": "1. 初始化左右指針 left 和 right 分別指向字符串首尾。\n2. 當 left < right 時，交換 s[left] 與 s[right]。\n3. left 向右移動，right 向左移動，直到兩指針相遇。\n4. 原地完成字符串反轉。",
+      "tag": "711",
+      "difficult": "easy"
+    }
+  ]
+}

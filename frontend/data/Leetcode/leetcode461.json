@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode461",
+  "coding_practice": [
+    {
+      "title": "Hamming Distance",
+      "description": "The Hamming distance between two integers is the number of positions at which the corresponding bits are different.\n\nGiven two integers x and y, return the Hamming distance between them.",
+      "examples": [
+        {
+          "input": "x = 1, y = 4",
+          "output": "2",
+          "explanation": "1   (0 0 0 1)\n4   (0 1 0 0)\n       ↑   ↑\nThe above arrows point to positions where the corresponding bits are different."
+        },
+        {
+          "input": "x = 3, y = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "0 <= x, y <= 2^31 - 1",
+      "note": "This question is the same as 2220: Minimum Bit Flips to Convert Number.",
+      "solution": "class Solution:\n    def hammingDistance(self, x, y):\n        # 使用 XOR 找出不同位，再計算其中 1 的個數\n        xor = x ^ y\n        distance = 0\n        while xor:\n            distance += xor & 1\n            xor >>= 1\n        return distance",
+      "explanation": "1. 對 x 與 y 執行 XOR 操作，得到不同位為 1 的數字。\n2. 使用位運算遍歷 XOR 結果，累加 1 的個數即為 Hamming 距離。\n3. 返回距離。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

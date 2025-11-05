@@ -1,0 +1,41 @@
+{
+  "ID": "leetcode8",
+  "coding_practice": [
+    {
+      "title": "String to Integer (atoi)",
+      "description": "Implement the myAtoi(string s) function, which converts a string to a 32-bit signed integer.\n\nThe algorithm for myAtoi(string s) is as follows:\n\n1.Whitespace: Ignore any leading whitespace (\" \").\n2.Signedness: Determine the sign by checking if the next character is '-' or '+', assuming positivity if neither present.\n3.Conversion: Read the integer by skipping leading zeros until a non-digit character is encountered or the end of the string is reached. If no digits were read, then the result is 0.\n4.Rounding: If the integer is out of the 32-bit signed integer range [-2^31, 2^31 - 1], then round the integer to remain in the range. Specifically, integers less than -2^31 should be rounded to -2^31, and integers greater than 2^31 - 1 should be rounded to 2^31 - 1.\nReturn the integer as the final result.",
+      "examples": [
+        {
+          "input": "s = \"42\"",
+          "output": "42",
+          "explanation": "The underlined characters are what is read in and the caret is the current reader position.\nStep 1: \"42\" (no characters read because there is no leading whitespace)\n         ^\nStep 2: \"42\" (no characters read because there is neither a '-' nor '+')\n         ^\nStep 3: \"42\" (\"42\" is read in)\n           ^"
+        },
+        {
+          "input": "s = \" -042\"",
+          "output": "-42",
+          "explanation": "Step 1: \"   -042\" (leading whitespace is read and ignored)\n            ^\nStep 2: \"   -042\" ('-' is read, so the result should be negative)\n             ^\nStep 3: \"   -042\" (\"042\" is read in, leading zeros ignored in the result)\n               ^"
+        },
+        {
+          "input": "s = \"1337c0d3\"",
+          "output": "1337",
+          "explanation": "Step 1: \"1337c0d3\" (no characters read because there is no leading whitespace)\n         ^\nStep 2: \"1337c0d3\" (no characters read because there is neither a '-' nor '+')\n         ^\nStep 3: \"1337c0d3\" (\"1337\" is read in; reading stops because the next character is a non-digit)\n             ^"
+        },
+        {
+          "input": "s = \"0-1\"",
+          "output": "0",
+          "explanation": "Step 1: \"0-1\" (no characters read because there is no leading whitespace)\n         ^\nStep 2: \"0-1\" (no characters read because there is neither a '-' nor '+')\n         ^\nStep 3: \"0-1\" (\"0\" is read in; reading stops because the next character is a non-digit)\n          ^"
+        },
+        {
+          "input": "s = \"words and 987\"",
+          "output": "0",
+          "explanation": "Reading stops at the first non-digit character 'w'."
+        }
+      ],
+      "constraints": "0 <= s.length <= 200\ns consists of English letters (lower-case and upper-case), digits (0-9), ' ', '+', '-', and '.'.",
+      "solution": "class Solution(object):\n    def myAtoi(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: int\n        \"\"\"\n        s = s.lstrip()\n        if not s:\n            return 0\n\n        sign = 1\n        index = 0\n        if s[0] == '+':\n            index += 1\n        elif s[0] == '-':\n            sign = -1\n            index += 1\n\n        result = 0\n        while index < len(s) and s[index].isdigit():\n            result = result * 10 + int(s[index])\n            index += 1\n\n        result *= sign\n\n        INT_MAX = 2**31 - 1\n        INT_MIN = -2**31\n        if result < INT_MIN:\n            return INT_MIN\n        if result > INT_MAX:\n            return INT_MAX\n\n        return result",
+      "explanation": "1. 使用 lstrip() 移除字串前導空格。\n2. 判斷字串第一個字元是否為 '+' 或 '-' 以確定符號。\n3. 使用 while 迴圈讀取連續數字字元並構建整數。\n4. 乘回符號後檢查是否超過 32-bit 整數範圍，超過則返回邊界值。\n5. 返回最終轉換的整數。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

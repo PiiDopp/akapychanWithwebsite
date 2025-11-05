@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode380",
+  "coding_practice": [
+    {
+      "title": "Insert Delete GetRandom O(1)",
+      "description": "Implement the RandomizedSet class:\n\nRandomizedSet() Initializes the RandomizedSet object.\nbool insert(int val) Inserts an item val into the set if not present. Returns true if the item was not present, false otherwise.\nbool remove(int val) Removes an item val from the set if present. Returns true if the item was present, false otherwise.\nint getRandom() Returns a random element from the current set of elements (it's guaranteed that at least one element exists when this method is called). Each element must have the same probability of being returned.\nYou must implement the functions of the class such that each function works in average O(1) time complexity.",
+      "examples": [
+        {
+          "input": "[\"RandomizedSet\", \"insert\", \"remove\", \"insert\", \"getRandom\", \"remove\", \"insert\", \"getRandom\"], [[], [1], [2], [2], [], [1], [2], []]",
+          "output": "[null, true, false, true, 2, true, false, 2]",
+          "explanation": "RandomizedSet randomizedSet = new RandomizedSet();\nrandomizedSet.insert(1); // Inserts 1 to the set. Returns true as 1 was inserted successfully.\nrandomizedSet.remove(2); // Returns false as 2 does not exist in the set.\nrandomizedSet.insert(2); // Inserts 2 to the set, returns true. Set now contains [1,2].\nrandomizedSet.getRandom(); // getRandom() should return either 1 or 2 randomly.\nrandomizedSet.remove(1); // Removes 1 from the set, returns true. Set now contains [2].\nrandomizedSet.insert(2); // 2 was already in the set, so return false.\nrandomizedSet.getRandom(); // Since 2 is the only number in the set, getRandom() will always return 2."
+        }
+      ],
+      "constraints": "-2^31 <= val <= 2^31 - 1\nAt most 2 * 10^5 calls will be made to insert, remove, and getRandom.\nThere will be at least one element in the data structure when getRandom is called.",
+      "solution": "import random\n\nclass RandomizedSet:\n\n    def __init__(self):\n        self.val_to_index = {}\n        self.values = []\n\n    def insert(self, val):\n        if val in self.val_to_index:\n            return False\n        self.values.append(val)\n        self.val_to_index[val] = len(self.values) - 1\n        return True\n\n    def remove(self, val):\n        if val not in self.val_to_index:\n            return False\n        index = self.val_to_index[val]\n        last_val = self.values[-1]\n        self.values[index] = last_val\n        self.val_to_index[last_val] = index\n        self.values.pop()\n        del self.val_to_index[val]\n        return True\n\n    def getRandom(self):\n        return random.choice(self.values)",
+      "explanation": "1. 使用列表保存所有元素，字典保存元素到索引的映射。\n2. insert: 若元素不存在，加入列表並更新字典索引。\n3. remove: 將目標元素與最後一個元素交換，刪除最後一個元素，更新字典索引。\n4. getRandom: 使用 random.choice 從列表中隨機選取元素。",
+      "tag": "632",
+      "difficult": "medium"
+    }
+  ]
+}

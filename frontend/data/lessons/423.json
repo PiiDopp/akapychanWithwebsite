@@ -1,0 +1,51 @@
+{
+  "ID": 423,
+  "Title": "if..elif..else 條件判斷",
+  "Intro": "\t在 Python 中，if elif else 用來處理多個條件的判斷。程式會依序檢查 if、elif 條件，第一個成立的區塊會被執行，若都不成立，則執行 else。",
+  "exp": {
+    "cor_exp": [
+      "x = 15\nif x < 10:\n    print('小於 10')\nelif x < 20:\n    print('小於 20')\nelse:\n    print('大於等於 20')  # 輸出：小於 20",
+      "score = 75\nif score >= 90:\n    print('優')\nelif score >= 60:\n    print('及格')\nelse:\n    print('不及格')  # 輸出：及格"
+    ],
+    "mis_exp": [
+      "n = 8\nif n > 10:\n    print('大於 10')\nelif n > 5\n    print('大於 5')\nelse:\n    print('小於等於 5')  # 錯誤：elif 缺少冒號",
+      "x = 12\nif x > 20:\n    print('大於 20')\nelif x > 10:\nprint('大於 10')\nelse:\n    print('小於等於 10')  # 錯誤：elif 區塊缺少縮排"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnum = int(input('請輸入一個數字: '))\nif num < 0:\n    print('負數')\nelif num <= 100:\n    print('正常範圍')\nelse:\n    print('超出範圍')  # 假設輸入 50",
+      "options": [
+        "A. 負數",
+        "B. 正常範圍",
+        "C. 超出範圍",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "50 介於 0 到 100，elif 條件成立，輸出『正常範圍』。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nscore = 85\nif score >= 90:\n    print('優')\nelif score >= 60:\n    print('及格')\nelse:\n    print('不及格')",
+      "options": [
+        "A. 優",
+        "B. 及格",
+        "C. 不及格",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "score = 85，第一個 if 不成立，但 elif score >= 60 成立，因此輸出『及格』。"
+    },
+    {
+      "question": "下列程式碼會發生什麼？\n\nx = 15\nif x > 20:\n    print('大於 20')\nelif x > 10\n    print('大於 10')\nelse:\n    print('小於等於 10')",
+      "options": [
+        "A. 大於 20",
+        "B. 大於 10",
+        "C. 小於等於 10",
+        "D. 程式錯誤"
+      ],
+      "answer": "D",
+      "explanation": "elif 後面缺少冒號，會導致語法錯誤。"
+    }
+  ]
+
+}

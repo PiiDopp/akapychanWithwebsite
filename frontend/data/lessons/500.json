@@ -1,0 +1,23 @@
+{
+  "ID": 500,
+  "coding_practice": [
+    {
+      "title": "倍數輸出",
+      "description": "請寫一個程式，輸入一個正整數 n，使用 for 迴圈搭配 range()，輸出 1~50 之間所有能被 n 整除的數字。",
+      "examples": {
+        "input": "7",
+        "output": "7 14 21 28 35 42 49"
+      },
+      "solution": "n = int(input())\nfor i in range(1, 51):\n    if i % n == 0:\n        print(i, end=' ')"
+    },
+    {
+      "title": "密碼檢查",
+      "description": "請寫一個程式，讓使用者重複輸入密碼，直到輸入正確的密碼 'python123' 為止。每次輸入錯誤都提示『密碼錯誤，請再試一次』，輸入正確時輸出『登入成功』。",
+      "examples": {
+        "input": "abc\n1234\npython123",
+        "output": "密碼錯誤，請再試一次\n密碼錯誤，請再試一次\n登入成功"
+      },
+      "solution": "password = ''\nwhile password != 'python123':\n    password = input()\n    if password != 'python123':\n        print('密碼錯誤，請再試一次')\nprint('登入成功')"
+    }
+  ]
+}

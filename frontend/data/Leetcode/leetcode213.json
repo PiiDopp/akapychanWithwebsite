@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode213",
+  "coding_practice": [
+    {
+      "title": "House Robber II",
+      "description": "You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have a security system connected, and it will automatically contact the police if two adjacent houses were broken into on the same night.\n\nGiven an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.",
+      "examples": [
+        {
+          "input": "nums = [2,3,2]",
+          "output": "3",
+          "explanation": "You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses."
+        },
+        {
+          "input": "nums = [1,2,3,1]",
+          "output": "4",
+          "explanation": "Rob house 1 (money = 1) and then rob house 3 (money = 3). Total amount you can rob = 1 + 3 = 4."
+        },
+        {
+          "input": "nums = [1,2,3]",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 100\n0 <= nums[i] <= 1000",
+      "solution": "class Solution:\n    def rob(self, nums):\n        if not nums:\n            return 0\n        if len(nums) == 1:\n            return nums[0]\n        \n        def rob_linear(houses):\n            prev, curr = 0, 0\n            for num in houses:\n                prev, curr = curr, max(curr, prev + num)\n            return curr\n        \n        return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))",
+      "explanation": "1. 如果只有一間房子，直接返回其金額。\n2. 定義 rob_linear 函數解決線性搶劫問題，使用動態規劃更新 prev 與 curr。\n3. 由於房屋是環形，分為兩種情況：搶第一間不搶最後一間，或不搶第一間搶最後一間。\n4. 返回兩種情況的最大值，即為答案。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

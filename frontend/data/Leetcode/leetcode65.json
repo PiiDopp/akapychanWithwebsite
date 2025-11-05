@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode65",
+  "coding_practice": [
+    {
+      "title": "Valid Number",
+      "description": "Given a string s, return whether s is a valid number.\n\nFor example, all the following are valid numbers: \"2\", \"0089\", \"-0.1\", \"+3.14\", \"4.\", \"-.9\", \"2e10\", \"-90E3\", \"3e+7\", \"+6e-1\", \"53.5e93\", \"-123.456e789\", while the following are not valid numbers: \"abc\", \"1a\", \"1e\", \"e3\", \"99e2.5\", \"--6\", \"-+3\", \"95a54e53\".\n\nFormally, a valid number is defined using one of the following definitions:\n\nAn integer number followed by an optional exponent.\nA decimal number followed by an optional exponent.\nAn integer number is defined with an optional sign '-' or '+' followed by digits.\n\nA decimal number is defined with an optional sign '-' or '+' followed by one of the following definitions:\n\nDigits followed by a dot '.'.\nDigits followed by a dot '.' followed by digits.\nA dot '.' followed by digits.\nAn exponent is defined with an exponent notation 'e' or 'E' followed by an integer number.\n\nThe digits are defined as one or more digits.",
+      "examples": [
+        {
+          "input": "s = \"0\"",
+          "output": true
+        },
+        {
+          "input": "s = \"e\"",
+          "output": false
+        },
+        {
+          "input": "s = \".\"",
+          "output": false
+        }
+      ],
+      "constraints": "1 <= s.length <= 20\ns consists of only English letters (both uppercase and lowercase), digits (0-9), plus '+', minus '-', or dot '.'.",
+      "solution": "class Solution(object):\n    def isNumber(self, s):\n        s = s.strip()\n        if not s:\n            return False\n        num_seen = False\n        dot_seen = False\n        e_seen = False\n        for i, char in enumerate(s):\n            if char.isdigit():\n                num_seen = True\n            elif char == '.':\n                if dot_seen or e_seen:\n                    return False\n                dot_seen = True\n            elif char in ['e', 'E']:\n                if e_seen or not num_seen:\n                    return False\n                e_seen = True\n                num_seen = False\n            elif char in ['+', '-']:\n                if i != 0 and s[i-1] not in ['e', 'E']:\n                    return False\n            else:\n                return False\n        return num_seen",
+      "explanation": "1. 去除首尾空白後，逐字檢查是否合法。\n2. 數字、小數點、e/E、正負號皆有明確規則限制其出現位置。\n3. 若遇到重複或錯誤位置的小數點、e/E 或符號立即返回 False。\n4. 最終需至少出現一個數字才為合法。\n5. 例如：'0' 為合法，'e' 與 '.' 為非法。",
+      "tag": 723,
+      "difficult": "hard"
+    }
+  ]
+}

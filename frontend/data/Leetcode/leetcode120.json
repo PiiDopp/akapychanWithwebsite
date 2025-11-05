@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode120",
+  "coding_practice": [
+    {
+      "title": "Triangle",
+      "description": "Given a triangle array, return the minimum path sum from top to bottom.\n\nFor each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.",
+      "examples": [
+        {
+          "input": "triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]",
+          "output": "11",
+          "explanation": "The triangle looks like:\n   2\n  3 4\n 6 5 7\n4 1 8 3\nThe minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above)."
+        },
+        {
+          "input": "triangle = [[-10]]",
+          "output": "-10"
+        }
+      ],
+      "constraints": "1 <= triangle.length <= 200\ntriangle[0].length == 1\ntriangle[i].length == triangle[i - 1].length + 1\n-10^4 <= triangle[i][j] <= 10^4",
+      "solution": "class Solution(object):\n    def minimumTotal(self, triangle):\n        n = len(triangle)\n        dp = triangle[-1][:]\n        for i in range(n-2, -1, -1):\n            for j in range(len(triangle[i])):\n                dp[j] = triangle[i][j] + min(dp[j], dp[j+1])\n        return dp[0]",
+      "explanation": "1. 從底向上進行動態規劃，初始化 dp 為最後一行。\n2. 從倒數第二行向上遍歷，每個位置選擇下一行相鄰兩個元素中的最小值加上當前值。\n3. 遍歷完畢後，dp[0] 即為最小路徑和。",
+      "tag": 530,
+      "difficult": "medium"
+    }
+  ]
+}

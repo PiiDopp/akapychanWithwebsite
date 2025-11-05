@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode300",
+  "coding_practice": [
+    {
+      "title": "Longest Increasing Subsequence",
+      "description": "Given an integer array nums, return the length of the longest strictly increasing subsequence.",
+      "examples": [
+        {
+          "input": "nums = [10,9,2,5,3,7,101,18]",
+          "output": "4",
+          "explanation": "The longest increasing subsequence is [2,3,7,101], therefore the length is 4."
+        },
+        {
+          "input": "nums = [0,1,0,3,2,3]",
+          "output": "4"
+        },
+        {
+          "input": "nums = [7,7,7,7,7,7,7]",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 2500\n-10^4 <= nums[i] <= 10^4",
+      "follow up": "Can you come up with an algorithm that runs in O(n log(n)) time complexity?",
+      "solution": "import bisect\n\nclass Solution:\n    def lengthOfLIS(self, nums):\n        # tails[i] 代表長度為 i+1 的遞增子序列的最小尾端元素\n        tails = []\n        for num in nums:\n            idx = bisect.bisect_left(tails, num)\n            if idx == len(tails):\n                tails.append(num)\n            else:\n                tails[idx] = num\n        return len(tails)",
+      "explanation": "1. 使用 tails 陣列維護不同長度的遞增子序列的最小尾端元素。\n2. 對於每個 num，在 tails 中使用二分查找找到它應插入的位置 idx。\n3. 如果 idx 等於 tails 長度，表示 num 可以延長子序列，將其 append。\n4. 否則替換 tails[idx] 為 num，以維持最小尾端元素。\n5. 最終 tails 的長度即為最長遞增子序列的長度。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

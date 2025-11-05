@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode66",
+  "coding_practice": [
+    {
+      "title": "Plus One",
+      "description": "You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.\n\nIncrement the large integer by one and return the resulting array of digits.",
+      "examples": [
+        {
+          "input": "digits = [1,2,3]",
+          "output": "[1,2,4]",
+          "explanation": "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]."
+        },
+        {
+          "input": "digits = [4,3,2,1]",
+          "output": "[4,3,2,2]",
+          "explanation": "The array represents the integer 4321.\nIncrementing by one gives 4321 + 1 = 4322.\nThus, the result should be [4,3,2,2]."
+        },
+        {
+          "input": "digits = [9]",
+          "output": "[1,0]",
+          "explanation": "The array represents the integer 9.\nIncrementing by one gives 9 + 1 = 10.\nThus, the result should be [1,0]."
+        }
+      ],
+      "constraints": "1 <= digits.length <= 100\n0 <= digits[i] <= 9\ndigits does not contain any leading 0's.",
+      "solution": "class Solution(object):\n    def plusOne(self, digits):\n        \"\"\"\n        :type digits: List[int]\n        :rtype: List[int]\n        \"\"\"\n        n = len(digits)\n        for i in range(n - 1, -1, -1):\n            if digits[i] < 9:\n                digits[i] += 1\n                return digits\n            digits[i] = 0\n        return [1] + digits",
+      "explanation": "1. 從最後一位開始檢查，若小於9則直接加1並回傳。\n2. 若該位數為9，則變成0並進入前一位繼續檢查。\n3. 若所有位數都是9（如 [9,9,9]），則在最前方加上1，回傳結果為 [1,0,0,0]。",
+      "tag": 711,
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "ID": 1110,
+  "Title": "類別與物件（Class & Object）",
+  "Intro": "\t在 Python 中，『類別（class）』是一種自訂資料型態，用來定義物件的屬性（attributes）與行為（methods）。『物件（object）』則是根據類別建立的實體。類別就像藍圖，而物件是依照藍圖製造出來的具體實例。使用類別能讓程式更有結構性與可重複使用性。",
+  "exp": {
+    "cor_exp": [
+      "# 定義最基本的類別與建立物件\nclass Dog:\n    pass  # 暫時不定義任何內容\n\nmy_dog = Dog()  # 建立物件\nprint(type(my_dog))  # <class '__main__.Dog'>",
+      "# 在類別中定義屬性與方法\nclass Dog:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def bark(self):\n        print(f'{self.name} 汪汪叫！')\n\nmy_dog = Dog('Lucky', 3)\nprint('狗名：', my_dog.name)\nprint('年齡：', my_dog.age)\nmy_dog.bark()",
+      "# 建立多個物件\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\n    def show_info(self):\n        print(f'{self.name} 的分數是 {self.score}')\n\ns1 = Student('Alice', 90)\ns2 = Student('Bob', 80)\ns1.show_info()\ns2.show_info()"
+    ],
+    "mis_exp": [
+      "# 錯誤：忘記 self 參數\nclass Dog:\n    def bark():\n        print('汪汪！')\n\nmy_dog = Dog()\nmy_dog.bark()  # TypeError：缺少 self 參數",
+      "# 錯誤：未呼叫建構子所需參數\nclass Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student()  # TypeError：缺少參數 name",
+      "# 錯誤：屬性名稱拼錯\nclass Cat:\n    def __init__(self, name):\n        self.name = name\n\nc = Cat('Mimi')\nprint(c.nmae)  # AttributeError：屬性名稱錯誤"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列程式輸出結果為何？\n\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n\n    def bark(self):\n        print(self.name, '汪汪叫！')\n\nmy_dog = Dog('Lucky')\nmy_dog.bark()",
+      "options": [
+        "A. Lucky 汪汪叫！",
+        "B. 汪汪叫！ Lucky",
+        "C. self.name 汪汪叫！",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "建立 Dog 類別後，my_dog 物件呼叫 bark() 方法，輸出『Lucky 汪汪叫！』。"
+    },
+    {
+      "question": "關於類別與物件的敘述，下列何者正確？",
+      "options": [
+        "A. 類別是具體的資料，物件是模板",
+        "B. 物件是由類別建立的實體",
+        "C. 一個類別只能建立一個物件",
+        "D. 類別無法擁有方法"
+      ],
+      "answer": "B",
+      "explanation": "類別是藍圖，物件是依據藍圖建立的實體，可建立多個物件。"
+    },
+    {
+      "question": "下列程式哪裡錯誤？\n\nclass Car:\n    def __init__(self, brand):\n        self.brand = brand\n\nmy_car = Car()\nprint(my_car.brand)",
+      "options": [
+        "A. 應改為 Car('Toyota')",
+        "B. 缺少 print()",
+        "C. def 拼錯",
+        "D. 無錯誤"
+      ],
+      "answer": "A",
+      "explanation": "__init__ 建構子需要傳入 brand 參數，建立物件時必須給定值。"
+    }
+  ]
+}

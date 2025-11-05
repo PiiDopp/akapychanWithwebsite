@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode446",
+  "coding_practice": [
+    {
+      "title": "Arithmetic Slices II - Subsequence",
+      "description": "Given an integer array nums, return the number of all the arithmetic subsequences of nums.\n\nA sequence of numbers is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.\n\n For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are arithmetic sequences.\n\n For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.\n\nA subsequence of an array is a sequence that can be formed by removing some elements (possibly none) of the array.\n\nFor example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].\n\nThe test cases are generated so that the answer fits in 32-bit integer.",
+      "examples": [
+        {
+          "input": "nums = [2,4,6,8,10]",
+          "output": "7",
+          "explanation": "All arithmetic subsequence slices are:\n[2,4,6]\n[4,6,8]\n[6,8,10]\n[2,4,6,8]\n[4,6,8,10]\n[2,4,6,8,10]\n[2,6,10]"
+        },
+        {
+          "input": "nums = [7,7,7,7,7]",
+          "output": "16",
+          "explanation": "Any subsequence of this array is arithmetic."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 1000\n-2^31 <= nums[i] <= 2^31 - 1",
+      "solution": "from collections import defaultdict\n\nclass Solution:\n    def numberOfArithmeticSlices(self, nums):\n        n = len(nums)\n        dp = [defaultdict(int) for _ in range(n)]\n        total = 0\n        \n        for i in range(n):\n            for j in range(i):\n                diff = nums[i] - nums[j]\n                count = dp[j][diff]\n                dp[i][diff] += count + 1\n                total += count\n        \n        return total",
+      "explanation": "1. 使用 dp[i] 來記錄以 nums[i] 結尾的差值 diff 的子序列數量。\n2. 遍歷每對索引 (j, i)，計算差值 diff = nums[i] - nums[j]。\n3. dp[j][diff] 表示以 nums[j] 結尾且差值為 diff 的子序列數量，這些子序列可與 nums[i] 組成新的子序列。\n4. 更新 dp[i][diff] = dp[i][diff] + dp[j][diff] + 1。\n5. 只將 dp[j][diff] 計入 total，因為只計算長度 >= 3 的子序列。\n6. 返回 total 即為所有算術子序列的數量。",
+      "tag": "520",
+      "difficult": "hard"
+    }
+  ]
+}

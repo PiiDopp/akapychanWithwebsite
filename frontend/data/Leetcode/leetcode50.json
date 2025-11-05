@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode50",
+  "coding_practice": [
+    {
+      "title": "Pow(x, n)",
+      "description": "Implement pow(x, n), which calculates x raised to the power n (i.e., x^n).",
+      "examples": [
+        {
+          "input": "x = 2.00000, n = 10",
+          "output": "1024.00000"
+        },
+        {
+          "input": "x = 2.10000, n = 3",
+          "output": "9.26100"
+        },
+        {
+          "input": "x = 2.00000, n = -2",
+          "output": "0.25000",
+          "explanation": "2^-2 = 1/2^2 = 1/4 = 0.25"
+        }
+      ],
+      "constraints": "-100.0 < x < 100.0\n-2^31 <= n <= 2^31-1\nn is an integer.\nEither x is not zero or n > 0.\n-10^4 <= x^n <= 10^4",
+      "solution": "class Solution(object):\n    def myPow(self, x, n):\n        \"\"\"\n        :type x: float\n        :type n: int\n        :rtype: float\n        \"\"\"\n        if n == 0:\n            return 1\n        if n < 0:\n            x = 1 / x\n            n = -n\n\n        def fastPow(x, n):\n            if n == 0:\n                return 1\n            half = fastPow(x, n // 2)\n            if n % 2 == 0:\n                return half * half\n            else:\n                return half * half * x\n\n        return fastPow(x, n)",
+      "explanation": "1. 特殊情況處理：如果 n == 0，返回 1；如果 n < 0，將 x 取倒數並將 n 取正。\n2. 使用遞迴快速冪法 fastPow(x, n)：\n   2.1 計算 half = fastPow(x, n // 2)\n   2.2 如果 n 為偶數，返回 half * half\n   2.3 如果 n 為奇數，返回 half * half * x\n3. 返回最終計算結果。\n4. 複雜度分析：\n   4.1 時間複雜度：O(log n)\n   4.2 空間複雜度：O(log n)（遞迴棧深度）",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

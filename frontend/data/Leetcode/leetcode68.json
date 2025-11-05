@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode68",
+  "coding_practice": [
+    {
+      "title": "Text Justification",
+      "description": "Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.\n\nYou should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.\n\nExtra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.\n\nFor the last line of text, it should be left-justified, and no extra space is inserted between words.\n\nNote:\n\nA word is defined as a character sequence consisting of non-space characters only.\nEach word's length is guaranteed to be greater than 0 and not exceed maxWidth.\nThe input array words contains at least one word.",
+      "examples": [
+        {
+          "input": "words = [\"This\", \"is\", \"an\", \"example\", \"of\", \"text\", \"justification.\"], maxWidth = 16",
+          "output": "[\"This    is    an\",\"example  of text\",\"justification.  \"]"
+        },
+        {
+          "input": "words = [\"What\",\"must\",\"be\",\"acknowledgment\",\"shall\",\"be\"], maxWidth = 16",
+          "output": "[\"What   must   be\",\"acknowledgment  \",\"shall be        \"]",
+          "explanation": "Note that the last line is \"shall be    \" instead of \"shall     be\", because the last line must be left-justified instead of fully-justified. The second line is also left-justified because it contains only one word."
+        },
+        {
+          "input": "words = [\"Science\",\"is\",\"what\",\"we\",\"understand\",\"well\",\"enough\",\"to\",\"explain\",\"to\",\"a\",\"computer.\",\"Art\",\"is\",\"everything\",\"else\",\"we\",\"do\"], maxWidth = 20",
+          "output": "[\"Science  is  what we\",\"understand      well\",\"enough to explain to\",\"a  computer.  Art is\",\"everything  else  we\",\"do                  \"]"
+        }
+      ],
+      "constraints": "1 <= words.length <= 300\n1 <= words[i].length <= 20\nwords[i] consists of only English letters and symbols.\n1 <= maxWidth <= 100\nwords[i].length <= maxWidth",
+      "solution": "class Solution(object):\n    def fullJustify(self, words, maxWidth):\n        \"\"\"\n        :type words: List[str]\n        :type maxWidth: int\n        :rtype: List[str]\n        \"\"\"\n        res = []\n        i = 0\n        n = len(words)\n\n        while i < n:\n            # determine how many words can fit in the line\n            line_len = len(words[i])\n            j = i + 1\n            while j < n and line_len + 1 + len(words[j]) <= maxWidth:\n                line_len += 1 + len(words[j])\n                j += 1\n\n            # build the line\n            line_words = words[i:j]\n            spaces_needed = maxWidth - sum(len(word) for word in line_words)\n            gaps = len(line_words) - 1\n\n            if j == n or gaps == 0:\n                # left-justify for last line or single word\n                line = ' '.join(line_words) + ' ' * (maxWidth - line_len)\n            else:\n                # fully justify\n                space, extra = divmod(spaces_needed, gaps)\n                line = ''\n                for k in range(gaps):\n                    line += line_words[k] + ' ' * (space + (1 if k < extra else 0))\n                line += line_words[-1]\n\n            res.append(line)\n            i = j\n\n        return res",
+      "explanation": "1. 使用貪婪算法，將盡可能多的單字放入每行，直到達到 maxWidth。\n2. 計算該行需要的空格數，分配到單字之間，如果不能平均分配，左邊的空格多一些。\n3. 最後一行或單字行採用左對齊，將多餘空格填充到行尾。",
+      "tag": 711,
+      "difficult": "medium"
+    }
+  ]
+}

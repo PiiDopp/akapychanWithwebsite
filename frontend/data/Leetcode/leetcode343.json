@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode343",
+  "coding_practice": [
+    {
+      "title": "Integer Break",
+      "description": "Given an integer n, break it into the sum of k positive integers, where k >= 2, and maximize the product of those integers.\n\nReturn the maximum product you can get.",
+      "examples": [
+        {
+          "input": "n = 2",
+          "output": "1",
+          "explanation": "2 = 1 + 1, 1 × 1 = 1."
+        },
+        {
+          "input": "n = 10",
+          "output": "36",
+          "explanation": "10 = 3 + 3 + 4, 3 × 3 × 4 = 36."
+        }
+      ],
+      "constraints": "2 <= n <= 58",
+      "solution": "class Solution:\n    def integerBreak(self, n):\n        if n == 2: return 1\n        if n == 3: return 2\n        res = 1\n        while n > 4:\n            res *= 3\n            n -= 3\n        return res * n",
+      "explanation": "1. 若 n 為 2 或 3，特殊處理返回 1 或 2。\n2. 迴圈中，每次從 n 中減去 3，並將結果乘到 res 上，因為 3 是最大化乘積的最佳切分數。\n3. 當剩餘 n <= 4，直接將其乘到 res 上。\n4. 返回 res，即最大乘積。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

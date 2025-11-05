@@ -1,0 +1,47 @@
+{
+  "ID": 810,
+  "Title": "模組簡介",
+  "Intro": "\t模組 (module) 就是一個 .py 檔案，裡面可以包含變數、函數、類別。\n使用模組的好處：\n\n1. 程式碼重複利用（不用每次都重寫）。\n2. 程式更有結構（依功能拆分檔案）。\n3. 方便共享（別人寫好的模組我們可以直接使用）。",
+  "exp": {
+    "cor_exp": [
+      "匯入模組的方式\nimport 模組名稱\t\t\t匯入整個模組，用 模組.名稱 使用內容\nimport 模組名稱 as 別名\t匯入並改名字，方便使用\nfrom 模組 import 名稱\t\t只匯入模組中的某個函數/變數",
+      "# 匯入 math 模組\nimport math\n\nprint(math.pi)        # 3.141592653589793\nprint(math.sqrt(25))  # 5.0\nprint(math.factorial(5))  # 120"
+    ],
+    "mis_exp": []
+  },
+  "practice": [
+    {
+      "question": "在 Python 中，模組 (module) 是什麼？",
+      "options": [
+        "A. 一個資料夾，裡面可以放多個檔案",
+        "B. 一個 .py 檔案，裡面可以包含變數、函數、類別",
+        "C. Python 內建的解譯器",
+        "D. 一個安裝在電腦上的程式"
+      ],
+      "answer": "B",
+      "explanation": "模組就是一個 .py 檔案，裡面可以包含變數、函數與類別。"
+    },
+    {
+      "question": "下列哪一個是正確的模組匯入方式？",
+      "options": [
+        "A. use math",
+        "B. include math",
+        "C. import math",
+        "D. require math"
+      ],
+      "answer": "C",
+      "explanation": "在 Python 中使用 `import 模組名稱` 來匯入模組，例如 `import math`。"
+    },
+    {
+      "question": "使用 `from math import sqrt` 之後，呼叫開根號的方法應該是？",
+      "options": [
+        "A. math.sqrt(16)",
+        "B. sqrt(16)",
+        "C. import.sqrt(16)",
+        "D. square_root(16)"
+      ],
+      "answer": "B",
+      "explanation": "使用 `from math import sqrt` 會直接匯入 sqrt 函數，可以直接呼叫 `sqrt(16)`。"
+    }
+  ]
+}

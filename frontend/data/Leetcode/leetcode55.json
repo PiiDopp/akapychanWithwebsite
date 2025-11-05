@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode55",
+  "coding_practice": [
+    {
+      "title": "Jump Game",
+      "description": "You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.\n\nReturn true if you can reach the last index, or false otherwise.",
+      "examples": [
+        {
+          "input": "nums = [2,3,1,1,4]",
+          "output": "true",
+          "explanation": "Jump 1 step from index 0 to 1, then 3 steps to the last index."
+        },
+        {
+          "input": "nums = [3,2,1,0,4]",
+          "output": "false",
+          "explanation": "You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^4\n0 <= nums[i] <= 10^5",
+      "solution": "class Solution(object):\n    def canJump(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: bool\n        \"\"\"\n        max_reach = 0\n        n = len(nums)\n        \n        for i in range(n):\n            if i > max_reach:\n                return False\n            max_reach = max(max_reach, i + nums[i])\n        \n        return True",
+      "explanation": "1. 初始化 max_reach = 0，表示目前能到達的最遠索引。\n2. 遍歷陣列 nums：\n   2.1 如果當前索引 i > max_reach，表示無法跳到這裡，返回 False。\n   2.2 否則更新 max_reach = max(max_reach, i + nums[i])。\n3. 遍歷完成後，若未提前返回 False，表示能到達最後索引，返回 True。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n)\n   4.2 空間複雜度：O(1)",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode336",
+  "coding_practice": [
+    {
+      "title": "Palindrome Pairs",
+      "description": "You are given a 0-indexed array of unique strings words.\n\nA palindrome pair is a pair of integers (i, j) such that:\n\n0 <= i, j < words.length,\ni != j, and\nwords[i] + words[j] (the concatenation of the two strings) is a palindrome.\nReturn an array of all the palindrome pairs of words.\n\nYou must write an algorithm with O(sum of words[i].length) runtime complexity.",
+      "examples": [
+        {
+          "input": "words = [\"abcd\",\"dcba\",\"lls\",\"s\",\"sssll\"]",
+          "output": "[[0,1],[1,0],[3,2],[2,4]]",
+          "explanation": "The palindromes are [\"abcddcba\",\"dcbaabcd\",\"slls\",\"llssssll\"]"
+        },
+        {
+          "input": "words = [\"bat\",\"tab\",\"cat\"]",
+          "output": "[[0,1],[1,0]]",
+          "explanation": "The palindromes are [\"battab\",\"tabbat\"]"
+        },
+        {
+          "input": "words = [\"a\",\"\"]",
+          "output": "[[0,1],[1,0]]",
+          "explanation": "The palindromes are [\"a\",\"a\"]"
+        }
+      ],
+      "constraints": "1 <= words.length <= 5000\n0 <= words[i].length <= 300\nwords[i] consists of lowercase English letters.",
+      "solution": "class Solution:\n    def palindromePairs(self, words):\n        wordict = {word[::-1]: i for i, word in enumerate(words)}\n        res = []\n        for i, word in enumerate(words):\n            for j in range(len(word)+1):\n                prefix, suffix = word[:j], word[j:]\n                if prefix in wordict and wordict[prefix] != i and suffix == suffix[::-1]:\n                    res.append([i, wordict[prefix]])\n                if j != 0 and suffix in wordict and wordict[suffix] != i and prefix == prefix[::-1]:\n                    res.append([wordict[suffix], i])\n        return res",
+      "explanation": "1. 建立一個字典 wordict，存儲每個單詞的反向及其索引。\n2. 遍歷每個單詞 word，對每個可能的分割點 j 將 word 分為 prefix 和 suffix。\n3. 檢查 prefix 是否在字典中且 suffix 是回文，若是，加入對應索引對。\n4. 同理，檢查 suffix 是否在字典中且 prefix 是回文，避免重複檢查 j=0。\n5. 返回所有符合條件的索引對。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

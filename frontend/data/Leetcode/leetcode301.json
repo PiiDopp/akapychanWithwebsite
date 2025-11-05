@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode301",
+  "coding_practice": [
+    {
+      "title": "Remove Invalid Parentheses",
+      "description": "Given a string s that contains parentheses and letters, remove the minimum number of invalid parentheses to make the input string valid.\n\nReturn a list of unique strings that are valid with the minimum number of removals. You may return the answer in any order.",
+      "examples": [
+        {
+          "input": "s = \"()())()\"",
+          "output": "[\"(())()\",\"()()()\"]"
+        },
+        {
+          "input": "s = \"(a)())()\"",
+          "output": "[\"(a())()\",\"(a)()()\"]"
+        },
+        {
+          "input": "s = \")(\"",
+          "output": "[\"\"]"
+        }
+      ],
+      "constraints": "1 <= s.length <= 25\ns consists of lowercase English letters and parentheses '(' and ')'.\nThere will be at most 20 parentheses in s.",
+      "solution": "class Solution(object):\n    def removeInvalidParentheses(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: List[str]\n        \"\"\"\n        res = set()\n        def isValid(string):\n            count = 0\n            for c in string:\n                if c == '(':\n                    count += 1\n                elif c == ')':\n                    count -= 1\n                    if count < 0:\n                        return False\n            return count == 0\n        \n        level = {s}\n        while level:\n            valid = list(filter(isValid, level))\n            if valid:\n                return valid\n            next_level = set()\n            for item in level:\n                for i in range(len(item)):\n                    if item[i] in ('(', ')'):\n                        next_level.add(item[:i] + item[i+1:])\n            level = next_level\n        return []",
+      "explanation": "1. 定義 isValid 函數，判斷字串的括號是否有效。\n2. 使用 BFS 層級遍歷，從原始字串開始，逐步刪除一個括號產生下一層。\n3. 在每一層檢查是否存在有效字串，若有直接返回，確保最少刪除。\n4. 若該層沒有有效字串，生成下一層集合繼續遍歷。\n5. 重複直到找到最少刪除後的所有有效字串。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

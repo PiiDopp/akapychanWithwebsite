@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode208",
+  "coding_practice": [
+    {
+      "title": "Implement Trie (Prefix Tree)",
+      "description": "A trie (pronounced as \"try\") or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. There are various applications of this data structure, such as autocomplete and spellchecker.\n\nImplement the Trie class:\n\nTrie() Initializes the trie object.\nvoid insert(String word) Inserts the string word into the trie.\nboolean search(String word) Returns true if the string word is in the trie (i.e., was inserted before), and false otherwise.\nboolean startsWith(String prefix) Returns true if there is a previously inserted string word that has the prefix prefix, and false otherwise.",
+      "examples": [
+        {
+          "input": "['Trie', 'insert', 'search', 'search', 'startsWith', 'insert', 'search'], [[], ['apple'], ['apple'], ['app'], ['app'], ['app'], ['app']]",
+          "output": "[null, null, true, false, true, null, true]",
+          "explanation": "Trie trie = new Trie(); trie.insert('apple'); trie.search('apple'); // return True; trie.search('app'); // return False; trie.startsWith('app'); // return True; trie.insert('app'); trie.search('app'); // return True"
+        }
+      ],
+      "constraints": "1 <= word.length, prefix.length <= 2000\nword and prefix consist only of lowercase English letters\nAt most 3 * 10^4 calls in total will be made to insert, search, and startsWith",
+      "solution": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.is_end = False\n\nclass Trie:\n\n    def __init__(self):\n        self.root = TrieNode()\n\n    def insert(self, word):\n        node = self.root\n        for char in word:\n            if char not in node.children:\n                node.children[char] = TrieNode()\n            node = node.children[char]\n        node.is_end = True\n\n    def search(self, word):\n        node = self.root\n        for char in word:\n            if char not in node.children:\n                return False\n            node = node.children[char]\n        return node.is_end\n\n    def startsWith(self, prefix):\n        node = self.root\n        for char in prefix:\n            if char not in node.children:\n                return False\n            node = node.children[char]\n        return True",
+      "explanation": "1. 建立 TrieNode 類別，每個節點包含 children 字典與 is_end 標記。\n2. insert: 遍歷字串每個字符，若不存在則創建新節點，最後將 is_end 設為 True。\n3. search: 遍歷字串每個字符，若節點不存在返回 False，最後返回 is_end。\n4. startsWith: 遍歷字串每個字符，若節點不存在返回 False，遍歷完成返回 True。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

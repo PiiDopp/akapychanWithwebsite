@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode436",
+  "coding_practice": [
+    {
+      "title": "Find Right Interval",
+      "description": "You are given an array of intervals, where intervals[i] = [starti, endi] and each starti is unique.\n\nThe right interval for an interval i is an interval j such that startj >= endi and startj is minimized. Note that i may equal j.\n\nReturn an array of right interval indices for each interval i. If no right interval exists for interval i, then put -1 at index i.",
+      "examples": [
+        {
+          "input": "intervals = [[1,2]]",
+          "output": "[-1]",
+          "explanation": "There is only one interval in the collection, so it outputs -1."
+        },
+        {
+          "input": "intervals = [[3,4],[2,3],[1,2]]",
+          "output": "[-1,0,1]",
+          "explanation": "There is no right interval for [3,4].\nThe right interval for [2,3] is [3,4] since start0 = 3 is the smallest start that is >= end1 = 3.\nThe right interval for [1,2] is [2,3] since start1 = 2 is the smallest start that is >= end2 = 2."
+        },
+        {
+          "input": "intervals = [[1,4],[2,3],[3,4]]",
+          "output": "[-1,2,-1]",
+          "explanation": "There is no right interval for [1,4] and [3,4].\nThe right interval for [2,3] is [3,4] since start2 = 3 is the smallest start that is >= end1 = 3."
+        }
+      ],
+      "constraints": "1 <= intervals.length <= 2 * 10^4\nintervals[i].length == 2\n-10^6 <= starti <= endi <= 10^6\nThe start point of each interval is unique.",
+      "solution": "import bisect\n\nclass Solution:\n    def findRightInterval(self, intervals):\n        # 建立開始時間對應索引的列表\n        starts = sorted((interval[0], i) for i, interval in enumerate(intervals))\n        res = []\n        \n        for interval in intervals:\n            # 找到 >= interval[1] 的最小開始時間\n            idx = bisect.bisect_left(starts, (interval[1],))\n            if idx < len(starts):\n                res.append(starts[idx][1])\n            else:\n                res.append(-1)\n        \n        return res",
+      "explanation": "1. 將每個區間的開始時間與索引組成 (start, index) 列表，並排序。\n2. 對每個區間，使用 bisect_left 找到大於等於該區間結束時間的最小 start。\n3. 如果找到，將對應索引加入結果，否則加入 -1。\n4. 返回結果列表。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

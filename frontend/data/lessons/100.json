@@ -1,0 +1,49 @@
+{
+  "ID": "001",
+  "Title": "Python 介紹",
+  "Intro": "\tPython 是一種高階、直譯式、具備強大可讀性的程式語言。它由 Guido van Rossum 在 1991 年首次釋出，設計理念強調簡潔、易讀與可維護性。Python 廣泛應用於資料分析、人工智慧、網頁開發、自動化、科學運算等領域。\n三大特色：\n1. 易讀性高：語法接近自然語言。\n2. 可移植性：同一份程式可在不同作業系統上執行。\n3. 標準函式庫豐富：內建大量模組與工具，幾乎可應付各種需求。",
+  "exp": {
+    "cor_exp": [
+      "# Python 是直譯式語言，可直接執行程式檔案\nprint(\"Hello, Python!\")\n\n# 可用 # 作為註解，解釋程式用途\n# 變數不需宣告型別\nx = 10\nname = \"阿明\"\nprint(name, \"的分數是\", x)\n\n# Python 以縮排 (indentation) 表示程式結構\nif x >= 60:\n    print(\"及格！\")\nelse:\n    print(\"需要加油！\")"
+    ],
+    "mis_exp": [
+      "# 錯誤：縮排不一致會造成語法錯誤\nif True:\nprint(\"這行沒有縮排\") ",
+      "# 錯誤：少了冒號 (:) 會出錯\nif x > 5\n    print(\"缺少冒號\")"
+    ]
+  },
+  "practice": [
+    {
+      "question": "Python 是屬於哪一種程式語言？",
+      "options": [
+        "A. 編譯式語言（Compiled）",
+        "B. 標記語言（Markup）",
+        "C. 直譯式語言（Interpreted）",
+        "D. 機械語言（Machine Code）"
+      ],
+      "answer": "C",
+      "explanation": "Python 屬於直譯式語言，程式碼可直接由直譯器執行，不需事先編譯成二進位。"
+    },
+    {
+      "question": "下列哪一項為 Python 中的註解語法？",
+      "options": [
+        "A. <!-- 註解 -->",
+        "B. // 註解",
+        "C. # 註解",
+        "D. /* 註解 */"
+      ],
+      "answer": "C",
+      "explanation": "Python 使用 # 符號來表示單行註解。"
+    },
+    {
+      "question": "下列哪一個 Python 程式碼可以正確輸出文字？",
+      "options": [
+        "A. print('Hello!')",
+        "B. echo 'Hello!'",
+        "C. System.out.println('Hello!')",
+        "D. printf('Hello!')"
+      ],
+      "answer": "A",
+      "explanation": "print() 是 Python 中的標準輸出函式。"
+    }
+  ]
+}

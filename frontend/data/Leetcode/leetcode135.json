@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode135",
+  "coding_practice": [
+    {
+      "title": "Candy",
+      "description": "There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings. You are giving candies to these children subjected to the following requirements:\n\nEach child must have at least one candy.\nChildren with a higher rating get more candies than their neighbors.\nReturn the minimum number of candies you need to have to distribute the candies to the children.",
+      "examples": [
+        {
+          "input": "ratings = [1,0,2]",
+          "output": "5",
+          "explanation": "You can allocate to the first, second and third child with 2, 1, 2 candies respectively."
+        },
+        {
+          "input": "ratings = [1,2,2]",
+          "output": "4",
+          "explanation": "You can allocate to the first, second and third child with 1, 2, 1 candies respectively.\nThe third child gets 1 candy because it satisfies the above two conditions."
+        }
+      ],
+      "constraints": "n == ratings.length\n1 <= n <= 2 * 10^4\n0 <= ratings[i] <= 2 * 10^4",
+      "solution": "class Solution:\n    def candy(self, ratings: List[int]) -> int:\n        n = len(ratings)\n        candies = [1] * n\n\n        # Left to right: if right child has higher rating, give one more candy\n        for i in range(1, n):\n            if ratings[i] > ratings[i - 1]:\n                candies[i] = candies[i - 1] + 1\n\n        # Right to left: if left child has higher rating, ensure it has more candies\n        for i in range(n - 2, -1, -1):\n            if ratings[i] > ratings[i + 1]:\n                candies[i] = max(candies[i], candies[i + 1] + 1)\n\n        return sum(candies)",
+      "explanation": "1. 每位孩子至少要有一顆糖果，故先建立 candies 陣列並全部設為 1。\n2. 從左往右遍歷：若右邊的孩子評分高於左邊，則右邊糖果數為左邊 + 1。\n3. 從右往左遍歷：若左邊的孩子評分高於右邊，則左邊糖果數需至少比右邊多 1（取兩者最大值）。\n4. 最後回傳 candies 的總和即為最少糖果數。",
+      "tag": "512",
+      "difficult": "hard"
+    }
+  ]
+}

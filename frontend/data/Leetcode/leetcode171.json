@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode171",
+  "coding_practice": [
+    {
+      "title": "Excel Sheet Column Number",
+      "description": "Given a string columnTitle that represents the column title as appears in an Excel sheet, return its corresponding column number.\n\nFor example:\n\nA -> 1\nB -> 2\nC -> 3\n...\nZ -> 26\nAA -> 27\nAB -> 28 \n...",
+      "examples": [
+        {
+          "input": "columnTitle = 'A'",
+          "output": "1"
+        },
+        {
+          "input": "columnTitle = 'AB'",
+          "output": "28"
+        },
+        {
+          "input": "columnTitle = 'ZY'",
+          "output": "701"
+        }
+      ],
+      "constraints": "1 <= columnTitle.length <= 7\ncolumnTitle consists only of uppercase English letters.\ncolumnTitle is in the range ['A', 'FXSHRXW']",
+      "solution": "class Solution:\n    def titleToNumber(self, columnTitle):\n        result = 0\n        for char in columnTitle:\n            result = result * 26 + (ord(char) - ord('A') + 1)\n        return result",
+      "explanation": "1. Initialize result as 0.\n2. Iterate over each character in columnTitle.\n3. For each character, convert it to its corresponding number (A=1, B=2, ... Z=26) and add to result after multiplying result by 26.\n4. Return the final result.",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

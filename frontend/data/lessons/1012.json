@@ -1,0 +1,52 @@
+{
+  "ID": 1012,
+  "Title": "字典與集合生成式（Dict & Set Comprehension）",
+  "Intro": "\t除了列表生成式外，Python 也提供字典（dict）與集合（set）的生成式語法。這些生成式能以簡潔的方式從可迭代物件中建立新的字典或集合，常用於資料轉換、去除重複值或建立鍵值對映。",
+  "exp": {
+    "cor_exp": [
+      "# 字典生成式（Dict Comprehension）\nnums = [1, 2, 3, 4, 5]\nsquare_dict = {n: n ** 2 for n in nums}\nprint(square_dict)  # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}",
+      "# 字典生成式搭配條件\nstudents = {'Alice': 85, 'Bob': 58, 'Cindy': 92}\npassed = {name: score for name, score in students.items() if score >= 60}\nprint(passed)  # {'Alice': 85, 'Cindy': 92}",
+      "# 集合生成式（Set Comprehension）\nnums = [1, 2, 2, 3, 3, 3]\nsquares = {n ** 2 for n in nums}\nprint(squares)  # {1, 4, 9}"
+    ],
+    "mis_exp": [
+      "# 錯誤：字典生成式缺少冒號\nnums = [1, 2, 3]\nsquare_dict = {n n**2 for n in nums}  # 錯誤：少了 ':'",
+      "# 錯誤：集合生成式誤用 []\nnums = [1, 2, 3, 4]\nsquares = [n ** 2 for n in nums]  # 這是列表，不是集合",
+      "# 錯誤：重複 key 只會保留最後一個值\nnums = [1, 1, 2]\nsquare_dict = {n: n ** 2 for n in nums}\nprint(square_dict)  # 結果為 {1: 1, 2: 4}"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列程式的輸出結果為何？\n\nnums = [1, 2, 3]\nsquare_dict = {n: n ** 2 for n in nums}\nprint(square_dict)",
+      "options": [
+        "A. {1: 2, 2: 3, 3: 4}",
+        "B. {1: 1, 2: 4, 3: 9}",
+        "C. [1, 4, 9]",
+        "D. {n: n ** 2}"
+      ],
+      "answer": "B",
+      "explanation": "字典生成式建立鍵值對 n: n**2，因此輸出 {1: 1, 2: 4, 3: 9}。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nnums = [1, 2, 2, 3, 3, 3]\nsquares = {n ** 2 for n in nums}\nprint(squares)",
+      "options": [
+        "A. [1, 4, 9]",
+        "B. {1, 4, 9}",
+        "C. {1, 4, 9, 9}",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "集合不允許重複元素，因此結果為 {1, 4, 9}。"
+    },
+    {
+      "question": "關於字典與集合生成式的敘述，下列何者正確？",
+      "options": [
+        "A. 字典生成式使用 [] 包住內容",
+        "B. 集合生成式使用 {} 包住內容",
+        "C. 字典生成式中不允許條件判斷",
+        "D. 集合生成式的結果可以重複"
+      ],
+      "answer": "B",
+      "explanation": "集合生成式使用 {} 並會自動去除重複值。"
+    }
+  ]
+}

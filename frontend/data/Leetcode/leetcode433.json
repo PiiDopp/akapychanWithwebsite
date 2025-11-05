@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode433",
+  "coding_practice": [
+    {
+      "title": "Minimum Genetic Mutation",
+      "description": "A gene string can be represented by an 8-character long string, with choices from 'A', 'C', 'G', and 'T'.\n\nSuppose we need to investigate a mutation from a gene string startGene to a gene string endGene where one mutation is defined as one single character changed in the gene string.\n\nThere is also a gene bank bank that records all the valid gene mutations. A gene must be in bank to make it a valid gene string.\n\nGiven the two gene strings startGene and endGene and the gene bank bank, return the minimum number of mutations needed to mutate from startGene to endGene. If there is no such a mutation, return -1.\n\nNote that the starting point is assumed to be valid, so it might not be included in the bank.",
+      "examples": [
+        {
+          "input": "startGene = \"AACCGGTT\", endGene = \"AACCGGTA\", bank = [\"AACCGGTA\"]",
+          "output": "1"
+        },
+        {
+          "input": "startGene = \"AACCGGTT\", endGene = \"AAACGGTA\", bank = [\"AACCGGTA\",\"AACCGCTA\",\"AAACGGTA\"]",
+          "output": "2"
+        }
+      ],
+      "constraints": "0 <= bank.length <= 10\nstartGene.length == endGene.length == bank[i].length == 8\nstartGene, endGene, and bank[i] consist of only the characters ['A', 'C', 'G', 'T'].",
+      "solution": "from collections import deque\n\nclass Solution:\n    def minMutation(self, start, end, bank):\n        if end not in bank:\n            return -1\n\n        bank_set = set(bank)\n        genes = ['A', 'C', 'G', 'T']\n        queue = deque([(start, 0)])\n        visited = set([start])\n\n        while queue:\n            current, steps = queue.popleft()\n            if current == end:\n                return steps\n\n            for i in range(len(current)):\n                for g in genes:\n                    mutation = current[:i] + g + current[i + 1:]\n                    if mutation in bank_set and mutation not in visited:\n                        visited.add(mutation)\n                        queue.append((mutation, steps + 1))\n        \n        return -1",
+      "explanation": "1. 使用 BFS 從 startGene 開始，每次嘗試將每個位置的字符變為 A, C, G, T，生成新的基因字符串。\n2. 若生成的字符串在 bank 中且未被訪問過，則加入隊列並記錄步數。\n3. 遇到 endGene 則返回當前步數。\n4. BFS 結束後仍未找到 endGene，返回 -1。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

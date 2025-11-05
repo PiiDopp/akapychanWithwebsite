@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode258",
+  "coding_practice": [
+    {
+      "title": "Add Digits",
+      "description": "Given an integer num, repeatedly add all its digits until the result has only one digit, and return it.",
+      "examples": [
+        {
+          "input": "num = 38",
+          "output": "2",
+          "explanation": "The process is\n38 --> 3 + 8 --> 11\n11 --> 1 + 1 --> 2\nSince 2 has only one digit, return it."
+        },
+        {
+          "input": "num = 0",
+          "output": "0"
+        }
+      ],
+      "constraints": "0 <= num <= 2^31 - 1",
+      "follow up": "Could you do it without any loop/recursion in O(1) runtime?",
+      "solution": "class Solution:\n    def addDigits(self, num):\n        while num >= 10:\n            num = sum(int(digit) for digit in str(num))\n        return num",
+      "explanation": "1. 當 num 大於等於 10 時，將 num 轉成字串，逐位拆解相加。\n2. 重複步驟 1，直到 num 只剩一位數。\n3. 回傳最終的 num。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}

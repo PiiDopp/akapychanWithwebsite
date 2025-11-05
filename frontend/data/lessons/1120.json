@@ -1,0 +1,52 @@
+{
+  "ID": 1120,
+  "Title": "建構子與屬性（__init__ 與 Attribute）",
+  "Intro": "\t在 Python 類別中，建構子（Constructor）是一個特殊的方法 __init__()，在建立物件時自動被呼叫，用來初始化屬性（attributes）。屬性是物件中用來儲存資料的變數，通常在 __init__() 中設定。可以使用「物件名稱.屬性」的方式存取與修改屬性值。",
+  "exp": {
+    "cor_exp": [
+      "# 基本建構子與屬性設定\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\ns = Student('Alice', 90)\nprint('學生姓名：', s.name)\nprint('成績：', s.score)",
+      "# 修改物件屬性\nclass Car:\n    def __init__(self, brand, color):\n        self.brand = brand\n        self.color = color\n\nmy_car = Car('Toyota', 'White')\nprint('原本顏色：', my_car.color)\n\nmy_car.color = 'Black'  # 修改屬性值\nprint('修改後顏色：', my_car.color)",
+      "# 在方法中使用屬性\nclass Circle:\n    def __init__(self, radius):\n        self.radius = radius\n\n    def area(self):\n        return 3.14 * (self.radius ** 2)\n\nc = Circle(5)\nprint('半徑：', c.radius)\nprint('面積：', c.area())"
+    ],
+    "mis_exp": [
+      "# 錯誤：未使用 self 設定屬性\nclass Dog:\n    def __init__(self, name):\n        name = name  # 錯誤：應為 self.name = name\n\nmy_dog = Dog('Lucky')\nprint(my_dog.name)  # AttributeError：找不到屬性 name",
+      "# 錯誤：初始化屬性時缺少參數\nclass Car:\n    def __init__(self, brand):\n        self.brand = brand\n\nmy_car = Car()  # TypeError：未傳入 brand 參數",
+      "# 錯誤：動態新增不存在的屬性（拼錯）\nclass Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student('Bob')\ns.nmae = 'Tom'  # 拼錯屬性名，不會修改原本的 name"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式輸出結果為何？\n\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\ns1 = Student('Alice', 95)\nprint(s1.name, s1.score)",
+      "options": [
+        "A. Alice 95",
+        "B. ('Alice', 95)",
+        "C. name score",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "__init__() 會在建立物件時設定屬性，因此輸出 Alice 95。"
+    },
+    {
+      "question": "下列哪一個寫法能正確修改屬性？\n\nclass Car:\n    def __init__(self, brand, color):\n        self.brand = brand\n        self.color = color\n\nmy_car = Car('BMW', 'Blue')\n# ( ) 中應填入正確語法",
+      "options": [
+        "A. my_car.color('Red')",
+        "B. my_car.color = 'Red'",
+        "C. self.color = 'Red'",
+        "D. Car.color = 'Red'"
+      ],
+      "answer": "B",
+      "explanation": "物件屬性可用「物件名稱.屬性 = 新值」方式修改，故為 B。"
+    },
+    {
+      "question": "下列關於 __init__() 的敘述何者正確？",
+      "options": [
+        "A. 必須手動呼叫才能執行",
+        "B. 僅能定義一個屬性",
+        "C. 在建立物件時會自動執行",
+        "D. 不能使用 self 關鍵字"
+      ],
+      "answer": "C",
+      "explanation": "__init__() 是建構子，在建立物件時會自動呼叫，用於初始化屬性。"
+    }
+  ]
+}

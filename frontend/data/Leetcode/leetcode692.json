@@ -1,0 +1,27 @@
+{
+  "ID": "leetcode692",
+  "coding_practice": [
+    {
+      "title": "Top K Frequent Words",
+      "description": "Given an array of strings words and an integer k, return the k most frequent strings.\n\nReturn the answer sorted by the frequency from highest to lowest. Sort the words with the same frequency by their lexicographical order.",
+      "examples": [
+        {
+          "input": "words = [\"i\",\"love\",\"leetcode\",\"i\",\"love\",\"coding\"], k = 2",
+          "output": "[\"i\",\"love\"]",
+          "explanation": "\"i\" and \"love\" are the two most frequent words.\nNote that \"i\" comes before \"love\" due to a lower alphabetical order."
+        },
+        {
+          "input": "words = [\"the\",\"day\",\"is\",\"sunny\",\"the\",\"the\",\"the\",\"sunny\",\"is\",\"is\"], k = 4",
+          "output": "[\"the\",\"is\",\"sunny\",\"day\"]",
+          "explanation": "\"the\", \"is\", \"sunny\" and \"day\" are the four most frequent words, with the number of occurrence being 4, 3, 2 and 1 respectively."
+        }
+      ],
+      "constraints": "1 <= words.length <= 500\n1 <= words[i].length <= 10\nwords[i] consists of lowercase English letters.\nk is in the range [1, The number of unique words[i]]",
+      "follow up": "Could you solve it in O(n log(k)) time and O(n) extra space?",
+      "solution": "from collections import Counter\n\nclass Solution:\n    def topKFrequent(self, words, k):\n        count = Counter(words)\n        sorted_words = sorted(count.items(), key=lambda x: (-x[1], x[0]))\n        return [word for word, freq in sorted_words[:k]]",
+      "explanation": "1. 使用 Counter 計算每個單詞出現次數。\n2. 使用 sorted 排序：先按頻率降序，頻率相同按字典序排列。\n3. 返回排序後的前 k 個單詞。",
+      "tag": "613",
+      "difficult": "medium"
+    }
+  ]
+}

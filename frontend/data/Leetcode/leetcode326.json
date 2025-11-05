@@ -1,0 +1,32 @@
+{
+  "ID": "leetcode326",
+  "coding_practice": [
+    {
+      "title": "Power of Three",
+      "description": "Given an integer n, return true if it is a power of three. Otherwise, return false.\n\nAn integer n is a power of three, if there exists an integer x such that n == 3^x.",
+      "examples": [
+        {
+          "input": "n = 27",
+          "output": "true",
+          "explanation": "27 = 3^3"
+        },
+        {
+          "input": "n = 0",
+          "output": "false",
+          "explanation": "There is no x where 3^x = 0."
+        },
+        {
+          "input": "n = -1",
+          "output": "false",
+          "explanation": "There is no x where 3^x = -1."
+        }
+      ],
+      "constraints": "-2^31 <= n <= 2^31 - 1",
+      "follow up": "Could you solve it without loops/recursion?",
+      "solution": "class Solution:\n    def isPowerOfThree(self, n):\n        if n <= 0:\n            return False\n        while n % 3 == 0:\n            n //= 3\n        return n == 1",
+      "explanation": "1. 若 n <= 0，直接返回 False。\n2. 使用 while 循環，不斷將 n 除以 3，直到不能整除。\n3. 最後若 n == 1，表示 n 是 3 的冪，返回 True；否則返回 False。",
+      "tag": "711",
+      "difficult": "easy"
+    }
+  ]
+}

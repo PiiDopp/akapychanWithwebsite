@@ -1,0 +1,46 @@
+{
+  "ID": 723,
+  "Title": "序列函數",
+  "Intro": "\tPython 的序列函數用於處理像串列、字串、tuple 等可迭代物件，可以用來計算長度、最大值、最小值或排序序列。以下列出序列相關函數",
+  "exp": {
+    "cor_exp": [
+      "序列通用內建函數\n函數\t\t說明\t\t\t\t範例\t\t\t\t輸出\nlist(x)\t\t將可迭代物件轉成串列\t\tlist(\"abc\")\t\t\t['a','b','c']\ntuple(x)\t\t將可迭代物件轉成元組\t\ttuple([1,2,3])\t\t\t(1,2,3)\nlen(seq)\t\t取得序列長度\t\t\tlen([1,2,3])\t\t\t3\nmax(seq)\t\t回傳最大值\t\t\tmax([1,5,3])\t\t\t5\nmin(seq)\t\t回傳最小值\t\t\tmin(\"banana\")\t\t\t'a'\nsum(seq)\t\t回傳數值型序列的總和\t\tsum([1,2,3])\t\t\t6\nsorted(seq)\t\t回傳排序後的新串列\t\tsorted((3,1,2))\t\t\t[1,2,3]\nreversed(seq)\t反轉序列（回傳迭代器）\t\tlist(reversed(\"abc\"))\t\t['c','b','a']\nenumerate(seq)\t同時取得索引和值\t\tlist(enumerate([\"a\",\"b\"]))\t[(0,'a'),(1,'b')]\nzip(a,b,…)\t\t打包多個序列\t\t\tlist(zip([1,2],[3,4]))\t\t[(1,3),(2,4)]\nany(seq)\t\t有任一元素為 True → True\tany([0,False,5])\t\tTrue\nall(seq)\t\t所有元素為 True → True\tall([1,2,3])\t\t\tTrue",
+      "list 常用方法\n函數\t\t\t說明\t\t\t\t\t範例\t\t\t\t輸出\nappend(x)\t\t在尾端加入一個元素\t\tlst=[1,2]; lst.append(3); lst\t[1,2,3]\nextend(iterable)\t將另一序列加入尾端\t\tlst=[1]; lst.extend([2,3]); lst\t[1,2,3]\ninsert(i, x)\t\t在指定位置插入元素\t\tlst=[1,3]; lst.insert(1,2); lst\t[1,2,3]\npop([i])\t\t移除並回傳指定位置元素（預設最後）\tlst=[1,2,3]; lst.pop(); lst\t[1,2]\nremove(x)\t\t移除第一個等於 x 的元素\tlst=[1,2,2]; lst.remove(2); lst\t[1,2]\nclear()\t\t\t清空列表\t\t\t\tlst=[1,2]; lst.clear(); lst\t[]\nindex(x)\t\t回傳第一個等於 x 的索引\t[\"a\",\"b\",\"c\"].index(\"b\")\t\t1\ncount(x)\t\t計算元素出現次數\t\t[1,2,2,3].count(2)\t\t2\nsort()\t\t\t就地排序（改變原列表）\tlst=[3,1,2]; lst.sort(); lst\t[1,2,3]\nreverse()\t\t就地反轉（改變原列表）\tlst=[1,2,3]; lst.reverse(); lst\t[3,2,1]\ncopy()\t\t\t回傳列表的淺層複製\t\tlst=[1,2]; new=lst.copy(); new\t[1,2]"
+    ],
+    "mis_exp": []
+  }, "practice": [
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nnums = [3, 1, 4]\nprint(sorted(nums))\nprint(nums)",
+      "options": [
+        "A. [1, 3, 4] 和 [1, 3, 4]",
+        "B. [3, 1, 4] 和 [3, 1, 4]",
+        "C. [1, 3, 4] 和 [3, 1, 4]",
+        "D. 程式錯誤"
+      ],
+      "answer": "C",
+      "explanation": "sorted() 會回傳新的排序後串列，不會改變原本的 nums。"
+    },
+    {
+      "question": "下列哪個方法會直接修改原本的列表？",
+      "options": [
+        "A. sorted()",
+        "B. reversed()",
+        "C. list.copy()",
+        "D. list.sort()"
+      ],
+      "answer": "D",
+      "explanation": "list.sort() 會就地排序，直接改變原列表；sorted() 會回傳新串列。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nletters = [\"a\", \"b\", \"c\"]\nprint(list(enumerate(letters)))",
+      "options": [
+        "A. ['a','b','c']",
+        "B. [(1,'a'),(2,'b'),(3,'c')]",
+        "C. [(0,'a'),(1,'b'),(2,'c')]",
+        "D. ['a:0','b:1','c:2']"
+      ],
+      "answer": "C",
+      "explanation": "enumerate() 會同時回傳索引和值，預設索引從 0 開始。"
+    }
+  ]
+}

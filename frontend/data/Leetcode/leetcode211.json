@@ -1,0 +1,21 @@
+{
+  "ID": "leetcode211",
+  "coding_practice": [
+    {
+      "title": "Design Add and Search Words Data Structure",
+      "description": "Design a data structure that supports adding new words and finding if a string matches any previously added string.\n\nImplement the WordDictionary class:\n\nWordDictionary() Initializes the object.\nvoid addWord(word) Adds word to the data structure, it can be matched later.\nbool search(word) Returns true if there is any string in the data structure that matches word or false otherwise. word may contain dots '.' where dots can be matched with any letter.",
+      "examples": [
+        {
+          "input": "[\"WordDictionary\",\"addWord\",\"addWord\",\"addWord\",\"search\",\"search\",\"search\",\"search\"],[[],[\"bad\"],[\"dad\"],[\"mad\"],[\"pad\"],[\"bad\"],[\".ad\"],[\"b..\"]]",
+          "output": "[null,null,null,null,false,true,true,true]",
+          "explanation": "WordDictionary wordDictionary = new WordDictionary(); wordDictionary.addWord(\"bad\"); wordDictionary.addWord(\"dad\"); wordDictionary.addWord(\"mad\"); wordDictionary.search(\"pad\"); // return False wordDictionary.search(\"bad\"); // return True wordDictionary.search(\".ad\"); // return True wordDictionary.search(\"b..\"); // return True"
+        }
+      ],
+      "constraints": "1 <= word.length <= 25\nword in addWord consists of lowercase English letters\nword in search consist of '.' or lowercase English letters\nThere will be at most 2 dots in word for search queries\nAt most 10^4 calls will be made to addWord and search",
+      "solution": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.is_end = False\n\nclass WordDictionary:\n\n    def __init__(self):\n        self.root = TrieNode()\n\n    def addWord(self, word):\n        node = self.root\n        for char in word:\n            if char not in node.children:\n                node.children[char] = TrieNode()\n            node = node.children[char]\n        node.is_end = True\n\n    def search(self, word):\n        def dfs(node, i):\n            if i == len(word):\n                return node.is_end\n            if word[i] == '.':\n                for child in node.children.values():\n                    if dfs(child, i + 1):\n                        return True\n                return False\n            else:\n                if word[i] not in node.children:\n                    return False\n                return dfs(node.children[word[i]], i + 1)\n        return dfs(self.root, 0)",
+      "explanation": "1. 建立 TrieNode 類別，每個節點包含 children 字典與 is_end 標記。\n2. addWord: 遍歷字串每個字符，若不存在則創建新節點，最後將 is_end 設為 True。\n3. search: 使用 DFS 遍歷，每遇到 '.' 嘗試所有子節點。\n4. 遍歷完成後返回結果，表示是否匹配成功。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

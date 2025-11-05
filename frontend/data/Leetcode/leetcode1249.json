@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode1249",
+  "coding_practice": [
+    {
+      "title": "Minimum Remove to Make Valid Parentheses",
+      "description": "Given a string s of '(' , ')' and lowercase English characters.\n\nYour task is to remove the minimum number of parentheses ( '(' or ')', in any positions ) so that the resulting parentheses string is valid and return any valid string.\n\nFormally, a parentheses string is valid if and only if:\n\nIt is the empty string, contains only lowercase characters, or\nIt can be written as AB (A concatenated with B), where A and B are valid strings, or\nIt can be written as (A), where A is a valid string.",
+      "examples": [
+        {
+          "input": "s = \"lee(t(c)o)de)\"",
+          "output": "\"lee(t(c)o)de\"",
+          "explanation": "\"lee(t(co)de)\" , \"lee(t(c)ode)\" would also be accepted."
+        },
+        {
+          "input": "s = \"a)b(c)d\"",
+          "output": "\"ab(c)d\""
+        },
+        {
+          "input": "s = \"))((\"",
+          "output": "\"\"",
+          "explanation": "An empty string is also valid."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns[i] is either '(' , ')', or lowercase English letter.",
+      "solution": "class Solution:\n    def minRemoveToMakeValid(self, s):\n        s = list(s)\n        stack = []\n\n        for i, c in enumerate(s):\n            if c == '(':\n                stack.append(i)\n            elif c == ')':\n                if stack:\n                    stack.pop()\n                else:\n                    s[i] = ''\n\n        for i in stack:\n            s[i] = ''\n\n        return ''.join(s)",
+      "explanation": "1. 將字串轉為列表以便刪除字符。\n2. 遍歷字串，遇到 '(' push 索引，遇到 ')' 則 pop 對應 '('，若沒有匹配就標記為空字符。\n3. 遍歷完後，stack 中剩下的 '(' 也標記為空字符。\n4. 用 ''.join(s) 拼接返回合法字串。\n5. 此方法保證最少刪除括號，使字串合法。",
+      "tag": "612",
+      "difficult": "medium"
+    }
+  ]
+}

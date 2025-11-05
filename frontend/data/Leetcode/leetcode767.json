@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode767",
+  "coding_practice": [
+    {
+      "title": "Reorganize String",
+      "description": "Given a string s, rearrange the characters of s so that any two adjacent characters are not the same.\n\nReturn any possible rearrangement of s or return \"\" if not possible.",
+      "examples": [
+        {
+          "input": "s = \"aab\"",
+          "output": "\"aba\""
+        },
+        {
+          "input": "s = \"aaab\"",
+          "output": "\"\""
+        }
+      ],
+      "constraints": "1 <= s.length <= 500\ns consists of lowercase English letters.",
+      "solution": "import heapq\nfrom collections import Counter\n\nclass Solution:\n    def reorganizeString(self, s):\n        count = Counter(s)\n        max_heap = [(-freq, char) for char, freq in count.items()]\n        heapq.heapify(max_heap)\n        prev_freq, prev_char = 0, ''\n        res = []\n\n        while max_heap:\n            freq, char = heapq.heappop(max_heap)\n            res.append(char)\n            if prev_freq < 0:\n                heapq.heappush(max_heap, (prev_freq, prev_char))\n            prev_freq, prev_char = freq + 1, char\n\n        result = ''.join(res)\n        return result if len(result) == len(s) else \"\"",
+      "explanation": "1. 使用 Counter 計算每個字符出現次數。\n2. 使用最大堆維護剩餘字符數量，每次選取頻率最高的字符加入結果，並確保不與上一次字符相同。\n3. 將上一次未用完的字符重新放回堆中。\n4. 最後檢查結果長度是否與原字串相同，不同則返回空字串。",
+      "tag": "721",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode239",
+  "coding_practice": [
+    {
+      "title": "Sliding Window Maximum",
+      "description": "You are given an array of integers nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position.\n\nReturn the max sliding window.",
+      "examples": [
+        {
+          "input": "nums = [1,3,-1,-3,5,3,6,7], k = 3",
+          "output": "[3,3,5,5,6,7]",
+          "explanation": "Window position                Max\n---------------               -----\n[1  3  -1] -3  5  3  6  7       3\n 1 [3  -1  -3] 5  3  6  7       3\n 1  3 [-1  -3  5] 3  6  7       5\n 1  3  -1 [-3  5  3] 6  7       5\n 1  3  -1  -3 [5  3  6] 7       6\n 1  3  -1  -3  5 [3  6  7]      7"
+        },
+        {
+          "input": "nums = [1], k = 1",
+          "output": "[1]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-10^4 <= nums[i] <= 10^4\n1 <= k <= nums.length",
+      "solution": "class Solution(object):\n    def maxSlidingWindow(self, nums, k):\n        \"\"\"\n        :type nums: List[int]\n        :type k: int\n        :rtype: List[int]\n        \"\"\"\n        from collections import deque\n        if not nums or k == 0:\n            return []\n        \n        deq = deque()\n        res = []\n        \n        for i in range(len(nums)):\n            # Remove indices outside the current window\n            while deq and deq[0] < i - k + 1:\n                deq.popleft()\n            # Remove smaller numbers from the back\n            while deq and nums[deq[-1]] < nums[i]:\n                deq.pop()\n            deq.append(i)\n            # Append current max to results\n            if i >= k - 1:\n                res.append(nums[deq[0]])\n        \n        return res",
+      "explanation": "1. 使用 deque 儲存當前窗口的索引，保持最大值在隊首。\n2. 當新元素進入窗口時，移除窗口外的索引以及比當前元素小的索引。\n3. 當窗口大小達到 k 時，將隊首的元素加入結果列表。\n4. 遍歷整個 nums，最終返回結果列表。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode481",
+  "coding_practice": [
+    {
+      "title": "Magical String",
+      "description": "A magical string s consists of only '1' and '2' and obeys the following rules:\n\nThe string s is magical because concatenating the number of contiguous occurrences of characters '1' and '2' generates the string s itself.\nThe first few elements of s is s = \"1221121221221121122……\". If we group the consecutive 1's and 2's in s, it will be \"1 22 11 2 1 22 1 22 11 2 11 22 ......\" and the occurrences of 1's or 2's in each group are \"1 2 2 1 1 2 1 2 2 1 2 2 ......\". You can see that the occurrence sequence is s itself.\n\nGiven an integer n, return the number of 1's in the first n number in the magical string s.",
+      "examples": [
+        {
+          "input": "n = 6",
+          "output": "3",
+          "explanation": "The first 6 elements of magical string s is \"122112\" and it contains three 1's, so return 3."
+        },
+        {
+          "input": "n = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= n <= 10^5",
+      "solution": "class Solution:\n    def magicalString(self, n):\n        if n == 0:\n            return 0\n        if n <= 3:\n            return 1\n\n        s = [1, 2, 2]  # 初始字符串\n        head = 2  # 指向生成規則的位置\n        num = 1  # 下一個要添加的數字\n        while len(s) < n:\n            s.extend([num] * s[head])\n            num ^= 3  # 1 和 2 互換\n            head += 1\n        return s[:n].count(1)",
+      "explanation": "1. 初始化 s = [1,2,2]，head 指向第三個元素，num 為下一個要添加的數字。\n2. 根據 s[head] 的值重複添加 num 到 s 中。\n3. num ^= 3 用於在 1 和 2 之間切換。\n4. 重複直到 s 長度 >= n，最後返回前 n 個數字中 1 的個數。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}
+

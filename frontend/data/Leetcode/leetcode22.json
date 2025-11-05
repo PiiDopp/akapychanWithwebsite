@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode22",
+  "coding_practice": [
+    {
+      "title": "Generate Parentheses",
+      "description": "Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.",
+      "examples": [
+        {
+          "input": "n = 3",
+          "output": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]"
+        },
+        {
+          "input": "n = 1",
+          "output": "[\"()\"]"
+        }
+      ],
+      "constraints": "1 <= n <= 8",
+      "solution": "class Solution(object):\n    def generateParenthesis(self, n):\n        \"\"\"\n        :type n: int\n        :rtype: List[str]\n        \"\"\"\n        res = []\n\n        def backtrack(s=\"\", left=0, right=0):\n            if len(s) == 2 * n:\n                res.append(s)\n                return\n            if left < n:\n                backtrack(s + \"(\", left + 1, right)\n            if right < left:\n                backtrack(s + \")\", left, right + 1)\n\n        backtrack()\n        return res",
+      "explanation": "1. 使用回溯法生成所有可能的括號組合。\n2. left 計數已使用的左括號，right 計數已使用的右括號。\n3. 當字串長度達到 2*n 時，加入結果列表。\n4. 左括號數量小於 n 時，可以繼續加左括號；右括號數量小於左括號時，可以加右括號。\n5. 返回所有合法括號組合列表。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

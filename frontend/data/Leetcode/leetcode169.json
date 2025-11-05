@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode169",
+  "coding_practice": [
+    {
+      "title": "Majority Element",
+      "description": "Given an array nums of size n, return the majority element.\n\nThe majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.",
+      "examples": [
+        {
+          "input": "nums = [3,2,3]",
+          "output": "3"
+        },
+        {
+          "input": "nums = [2,2,1,1,1,2,2]",
+          "output": "2"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 5 * 10^4\n-10^9 <= nums[i] <= 10^9",
+      "follow up": "Could you solve the problem in linear time and in O(1) space?",
+      "solution": "class Solution:\n    def majorityElement(self, nums):\n        count = 0\n        candidate = None\n        for num in nums:\n            if count == 0:\n                candidate = num\n            count += (1 if num == candidate else -1)\n        return candidate",
+      "explanation": "1. Use the Boyer-Moore Voting Algorithm.\n2. Iterate through nums, maintaining a candidate and count.\n3. If count is 0, update candidate to current number.\n4. Increment count if current number equals candidate, else decrement.\n5. After iteration, candidate holds the majority element.",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

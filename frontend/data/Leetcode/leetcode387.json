@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode387",
+  "coding_practice": [
+    {
+      "title": "First Unique Character in a String",
+      "description": "Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.",
+      "examples": [
+        {
+          "input": "s = \"leetcode\"",
+          "output": "0",
+          "explanation": "The character 'l' at index 0 is the first character that does not occur at any other index."
+        },
+        {
+          "input": "s = \"loveleetcode\"",
+          "output": "2"
+        },
+        {
+          "input": "s = \"aabb\"",
+          "output": "-1"
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of only lowercase English letters.",
+      "solution": "import collections\n\nclass Solution:\n    def firstUniqChar(self, s):\n        count = collections.Counter(s)\n        for i, char in enumerate(s):\n            if count[char] == 1:\n                return i\n        return -1",
+      "explanation": "1. 使用 Counter 計算每個字母出現次數。\n2. 遍歷字符串 s，找到第一個出現次數為 1 的字母。\n3. 返回該字母的索引。\n4. 如果所有字母都重複，返回 -1。",
+      "tag": "611",
+      "difficult": "easy"
+    }
+  ]
+}

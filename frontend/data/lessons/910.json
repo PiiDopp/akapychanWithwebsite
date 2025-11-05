@@ -1,0 +1,50 @@
+{
+  "ID": 910,
+  "Title": "try / except 例外處理",
+  "Intro": "\t在撰寫程式時，常會遇到錯誤（例外）導致程式中斷，例如除以零、開啟不存在的檔案、型態不相容等。使用 try / except 可以讓程式在發生錯誤時，不中斷執行，並顯示適當的提示訊息。",
+  "exp": {
+    "cor_exp": [
+      "# 基本的 try / except\ntry:\n    x = int(input('請輸入一個整數: '))\n    print('100 除以該數的結果為:', 100 / x)\nexcept:\n    print('發生錯誤，請確認輸入是否正確！')",
+      "# 針對特定錯誤類型處理\ntry:\n    num = int(input('請輸入數字: '))\n    result = 10 / num\n    print('結果為:', result)\nexcept ZeroDivisionError:\n    print('錯誤：除數不能為 0')\nexcept ValueError:\n    print('錯誤：請輸入正確的數字')"
+    ],
+    "mis_exp": [
+      "# 錯誤: 未使用 try / except 導致程式中斷\nnum = int(input('請輸入數字: '))\nprint(10 / num)  # 若輸入 0，程式會直接出錯停止",
+      "# 錯誤: except 語法錯誤\ntry:\n    x = int(input('請輸入整數: '))\n    print(100 / x)\nexcept\n    print('錯誤！')  # 少了冒號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列程式執行時，若輸入 0，輸出結果為何？\n\ntry:\n    num = int(input('輸入數字: '))\n    print(10 / num)\nexcept ZeroDivisionError:\n    print('除數不可為 0')",
+      "options": [
+        "A. 0",
+        "B. 除數不可為 0",
+        "C. 程式錯誤",
+        "D. 不輸出任何東西"
+      ],
+      "answer": "B",
+      "explanation": "輸入 0 會觸發 ZeroDivisionError，因此 except 區塊被執行。"
+    },
+    {
+      "question": "下列程式中，except 的作用是什麼？\n\ntry:\n    x = int('abc')\nexcept:\n    print('發生錯誤')",
+      "options": [
+        "A. 判斷字串是否可轉為整數",
+        "B. 改變輸入內容",
+        "C. 捕捉錯誤並執行替代程式碼",
+        "D. 停止程式執行"
+      ],
+      "answer": "C",
+      "explanation": "except 負責在發生錯誤時捕捉例外，並執行對應的錯誤處理動作。"
+    },
+    {
+      "question": "關於 try / except 的敘述，下列何者正確？",
+      "options": [
+        "A. try 只能搭配一個 except",
+        "B. except 不能指定錯誤類型",
+        "C. try 內部若無錯誤，except 不會執行",
+        "D. try / except 只能用在輸入錯誤"
+      ],
+      "answer": "C",
+      "explanation": "若 try 區塊內程式正確執行，不會進入 except 區塊。"
+    }
+  ]
+}

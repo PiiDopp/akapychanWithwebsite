@@ -1,0 +1,29 @@
+{
+  "ID": "leetcode315",
+  "coding_practice": [
+    {
+      "title": "Count of Smaller Numbers After Self",
+      "description": "Given an integer array nums, return an integer array counts where counts[i] is the number of smaller elements to the right of nums[i].",
+      "examples": [
+        {
+          "input": "nums = [5,2,6,1]",
+          "output": "[2,1,1,0]",
+          "explanation": "To the right of 5 there are 2 smaller elements (2 and 1).\nTo the right of 2 there is only 1 smaller element (1).\nTo the right of 6 there is 1 smaller element (1).\nTo the right of 1 there is 0 smaller element."
+        },
+        {
+          "input": "nums = [-1]",
+          "output": "[0]"
+        },
+        {
+          "input": "nums = [-1,-1]",
+          "output": "[0,0]"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-10^4 <= nums[i] <= 10^4",
+      "solution": "class BIT:\n    def __init__(self, size):\n        self.tree = [0] * (size + 1)\n        self.size = size\n\n    def update(self, index, delta):\n        while index <= self.size:\n            self.tree[index] += delta\n            index += index & -index\n\n    def query(self, index):\n        res = 0\n        while index > 0:\n            res += self.tree[index]\n            index -= index & -index\n        return res\n\n\nclass Solution:\n    def countSmaller(self, nums):\n        sorted_unique = sorted(set(nums))\n        ranks = {num: i+1 for i, num in enumerate(sorted_unique)}\n\n        bit = BIT(len(ranks))\n        res = []\n\n        for num in reversed(nums):\n            rank = ranks[num]\n            res.append(bit.query(rank - 1))\n            bit.update(rank, 1)\n\n        return res[::-1]",
+      "explanation": "1. 使用離散化把數字映射到 1..N 的範圍，方便 BIT 操作。\n2. 使用 Binary Indexed Tree (Fenwick Tree) 快速查詢比當前數字小的元素數量。\n3. 從右向左遍歷 nums，查詢右側比當前元素小的數量並更新 BIT。\n4. 最後將結果反轉回正確順序。",
+      "tag": "632",
+      "difficult": "hard"
+    }
+  ]
+}

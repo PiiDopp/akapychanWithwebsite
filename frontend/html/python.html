@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="no-trans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AkaPyChan</title>
+    <link rel="stylesheet" href="../css/python.css" />
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.min.js"></script>
+    <script type="module" src="../js/python-practice/main.js"></script>
+    <script src="../js/viewTransitions.js" defer></script>
+  </head>
+  <body>
+    <main class="workspace">
+      <div class="leftSideBar">
+        <button class="leftsideBtn"><img src="../img/leftsideBtn.png" alt=""></button>
+        <div class="menuSelectionMeun scroll-area">
+          <h1 style="margin: 10px">題型選擇</h1>
+          <hr style="margin: 10px" />
+          <a class="backBtn" id="backToMenuBtn">← 回到主選單</a>
+          <ul class="unitContent" id="mainMenu">
+            <ul class="L-Unit">
+              <div class="menuTitle">單元總複習</div>
+              <li class="M-Unit" data-id="200"># 第二單元總複習</li>
+              <li class="M-Unit" data-id="300"># 第三單元總複習</li>
+              <li class="M-Unit" data-id="400"># 第四單元總複習</li>
+              <li class="M-Unit" data-id="500"># 第五單元總複習</li>
+              <li class="M-Unit" data-id="600"># 第六單元總複習</li>
+              <li class="M-Unit" data-id="700"># 第七單元總複習</li>
+              <li class="M-Unit" data-id="800"># 第八單元總複習</li>
+              <li class="M-Unit" data-id="900"># 第九單元總複習</li>
+              <li class="M-Unit" data-id="1000"># 第十單元總複習</li>
+              <li class="M-Unit" data-id="1100"># 第十一單元總複習</li>
+              <li class="M-Unit" data-id="1200"># 第十二單元總複習</li>
+            </ul>
+            <ul class="L-Unit" id="leetcode-list">
+              <div class="menuTitle">Leetcode</div>
+            </ul>
+          </ul>
+        </div>
+        <div class="btnContent">
+          <a href="/html/main.html" class="changeBtn"><b>課程模式</b></a>
+          <a class="testBtn"><b>考試模式</b></a>
+        </div>
+      </div>
+      <section class="editor">
+        <div id="editorContainer" class="editorContainer"></div>
+        <button type="button" class="runBtn">Run</button>
+      </section>
+
+      <aside class="codePane">
+        <div class="textContent" id="practiceArea">
+          <div class="titleRow">
+            <h1 class="title">Hello World!!</h1>
+          </div>
+          <p class="description"></p>
+          <ul class="expContent">
+            # 範例輸出:
+            <li class="exp">Hello World!!</li>
+          </ul>
+        </div>
+        <section class="preview">
+          <header class="outputHeader">
+            <h1>輸出結果</h1>
+            <div class="btnContent">
+              <button type="button" class="hintbtn">提示</button>
+              <button type="button" class="answerbtn">解答</button>
+            </div>
+          </header>
+          <div class="outputContent">
+            <pre id="output"></pre>
+            <pre id="hint"></pre>
+            <pre id="answer"></pre>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </body>
+</html>

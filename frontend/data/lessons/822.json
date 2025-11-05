@@ -1,0 +1,55 @@
+{
+  "ID": 822,
+  "Title": "time模組",
+  "Intro": "\ttime 模組提供了 時間相關的功能，包括取得目前時間、計算程式執行時間、讓程式暫停一段時間等。",
+  "exp": {
+    "cor_exp": [
+      "import time",
+      "取得當前時間\nprint(time.time())  # 從 1970/1/1 00:00:00 UTC 起算的秒數 (float)",
+      "轉換為可讀時間\nprint(time.ctime())  # 輸出：'Sun Sep 14 22:10:30 2025'  (當前時間字串)\nprint(time.ctime(0))  # 輸出：'Thu Jan  1 08:00:00 1970' (根據時區)",
+      "暫停程式執行\nprint(\"開始倒數...\")\ntime.sleep(3)   # 程式暫停 3 秒\nprint(\"時間到！\")",
+      "取得當地時間與 UTC 時間\nlocal_time = time.localtime()\nprint(local_time)\n# 輸出：time.struct_time(tm_year=2025, tm_mon=9, tm_mday=14, ...)\n\nutc_time = time.gmtime()\nprint(utc_time)\n# 輸出：UTC 格式的時間",
+      "格式化時間\nnow = time.localtime()\nprint(time.strftime(\"%Y-%m-%d %H:%M:%S\", now))\n# 輸出：2025-09-14 22:15:00",
+      "將字串轉換成時間\ntime_str = \"2025-09-14 22:15:00\"\nparsed = time.strptime(time_str, \"%Y-%m-%d %H:%M:%S\")\nprint(parsed)\n# 輸出：time.struct_time(tm_year=2025, tm_mon=9, tm_mday=14, ...)",
+      "struct_time 轉回時間戳\nnow = time.localtime()\nprint(time.mktime(now))\n# 輸出：對應的時間戳 (秒數)"
+    ],
+    "mis_exp": [
+      "1. 時間戳 (timestamp)：用來計算時間差很方便，例如測量程式執行時間。\n2. struct_time：是一種結構，類似一個小型物件，裡面有 tm_year、tm_mon、tm_mday 等欄位。\n3. strftime / strptime：一個負責「格式化輸出」，一個負責「解析字串」。\n4. sleep()：常用於模擬延遲、排程、遊戲倒數。"
+    ]
+  },
+  "practice": [
+    {
+      "question": "在 Python 中，time.time() 會回傳什麼？",
+      "options": [
+        "A. 現在時間的字串表示",
+        "B. 從 1970/1/1 00:00:00 UTC 起算的秒數 (float)",
+        "C. struct_time 物件",
+        "D. 程式執行所花的時間"
+      ],
+      "answer": "B",
+      "explanation": "time.time() 回傳的是 Unix 時間戳記，即從 1970/1/1 00:00:00 UTC 起算的秒數。"
+    },
+    {
+      "question": "下列哪個函數可以讓程式暫停一段時間？",
+      "options": [
+        "A. time.pause()",
+        "B. time.stop()",
+        "C. time.sleep()",
+        "D. time.wait()"
+      ],
+      "answer": "C",
+      "explanation": "time.sleep(seconds) 可以讓程式暫停指定秒數。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\n\nimport time\nprint(time.ctime(0))",
+      "options": [
+        "A. '1970-01-01 00:00:00'",
+        "B. 'Thu Jan  1 08:00:00 1970' (依時區而定)",
+        "C. '0'",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "time.ctime(0) 會把時間戳 0 轉換成人類可讀的時間字串，結果會依電腦所在時區而定。"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "ID": "leetcode334",
+  "coding_practice": [
+    {
+      "title": "Increasing Triplet Subsequence",
+      "description": "Given an integer array nums, return true if there exists a triple of indices (i, j, k) such that i < j < k and nums[i] < nums[j] < nums[k]. If no such indices exists, return false.",
+      "examples": [
+        {
+          "input": "nums = [1,2,3,4,5]",
+          "output": "true",
+          "explanation": "Any triplet where i < j < k is valid."
+        },
+        {
+          "input": "nums = [5,4,3,2,1]",
+          "output": "false",
+          "explanation": "No triplet exists."
+        },
+        {
+          "input": "nums = [2,1,5,0,4,6]",
+          "output": "true",
+          "explanation": "One of the valid triplet is (3, 4, 5), because nums[3] == 0 < nums[4] == 4 < nums[5] == 6."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 5 * 10^5\n-2^31 <= nums[i] <= 2^31 - 1",
+      "follow up": "Could you implement a solution that runs in O(n) time complexity and O(1) space complexity?",
+      "solution": "class Solution:\n    def increasingTriplet(self, nums):\n        first = second = float('inf')\n        for num in nums:\n            if num <= first:\n                first = num\n            elif num <= second:\n                second = num\n            else:\n                return True\n        return False",
+      "explanation": "1. 使用兩個變數 first 和 second 分別保存目前最小和次小值。\n2. 遍歷 nums，若 num <= first，更新 first。\n3. 若 first < num <= second，更新 second。\n4. 若 num > second，表示找到一個遞增三元組，返回 True。\n5. 遍歷完仍未找到，返回 False。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}
+

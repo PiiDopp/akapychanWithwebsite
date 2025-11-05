@@ -1,0 +1,33 @@
+{
+  "ID": "leetcode1009",
+  "coding_practice": [
+    {
+      "title": "Complement of Base 10 Integer",
+      "description": "The complement of an integer is the integer you get when you flip all the 0's to 1's and all the 1's to 0's in its binary representation.\n\nFor example, The integer 5 is \"101\" in binary and its complement is \"010\" which is the integer 2.\nGiven an integer n, return its complement.",
+      "examples": [
+        {
+          "input": "n = 5",
+          "output": "2",
+          "explanation": "5 is \"101\" in binary, with complement \"010\" in binary, which is 2 in base-10."
+        },
+        {
+          "input": "n = 7",
+          "output": "0",
+          "explanation": "7 is \"111\" in binary, with complement \"000\" in binary, which is 0 in base-10."
+        },
+        {
+          "input": "n = 10",
+          "output": "5",
+          "explanation": "10 is \"1010\" in binary, with complement \"0101\" in binary, which is 5 in base-10."
+        }
+      ],
+      "constraints": "0 <= n < 10^9",
+      "note": "This question is the same as 476. Number Complement",
+      "solution": "class Solution:\n    def bitwiseComplement(self, n):\n        if n == 0:\n            return 1\n        bit_length = n.bit_length()\n        mask = (1 << bit_length) - 1\n        return n ^ mask",
+      "explanation": "1. 特殊處理 n = 0，補數為 1。\n2. 計算 n 的二進位長度 bit_length。\n3. 建立全 1 掩碼 mask = (1 << bit_length) - 1，掩碼每一位都是 1，與 n 的長度一致。\n4. 對 n 執行 XOR 運算 n ^ mask，可得到 n 的二進位補數，返回十進位結果。",
+      "tag": "721",
+      "difficult": "easy"
+    }
+  ]
+}
+

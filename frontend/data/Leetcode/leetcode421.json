@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode421",
+  "coding_practice": [
+    {
+      "title": "Maximum XOR of Two Numbers in an Array",
+      "description": "Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.",
+      "examples": [
+        {
+          "input": "nums = [3,10,5,25,2,8]",
+          "output": "28",
+          "explanation": "The maximum result is 5 XOR 25 = 28."
+        },
+        {
+          "input": "nums = [14,70,53,83,49,91,36,80,92,51,66,70]",
+          "output": "127"
+        }
+      ],
+      "constraints": "1 <= nums.length <= 2 * 10^5\n0 <= nums[i] <= 2^31 - 1",
+      "solution": "class Solution:\n    def findMaximumXOR(self, nums):\n        max_xor = 0\n        mask = 0\n        for i in range(31, -1, -1):\n            mask |= (1 << i)\n            prefixes = set([num & mask for num in nums])\n            temp = max_xor | (1 << i)\n            for p in prefixes:\n                if temp ^ p in prefixes:\n                    max_xor = temp\n                    break\n        return max_xor",
+      "explanation": "1. 從最高位開始，每次將 mask 擴展一位，取得所有數的前綴。\n2. 嘗試將當前位設為 1，即 temp = max_xor | (1 << i)。\n3. 檢查是否存在兩個前綴，使得 temp ^ p 也在前綴集合中，如果存在，更新 max_xor。\n4. 循環直到最低位，返回最大 XOR。",
+      "tag": "711",
+      "difficult": "medium"
+    }
+  ]
+}

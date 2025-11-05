@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode41",
+  "coding_practice": [
+    {
+      "title": "First Missing Positive",
+      "description": "Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums.\n\nYou must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.",
+      "examples": [
+        {
+          "input": "nums = [1,2,0]",
+          "output": "3",
+          "explanation": "The numbers in the range [1,2] are all in the array."
+        },
+        {
+          "input": "nums = [3,4,-1,1]",
+          "output": "2",
+          "explanation": "1 is in the array but 2 is missing."
+        },
+        {
+          "input": "nums = [7,8,9,11,12]",
+          "output": "1",
+          "explanation": "The smallest positive integer 1 is missing."
+        }
+      ],
+      "constraints": "1 <= nums.length <= 10^5\n-2^31 <= nums[i] <= 2^31 - 1",
+      "solution": "class Solution(object):\n    def firstMissingPositive(self, nums):\n        \"\"\"\n        :type nums: List[int]\n        :rtype: int\n        \"\"\"\n        n = len(nums)\n        for i in range(n):\n            while 1 <= nums[i] <= n and nums[nums[i]-1] != nums[i]:\n                nums[nums[i]-1], nums[i] = nums[i], nums[nums[i]-1]\n\n        for i in range(n):\n            if nums[i] != i + 1:\n                return i + 1\n        return n + 1",
+      "explanation": "1. 遍歷 nums，將每個數字 x 放到索引 x-1 的位置上，前提是 x 在 [1, n] 範圍內且 nums[nums[i]-1] != nums[i]。\n2. 再次遍歷 nums，找到第一個 nums[i] != i+1 的索引 i，返回 i+1。\n3. 如果所有位置都正確，返回 n+1。\n4. 複雜度分析：\n   4.1 時間複雜度：O(n)\n   4.2 空間複雜度：O(1)（原地操作）",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

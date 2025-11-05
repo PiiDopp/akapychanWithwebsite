@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode452",
+  "coding_practice": [
+    {
+      "title": "Minimum Number of Arrows to Burst Balloons",
+      "description": "There are some spherical balloons taped onto a flat wall that represents the XY-plane. The balloons are represented as a 2D integer array points where points[i] = [x_start, x_end] denotes a balloon whose horizontal diameter stretches between xstart and xend. You do not know the exact y-coordinates of the balloons.\n\nArrows can be shot up directly vertically (in the positive y-direction) from different points along the x-axis. A balloon with x_start and x_end is burst by an arrow shot at x if x_start <= x <= x_end. There is no limit to the number of arrows that can be shot. A shot arrow keeps traveling up infinitely, bursting any balloons in its path.\n\nGiven the array points, return the minimum number of arrows that must be shot to burst all balloons.",
+      "examples": [
+        {
+          "input": "points = [[10,16],[2,8],[1,6],[7,12]]",
+          "output": "2",
+          "explanation": "The balloons can be burst by 2 arrows: Shoot an arrow at x = 6, bursting the balloons [2,8] and [1,6]. Shoot an arrow at x = 11, bursting the balloons [10,16] and [7,12]."
+        },
+        {
+          "input": "points = [[1,2],[3,4],[5,6],[7,8]]",
+          "output": "4",
+          "explanation": "One arrow needs to be shot for each balloon for a total of 4 arrows."
+        },
+        {
+          "input": "points = [[1,2],[2,3],[3,4],[4,5]]",
+          "output": "2",
+          "explanation": "Shoot an arrow at x = 2, bursting the balloons [1,2] and [2,3]. Shoot an arrow at x = 4, bursting the balloons [3,4] and [4,5]."
+        }
+      ],
+      "constraints": "1 <= points.length <= 10^5\npoints[i].length == 2\n-2^31 <= x_start < x_end <= 2^31 - 1",
+      "solution": "class Solution:\n    def findMinArrowShots(self, points):\n        if not points:\n            return 0\n        \n        points.sort(key=lambda x: x[1])\n        arrows = 1\n        current_end = points[0][1]\n        \n        for start, end in points[1:]:\n            if start > current_end:\n                arrows += 1\n                current_end = end\n        \n        return arrows",
+      "explanation": "1. 按照氣球的結束位置升序排序。\n2. 初始化箭矢數量為 1，current_end 為第一個氣球的結束位置。\n3. 遍歷氣球，若下一個氣球的開始位置大於 current_end，增加箭矢數量並更新 current_end。\n4. 返回最少箭矢數量。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

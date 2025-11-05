@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode349",
+  "coding_practice": [
+    {
+      "title": "Intersection of Two Arrays",
+      "description": "Given two integer arrays nums1 and nums2, return an array of their intersection. Each element in the result must be unique and you may return the result in any order.",
+      "examples": [
+        {
+          "input": "nums1 = [1,2,2,1], nums2 = [2,2]",
+          "output": "[2]"
+        },
+        {
+          "input": "nums1 = [4,9,5], nums2 = [9,4,9,8,4]",
+          "output": "[9,4]",
+          "explanation": "[4,9] is also accepted."
+        }
+      ],
+      "constraints": "1 <= nums1.length, nums2.length <= 1000\n0 <= nums1[i], nums2[i] <= 1000",
+      "solution": "class Solution:\n    def intersection(self, nums1, nums2):\n        return list(set(nums1) & set(nums2))",
+      "explanation": "1. 將 nums1 和 nums2 轉換為集合，去除重複元素。\n2. 使用集合交集操作 & 找出共同元素。\n3. 將結果轉換為列表返回，順序不限。",
+      "tag": "632",
+      "difficult": "easy"
+    }
+  ]
+}

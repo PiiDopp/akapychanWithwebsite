@@ -1,0 +1,52 @@
+{
+  "ID": 1230,
+  "Title": "tkinter 視窗應用",
+  "Intro": "\tTkinter 是 Python 內建的 GUI（圖形介面）工具包，能快速建立視窗、按鈕、輸入框與標籤等元件。建立 GUI 的基本步驟：1) 建立主視窗 Tk()，2) 建立各種元件（Label、Button、Entry 等），3) 佈局（pack/grid/place），4) 事件綁定（如 Button 的 command），5) 呼叫 mainloop() 進入事件迴圈。",
+  "exp": {
+    "cor_exp": [
+      "# 最小可用視窗 + 按鈕改變標籤\nimport tkinter as tk\n\nwin = tk.Tk()\nwin.title('Hello Tkinter')\n\nlabel = tk.Label(win, text='初始文字')\nlabel.pack(padx=10, pady=10)\n\ndef change_text():\n    label.config(text='按下按鈕了！')\n\nbtn = tk.Button(win, text='點我', command=change_text)\nbtn.pack(padx=10, pady=10)\n\nwin.mainloop()",
+      "# 讀取輸入框內容並顯示\nimport tkinter as tk\n\nwin = tk.Tk()\nwin.title('輸入範例')\n\nentry = tk.Entry(win, width=20)\nentry.pack(pady=5)\n\nresult = tk.Label(win, text='請輸入名字')\nresult.pack(pady=5)\n\ndef greet():\n    name = entry.get()\n    result.config(text=f'Hello, {name}!')\n\nbtn = tk.Button(win, text='送出', command=greet)\nbtn.pack(pady=5)\n\nwin.mainloop()",
+      "# grid 佈局做簡易加總器\nimport tkinter as tk\n\nwin = tk.Tk()\nwin.title('加總器')\n\ntk.Label(win, text='數字 A').grid(row=0, column=0, padx=5, pady=5)\nentry_a = tk.Entry(win, width=8)\nentry_a.grid(row=0, column=1, padx=5, pady=5)\n\ntk.Label(win, text='數字 B').grid(row=1, column=0, padx=5, pady=5)\nentry_b = tk.Entry(win, width=8)\nentry_b.grid(row=1, column=1, padx=5, pady=5)\n\nans = tk.Label(win, text='結果：')\nans.grid(row=2, column=0, columnspan=2, pady=5)\n\ndef calc():\n    try:\n        a = float(entry_a.get())\n        b = float(entry_b.get())\n        ans.config(text=f'結果：{a + b}')\n    except ValueError:\n        ans.config(text='請輸入數字！')\n\ntk.Button(win, text='相加', command=calc).grid(row=3, column=0, columnspan=2, pady=8)\n\nwin.mainloop()"
+    ],
+    "mis_exp": [
+      "# 錯誤：忘記 mainloop（視窗閃一下就結束）\nimport tkinter as tk\nwin = tk.Tk()\ntk.Label(win, text='Hello').pack()\n# win.mainloop()  # 忘了呼叫，程式會直接結束",
+      "# 錯誤：command 綁定錯誤，提早執行\nimport tkinter as tk\nwin = tk.Tk()\n\ndef click():\n    print('被點了')\n\n# 錯：command=click() 會在建構按鈕時就執行\nbtn = tk.Button(win, text='點我', command=click())\nbtn.pack()\nwin.mainloop()",
+      "# 錯誤：同一容器混用 pack 與 grid\nimport tkinter as tk\nwin = tk.Tk()\nlabel = tk.Label(win, text='A')\nlabel.pack()\nentry = tk.Entry(win)\nentry.grid(row=0, column=1)  # 錯：同一個父容器 win 不可混用 pack 與 grid\nwin.mainloop()"
+    ]
+  },
+  "practice": [
+    {
+      "question": "在 tkinter 中，正確綁定按鈕事件的方式為何？（假設已有函式 def run(): ...）",
+      "options": [
+        "A. tk.Button(win, text='Run', command=run())",
+        "B. tk.Button(win, text='Run', command=run)",
+        "C. tk.Button(win, text='Run', run)",
+        "D. tk.Button(win, text='Run').command=run"
+      ],
+      "answer": "B",
+      "explanation": "command 參數需傳入函式物件本身（不加括號），A 會在建立按鈕時就呼叫。"
+    },
+    {
+      "question": "下列哪一個敘述正確？",
+      "options": [
+        "A. 同一個父容器中可以隨意混用 pack 與 grid",
+        "B. 必須呼叫 mainloop() 才會進入事件迴圈並顯示視窗",
+        "C. Label 不能動態修改文字，需重建元件",
+        "D. Entry.get() 會回傳整數"
+      ],
+      "answer": "B",
+      "explanation": "tkinter 需進入事件迴圈才能顯示並互動；Label 可用 config 修改文字；Entry.get() 回傳字串。"
+    },
+    {
+      "question": "若要以 grid 讓兩個元件並排顯示（同一行），下列何者可行？",
+      "options": [
+        "A. w1.pack(); w2.grid(row=0, column=1)",
+        "B. w1.grid(row=0, column=0); w2.grid(row=0, column=1)",
+        "C. w1.grid(row=0, column=0); w2.pack()",
+        "D. w1.place(); w2.grid()"
+      ],
+      "answer": "B",
+      "explanation": "在同一父容器中，grid 以列與行控制位置；不可與 pack 混用在同一容器。"
+    }
+  ]
+}

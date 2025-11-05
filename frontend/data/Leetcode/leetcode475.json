@@ -1,0 +1,30 @@
+{
+  "ID": "leetcode475",
+  "coding_practice": [
+    {
+      "title": "Heaters",
+      "description": "Winter is coming! During the contest, your first job is to design a standard heater with a fixed warm radius to warm all the houses.\n\nEvery house can be warmed, as long as the house is within the heater's warm radius range.\n\nGiven the positions of houses and heaters on a horizontal line, return the minimum radius standard of heaters so that those heaters could cover all houses.\n\nNotice that all the heaters follow your radius standard, and the warm radius will be the same.",
+      "examples": [
+        {
+          "input": "houses = [1,2,3], heaters = [2]",
+          "output": "1",
+          "explanation": "The only heater was placed in the position 2, and if we use the radius 1 standard, then all the houses can be warmed."
+        },
+        {
+          "input": "houses = [1,2,3,4], heaters = [1,4]",
+          "output": "1",
+          "explanation": "The two heaters were placed at positions 1 and 4. We need to use a radius 1 standard, then all the houses can be warmed."
+        },
+        {
+          "input": "houses = [1,5], heaters = [2]",
+          "output": "3"
+        }
+      ],
+      "constraints": "1 <= houses.length, heaters.length <= 3 * 10^4\n1 <= houses[i], heaters[i] <= 10^9",
+      "solution": "class Solution:\n    def findRadius(self, houses, heaters):\n        houses.sort()\n        heaters.sort()\n        res = 0\n        i = 0  # 指向最近的右邊加熱器\n\n        for house in houses:\n            # 找到離 house 最近的右邊加熱器\n            while i < len(heaters) - 1 and abs(heaters[i+1] - house) <= abs(heaters[i] - house):\n                i += 1\n            # 記錄最遠距離\n            res = max(res, abs(heaters[i] - house))\n        return res",
+      "explanation": "1. 將 houses 和 heaters 排序，以便逐個房屋找到最近的加熱器。\n2. 使用指標 i 遍歷 heaters，對每個房屋找到離它最近的加熱器。\n3. 計算每個房屋與最近加熱器的距離，並更新最大距離。\n4. 遍歷所有房屋後，最大距離即為最小加熱半徑。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

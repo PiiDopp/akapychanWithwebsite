@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode424",
+  "coding_practice": [
+    {
+      "title": "Longest Repeating Character Replacement",
+      "description": "You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.\n\nReturn the length of the longest substring containing the same letter you can get after performing the above operations.",
+      "examples": [
+        {
+          "input": "s = \"ABAB\", k = 2",
+          "output": "4",
+          "explanation": "Replace the two 'A's with two 'B's or vice versa."
+        },
+        {
+          "input": "s = \"AABABBA\", k = 1",
+          "output": "4",
+          "explanation": "Replace the one 'A' in the middle with 'B' and form \"AABBBBA\". The substring \"BBBB\" has the longest repeating letters, which is 4.There may exists other ways to achieve this answer too."
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^5\ns consists of only uppercase English letters.\n0 <= k <= s.length",
+      "solution": "class Solution:\n    def characterReplacement(self, s, k):\n        count = [0] * 26\n        max_count = 0\n        left = 0\n        res = 0\n        \n        for right in range(len(s)):\n            count[ord(s[right]) - ord('A')] += 1\n            max_count = max(max_count, count[ord(s[right]) - ord('A')])\n            \n            while (right - left + 1) - max_count > k:\n                count[ord(s[left]) - ord('A')] -= 1\n                left += 1\n            \n            res = max(res, right - left + 1)\n        \n        return res",
+      "explanation": "1. 使用滑動窗口，維護窗口中每個字符出現的次數。\n2. max_count 記錄窗口內出現次數最多的字符。\n3. 如果窗口長度減去 max_count 大於 k，說明需要替換的字符太多，左指針右移。\n4. 每次更新窗口長度，最後返回最大值。",
+      "tag": "511",
+      "difficult": "medium"
+    }
+  ]
+}

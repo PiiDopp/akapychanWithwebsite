@@ -1,0 +1,52 @@
+{
+  "ID": 940,
+  "Title": "檔案開啟與寫入 (open, read, write)",
+  "Intro": "\t在程式中，我們可以使用 open() 來開啟檔案，並透過 read()、write()、close() 等方法讀取或寫入資料。這讓程式能夠儲存執行結果、紀錄日誌或讀取外部資料。開啟檔案時需指定模式：'r' 代表讀取、'w' 代表覆寫、'a' 代表附加寫入。",
+  "exp": {
+    "cor_exp": [
+      "# 讀取文字檔內容\nfile = open('data.txt', 'r', encoding='utf-8')\ncontent = file.read()\nprint('檔案內容如下：')\nprint(content)\nfile.close()",
+      "# 寫入檔案\nfile = open('output.txt', 'w', encoding='utf-8')\nfile.write('這是一行測試文字\\n')\nfile.write('Python 檔案寫入成功！')\nfile.close()\nprint('資料已寫入 output.txt')",
+      "# 逐行讀取\nfile = open('data.txt', 'r', encoding='utf-8')\nfor line in file:\n    print(line.strip())  # strip() 移除換行符號\nfile.close()"
+    ],
+    "mis_exp": [
+      "# 錯誤：未關閉檔案\nfile = open('data.txt', 'r')\nprint(file.read())\n# 忘記 file.close() 可能導致資源未釋放",
+      "# 錯誤：開啟不存在的檔案\nfile = open('not_exist.txt', 'r')  # FileNotFoundError：找不到檔案",
+      "# 錯誤：寫入模式錯誤\nfile = open('data.txt', 'r')\nfile.write('無法寫入！')  # 錯誤：以讀取模式開啟，不能寫入"
+    ]
+  },
+  "practice": [
+    {
+      "question": "若要開啟名為 'info.txt' 的檔案以進行寫入，應使用哪一段程式？",
+      "options": [
+        "A. open('info.txt', 'r')",
+        "B. open('info.txt', 'w')",
+        "C. open('info.txt', 'a')",
+        "D. open('info.txt', 'x')"
+      ],
+      "answer": "B",
+      "explanation": "模式 'w' 用於覆寫檔案內容或建立新檔案。"
+    },
+    {
+      "question": "執行下列程式時，若 data.txt 不存在，會發生什麼？\n\nfile = open('data.txt', 'r')\ncontent = file.read()\nfile.close()",
+      "options": [
+        "A. 程式會自動建立空白檔案",
+        "B. 讀取空字串",
+        "C. 發生 FileNotFoundError",
+        "D. 無輸出"
+      ],
+      "answer": "C",
+      "explanation": "使用 'r' 模式開啟不存在的檔案會引發 FileNotFoundError。"
+    },
+    {
+      "question": "下列哪一段程式能正確讀取檔案並顯示每一行內容？",
+      "options": [
+        "A. file = open('data.txt', 'r')\nfor line in file:\n    print(line)\nfile.close()",
+        "B. file = open('data.txt', 'r')\nprint(line)\nfile.close()",
+        "C. open('data.txt')\nprint(file.read())",
+        "D. file = open('data.txt', 'r')\nfor file in line:\n    print(line)"
+      ],
+      "answer": "A",
+      "explanation": "A 使用 for 逐行讀取並在最後關閉檔案，語法正確。"
+    }
+  ]
+}

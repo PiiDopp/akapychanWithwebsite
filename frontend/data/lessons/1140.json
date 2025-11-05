@@ -1,0 +1,52 @@
+{
+  "ID": 1140,
+  "Title": "繼承與多型（Inheritance & Polymorphism）",
+  "Intro": "\t繼承（Inheritance）是物件導向程式設計的重要特性，允許子類別（subclass）繼承父類別（superclass）的屬性與方法，達到程式重複利用與擴充的目的。多型（Polymorphism）則指子類別可以改寫父類的方法，使相同的介面具有不同的行為表現。",
+  "exp": {
+    "cor_exp": [
+      "# 基本繼承\nclass Animal:\n    def speak(self):\n        print('動物發出聲音')\n\nclass Dog(Animal):\n    def bark(self):\n        print('汪汪！')\n\nmy_dog = Dog()\nmy_dog.speak()  # 繼承父類方法\nmy_dog.bark()   # 子類自訂方法",
+      "# 使用 super() 呼叫父類建構子\nclass Person:\n    def __init__(self, name):\n        self.name = name\n\nclass Student(Person):\n    def __init__(self, name, score):\n        super().__init__(name)  # 呼叫父類建構子\n        self.score = score\n\ns = Student('Alice', 90)\nprint(s.name, s.score)",
+      "# 多型（方法覆寫）\nclass Animal:\n    def make_sound(self):\n        print('動物發出聲音')\n\nclass Cat(Animal):\n    def make_sound(self):\n        print('喵～')\n\nclass Dog(Animal):\n    def make_sound(self):\n        print('汪汪！')\n\nfor a in [Cat(), Dog(), Animal()]:\n    a.make_sound()"
+    ],
+    "mis_exp": [
+      "# 錯誤：未正確繼承父類\nclass Dog:\n    def bark(self):\n        print('汪汪')\n\nclass Puppy:\n    pass\n\np = Puppy()\np.bark()  # AttributeError：Puppy 沒有繼承 Dog",
+      "# 錯誤：忘記使用 super()\nclass Person:\n    def __init__(self, name):\n        self.name = name\n\nclass Student(Person):\n    def __init__(self, name, score):\n        self.score = score  # 忘記初始化 name\n\ns = Student('Amy', 85)\nprint(s.name)  # AttributeError：未建立 name 屬性",
+      "# 錯誤：覆寫方法但拼錯名稱\nclass Animal:\n    def speak(self):\n        print('動物聲音')\n\nclass Cat(Animal):\n    def speek(self):  # 拼錯，未成功覆寫\n        print('喵')\n\nc = Cat()\nc.speak()  # 仍執行父類方法"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式結果為何？\n\nclass Animal:\n    def speak(self):\n        print('動物發出聲音')\n\nclass Dog(Animal):\n    def speak(self):\n        print('汪汪！')\n\nd = Dog()\nd.speak()",
+      "options": [
+        "A. 動物發出聲音",
+        "B. 汪汪！",
+        "C. 動物發出聲音\\n汪汪！",
+        "D. 程式錯誤"
+      ],
+      "answer": "B",
+      "explanation": "Dog 類別覆寫了父類別的 speak() 方法，因此輸出『汪汪！』。"
+    },
+    {
+      "question": "下列程式輸出結果為何？\n\nclass Person:\n    def __init__(self, name):\n        self.name = name\n\nclass Student(Person):\n    def __init__(self, name, score):\n        super().__init__(name)\n        self.score = score\n\ns = Student('Alice', 95)\nprint(s.name, s.score)",
+      "options": [
+        "A. Alice 95",
+        "B. name score",
+        "C. 程式錯誤",
+        "D. ('Alice', 95)"
+      ],
+      "answer": "A",
+      "explanation": "Student 使用 super() 呼叫父類建構子正確初始化 name，因此輸出 Alice 95。"
+    },
+    {
+      "question": "關於繼承與多型的敘述，下列何者正確？",
+      "options": [
+        "A. 子類別無法使用父類方法",
+        "B. super() 可用於呼叫父類的建構子或方法",
+        "C. 繼承會刪除父類所有屬性",
+        "D. 多型指的是一個類別只能有一個方法"
+      ],
+      "answer": "B",
+      "explanation": "super() 能呼叫父類別的方法或建構子，多型則是不同類別對相同方法有不同實作。"
+    }
+  ]
+}

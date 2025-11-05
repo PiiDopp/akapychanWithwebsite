@@ -1,0 +1,24 @@
+{
+  "ID": "leetcode520",
+  "coding_practice": [
+    {
+      "title": "Detect Capital",
+      "description": "We define the usage of capitals in a word to be right when one of the following cases holds:\n\nAll letters in this word are capitals, like \"USA\".\nAll letters in this word are not capitals, like \"leetcode\".\nOnly the first letter in this word is capital, like \"Google\".\nGiven a string word, return true if the usage of capitals in it is right.",
+      "examples": [
+        {
+          "input": "\"USA\"",
+          "output": "true"
+        },
+        {
+          "input": "\"FlaG\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= word.length <= 100\nword consists of lowercase and uppercase English letters",
+      "solution": "class Solution:\n    def detectCapitalUse(self, word):\n        return word.isupper() or word.islower() or word.istitle()",
+      "explanation": "1. 使用 Python 字串方法判斷是否符合三種正確大小寫使用情況：\n   - word.isupper() 判斷全部大寫。\n   - word.islower() 判斷全部小寫。\n   - word.istitle() 判斷首字母大寫，其餘小寫。\n2. 只要符合其中一種情況，就返回 True，否則返回 False。",
+      "tag": "723",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode406",
+  "coding_practice": [
+    {
+      "title": "Queue Reconstruction by Height",
+      "description": "You are given an array of people, people, which are the attributes of some people in a queue (not necessarily in order). Each people[i] = [h_i, k_i] represents the i^th person of height h_i with exactly k_i other people in front who have a height greater than or equal to hi.\n\nReconstruct and return the queue that is represented by the input array people. The returned queue should be formatted as an array queue, where queue[j] = [h_j, k_j] is the attributes of the jth person in the queue (queue[0] is the person at the front of the queue).",
+      "examples": [
+        {
+          "input": "people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]",
+          "output": "[[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]",
+          "explanation": "Person 0 has height 5 with no other people taller or the same height in front.\nPerson 1 has height 7 with no other people taller or the same height in front.\nPerson 2 has height 5 with two persons taller or the same height in front, which is person 0 and \nPerson 3 has height 6 with one person taller or the same height in front, which is person 1.\nPerson 4 has height 4 with four people taller or the same height in front, which are people 0, 1, 2, and 3.\nPerson 5 has height 7 with one person taller or the same height in front, which is person 1.\nHence [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]] is the reconstructed queue."
+        },
+        {
+          "input": "people = [[6,0],[5,0],[4,0],[3,2],[2,2],[1,4]]",
+          "output": "[[4,0],[5,0],[2,2],[3,2],[1,4],[6,0]]"
+        }
+      ],
+      "constraints": "1 <= people.length <= 2000\n0 <= hi <= 10^6\n0 <= ki < people.length\nIt is guaranteed that the queue can be reconstructed.",
+      "solution": "class Solution:\n    def reconstructQueue(self, people):\n        # Sort people by descending height; if heights are same, sort by ascending k\n        people.sort(key=lambda x: (-x[0], x[1]))\n        res = []\n        for p in people:\n            res.insert(p[1], p)\n        return res",
+      "explanation": "1. 將 people 依身高降序排列，若身高相同則依 k 值升序排列。\n2. 初始化一個空列表 res。\n3. 逐一將每個人插入 res 的第 p[1] 個位置。\n4. 插入時，身高較高的人會先佔據位置，確保 k 的條件被滿足。\n5. 最終返回重建好的隊列。",
+      "tag": "631",
+      "difficult": "medium"
+    }
+  ]
+}

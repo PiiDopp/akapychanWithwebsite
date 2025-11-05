@@ -1,0 +1,49 @@
+{
+  "ID": 622,
+  "Title": "常用的元組函數",
+  "Intro": "\t當元組建立之後，絕對不能變動每個索引所指向的元素。串列大部分的函數在元組中可以使用，但那些會改變元素個數或內容值的函數（如 append()、insert()）則不能使用。而像 count() 用來統計特定元素出現次數，index() 用來取得某項目第一次出現的索引值等，則可以應用在元組資料型態。",
+  "exp": {
+    "cor_exp": [
+      "salary = (86000, 72000, 83000, 47000, 55000)\n\nprint('原有資料：')\nprint(salary)\nprint('-------------------------')\n\n# 遞增排序\nprint('薪資由小而大排序：', sorted(salary))\nprint('-------------------------')\n\n# 遞減排序\nprint('薪資由大而小排序：', sorted(salary, reverse=True))\nprint('-------------------------')\n\nprint('資料經排序後仍保留原資料位置：')\nprint(salary)\nprint('-------------------------')"
+    ],
+    "mis_exp": [
+      "salary = (86000, 72000, 83000)\nsalary.append(50000)  # 錯誤：tuple 沒有 append 方法",
+      "salary = (86000, 72000, 83000)\nsalary[0] = 99999  # 錯誤：tuple 不能修改元素"
+    ]
+  },
+  "practice": [
+    {
+      "question": "若有 tup = (3, 5, 3, 7, 3)，則執行 tup.count(3) 的結果為何？",
+      "options": [
+        "A. 1",
+        "B. 2",
+        "C. 3",
+        "D. 5"
+      ],
+      "answer": "C",
+      "explanation": "count() 會統計元素出現的次數，3 出現了三次，因此結果為 3。"
+    },
+    {
+      "question": "若有 tup = (10, 20, 30, 20, 40)，則執行 tup.index(20) 的結果為何？",
+      "options": [
+        "A. 0",
+        "B. 1",
+        "C. 2",
+        "D. 3"
+      ],
+      "answer": "B",
+      "explanation": "index() 會回傳第一次出現的位置，20 第一次出現在索引 1。"
+    },
+    {
+      "question": "關於 sorted() 與 tuple 的敘述，下列何者正確？",
+      "options": [
+        "A. sorted() 會直接修改 tuple 本身的內容",
+        "B. sorted() 回傳一個新的串列，不會改變原本的 tuple",
+        "C. sorted() 只能用在 list，不能用在 tuple",
+        "D. sorted() 回傳一個新的 tuple"
+      ],
+      "answer": "B",
+      "explanation": "sorted() 會回傳一個新的 list，原本的 tuple 保持不變。"
+    }
+  ]
+}

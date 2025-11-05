@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode321",
+  "coding_practice": [
+    {
+      "title": "Create Maximum Number",
+      "description": "You are given two integer arrays nums1 and nums2 of lengths m and n respectively. nums1 and nums2 represent the digits of two numbers. You are also given an integer k.\n\nCreate the maximum number of length k <= m + n from digits of the two numbers. The relative order of the digits from the same array must be preserved.\n\nReturn an array of the k digits representing the answer.",
+      "examples": [
+        {
+          "input": "nums1 = [3,4,6,5], nums2 = [9,1,2,5,8,3], k = 5",
+          "output": "[9,8,6,5,3]"
+        },
+        {
+          "input": "nums1 = [6,7], nums2 = [6,0,4], k = 5",
+          "output": "[6,7,6,0,4]"
+        },
+        {
+          "input": "nums1 = [3,9], nums2 = [8,9], k = 3",
+          "output": "[9,8,9]"
+        }
+      ],
+      "constraints": "m == nums1.length\nn == nums2.length\n1 <= m, n <= 500\n0 <= nums1[i], nums2[i] <= 9\n1 <= k <= m + n\nnums1 and nums2 do not have leading zeros.",
+      "solution": "class Solution:\n    def maxNumber(self, nums1, nums2, k):\n        def pick_max(nums, t):\n            drop = len(nums) - t\n            stack = []\n            for num in nums:\n                while drop and stack and stack[-1] < num:\n                    stack.pop()\n                    drop -= 1\n                stack.append(num)\n            return stack[:t]\n        \n        def merge(a, b):\n            res = []\n            while a or b:\n                if a > b:\n                    res.append(a.pop(0))\n                else:\n                    res.append(b.pop(0))\n            return res\n        \n        max_res = []\n        for i in range(max(0, k - len(nums2)), min(k, len(nums1)) + 1):\n            a = pick_max(nums1, i)\n            b = pick_max(nums2, k - i)\n            max_res = max(max_res, merge(a[:], b[:]))\n        return max_res",
+      "explanation": "1. 定義 pick_max(nums, t) 函數取得長度為 t 的最大子序列，保持原有相對順序，使用單調棧策略。\n2. 定義 merge(a, b) 將兩個子序列合併成字典序最大的序列。\n3. 遍歷所有可能從 nums1 選取的數量 i，剩下從 nums2 選取 k-i。\n4. 每次合併後更新 max_res 為當前最大序列。\n5. 最後返回 max_res 即為答案。",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

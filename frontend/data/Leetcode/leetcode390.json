@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode390",
+  "coding_practice": [
+    {
+      "title": "Elimination Game",
+      "description": "You have a list arr of all integers in the range [1, n] sorted in a strictly increasing order. Apply the following algorithm on arr:\n\nStarting from left to right, remove the first number and every other number afterward until you reach the end of the list.\nRepeat the previous step again, but this time from right to left, remove the rightmost number and every other number from the remaining numbers.\nKeep repeating the steps again, alternating left to right and right to left, until a single number remains.\nGiven the integer n, return the last number that remains in arr.",
+      "examples": [
+        {
+          "input": "n = 9",
+          "output": "6",
+          "explanation": "arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]\narr = [2, 4, 6, 8]\narr = [2, 6]\narr = [6]"
+        },
+        {
+          "input": "n = 1",
+          "output": "1"
+        }
+      ],
+      "constraints": "1 <= n <= 10^9",
+      "solution": "class Solution:\n    def lastRemaining(self, n):\n        head = 1\n        step = 1\n        remaining = n\n        left = True\n\n        while remaining > 1:\n            if left or remaining % 2 == 1:\n                head += step\n            remaining //= 2\n            step *= 2\n            left = not left\n\n        return head",
+      "explanation": "1. 使用 head 表示當前序列的第一個元素。\n2. step 表示相鄰元素之間的差距。\n3. 每一輪刪除後，剩餘元素數量減半。\n4. 從左向右刪除時，head 一定會移動；從右向左刪除時，若剩餘數量為奇數，head 也會移動。\n5. 重複直到剩下最後一個元素，返回 head。",
+      "tag": "520",
+      "difficult": "medium"
+    }
+  ]
+}

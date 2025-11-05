@@ -1,0 +1,31 @@
+{
+  "ID": "leetcode517",
+  "coding_practice": [
+    {
+      "title": "Super Washing Machines",
+      "description": "You have n super washing machines on a line. Initially, each washing machine has some dresses or is empty.\n\nFor each move, you could choose any m (1 <= m <= n) washing machines, and pass one dress of each washing machine to one of its adjacent washing machines at the same time.\n\nGiven an integer array machines representing the number of dresses in each washing machine from left to right on the line, return the minimum number of moves to make all the washing machines have the same number of dresses. If it is not possible to do it, return -1.",
+      "examples": [
+        {
+          "input": "[1,0,5]",
+          "output": "3",
+          "explanation": "1st move:    1     0 <-- 5    =>    1     1     4\n2nd move:    1 <-- 1 <-- 4    =>    2     1     3\n3rd move:    2     1 <-- 3    =>    2     2     2"
+        },
+        {
+          "input": "[0,3,0]",
+          "output": "2",
+          "explanation": "1st move:    0 <-- 3     0    =>    1     2     0\n2nd move:    1     2 --> 0    =>    1     1     1"
+        },
+        {
+          "input": "[0,2,0]",
+          "output": "-1",
+          "explanation": "It's impossible to make all three washing machines have the same number of dresses."
+        }
+      ],
+      "constraints": "n == machines.length\n1 <= n <= 10^4\n0 <= machines[i] <= 10^5",
+      "solution": "class Solution:\n    def findMinMoves(self, machines):\n        total = sum(machines)\n        n = len(machines)\n        if total % n != 0:\n            return -1\n        avg = total // n\n        res = 0\n        cum_diff = 0\n        for load in machines:\n            diff = load - avg\n            cum_diff += diff\n            res = max(res, abs(cum_diff), diff)\n        return res",
+      "explanation": "1. 計算所有衣物總數，若無法被 n 整除則返回 -1。\n2. 計算每台洗衣機應有的平均衣物數 avg。\n3. 遍歷 machines，對每台洗衣機計算當前與平均的差值 diff，並累加到 cum_diff。\n4. 更新結果 res 為當前最大的絕對累積差值或當前差值。\n5. 最後 res 即為最少移動次數。",
+      "tag": "511",
+      "difficult": "hard"
+    }
+  ]
+}

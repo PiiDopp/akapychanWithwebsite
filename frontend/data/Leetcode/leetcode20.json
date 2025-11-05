@@ -1,0 +1,36 @@
+{
+  "ID": "leetcode20",
+  "coding_practice": [
+    {
+      "title": "Valid Parentheses",
+      "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nAn input string is valid if:\n\nOpen brackets must be closed by the same type of brackets.\nOpen brackets must be closed in the correct order.\nEvery close bracket has a corresponding open bracket of the same type.",
+      "examples": [
+        {
+          "input": "s = \"()\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"()[]{}\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"(]\"",
+          "output": "false"
+        },
+        {
+          "input": "s = \"([])\"",
+          "output": "true"
+        },
+        {
+          "input": "s = \"([)]\"",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= s.length <= 10^4\ns consists of parentheses only '()[]{}'.",
+      "solution": "class Solution(object):\n    def isValid(self, s):\n        \"\"\"\n        :type s: str\n        :rtype: bool\n        \"\"\"\n        stack = []\n        mapping = {')': '(', '}': '{', ']': '['}\n        \n        for char in s:\n            if char in mapping:\n                top_element = stack.pop() if stack else '#'\n                if mapping[char] != top_element:\n                    return False\n            else:\n                stack.append(char)\n        return not stack",
+      "explanation": "1. 使用堆疊存放左括號。\n2. 遇到右括號時，檢查堆疊頂端元素是否匹配對應左括號。\n3. 若不匹配或堆疊為空，返回 False。\n4. 遍歷完成後，如果堆疊為空，則括號有效，返回 True。\n5. 時間複雜度 O(n)，空間複雜度 O(n)。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "ID": 920,
+  "Title": "多重例外與 finally",
+  "Intro": "\t在一段程式中，可能同時出現不同種類的錯誤，例如除以零、資料型態錯誤或檔案未找到。此時可以使用多個 except 區塊來分別處理不同錯誤。若希望在不論是否發生錯誤時都執行某些動作（如關閉檔案），可使用 finally 區塊。",
+  "exp": {
+    "cor_exp": [
+      "# 多重 except 處理不同錯誤\ntry:\n    x = int(input('請輸入整數 x: '))\n    y = int(input('請輸入整數 y: '))\n    print('結果:', x / y)\nexcept ValueError:\n    print('輸入錯誤：請輸入整數數值')\nexcept ZeroDivisionError:\n    print('錯誤：除數不可為 0')\nexcept Exception as e:\n    print('其他錯誤：', e)\n\n# 若輸入字母會觸發 ValueError，若輸入 y = 0 會觸發 ZeroDivisionError",
+      "# finally 區塊一定會執行\ntry:\n    f = open('data.txt', 'r')\n    content = f.read()\n    print(content)\nexcept FileNotFoundError:\n    print('找不到檔案！')\nfinally:\n    print('程式執行結束，無論是否出錯都會執行這段。')"
+    ],
+    "mis_exp": [
+      "# 錯誤：未分開處理錯誤類型\ntry:\n    num = int(input('輸入整數: '))\n    print(10 / num)\nexcept:\n    print('有錯誤發生')  # 雖可執行，但無法分辨錯誤類型",
+      "# 錯誤：finally 的語法錯誤\ntry:\n    print('Hello')\nfinally\n    print('結束')  # 錯誤：finally 後面應加冒號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式，若使用者輸入字母 'a'，輸出結果為何？\n\ntry:\n    n = int(input('輸入數字: '))\n    print(10 / n)\nexcept ValueError:\n    print('輸入錯誤')\nexcept ZeroDivisionError:\n    print('除數不可為 0')\nfinally:\n    print('程式結束')",
+      "options": [
+        "A. 輸入錯誤\n程式結束",
+        "B. 除數不可為 0\n程式結束",
+        "C. 10 / n 的結果",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "輸入字母會產生 ValueError，執行第一個 except 區塊，finally 仍會執行。"
+    },
+    {
+      "question": "關於 finally 的敘述，下列何者正確？",
+      "options": [
+        "A. 只有發生錯誤時才會執行",
+        "B. 沒有錯誤時不會執行",
+        "C. 無論是否有錯誤都會執行",
+        "D. 只能與 ZeroDivisionError 一起使用"
+      ],
+      "answer": "C",
+      "explanation": "finally 區塊會在 try/except 結束後一定執行，用於收尾動作。"
+    },
+    {
+      "question": "若希望在同一段程式中分別處理除以零與型態錯誤，應如何撰寫？",
+      "options": [
+        "A. 使用多個 except 區塊",
+        "B. 使用多個 try 區塊",
+        "C. 使用一個 except 搭配 pass",
+        "D. 使用 if 判斷錯誤"
+      ],
+      "answer": "A",
+      "explanation": "可在一個 try 後接多個 except 來針對不同錯誤類型做處理。"
+    }
+  ]
+}

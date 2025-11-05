@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode507",
+  "coding_practice": [
+    {
+      "title": "Perfect Number",
+      "description": "A perfect number is a positive integer that is equal to the sum of its positive divisors, excluding the number itself. A divisor of an integer x is an integer that can divide x evenly.\n\nGiven an integer n, return true if n is a perfect number, otherwise return false.",
+      "examples": [
+        {
+          "input": "28",
+          "output": "true",
+          "explanation": "28 = 1 + 2 + 4 + 7 + 14\n1, 2, 4, 7, and 14 are all divisors of 28."
+        },
+        {
+          "input": "7",
+          "output": "false"
+        }
+      ],
+      "constraints": "1 <= num <= 10^8",
+      "solution": "class Solution:\n    def checkPerfectNumber(self, num):\n        if num < 2:\n            return False\n        s = 1\n        i = 2\n        while i * i <= num:\n            if num % i == 0:\n                s += i\n                if i != num // i:\n                    s += num // i\n            i += 1\n        return s == num",
+      "explanation": "1. 若 num 小於 2，直接返回 False，因為最小完美數是 6。\n2. 初始化 sum 為 1（因為 1 是任何正整數的因數）。\n3. 從 2 開始迴圈到 sqrt(num)，若 i 可以整除 num，則加上 i 和 num//i（避免平方根重複計算）。\n4. 最後判斷累加和是否等於 num，若相等則為完美數。",
+      "tag": "511",
+      "difficult": "easy"
+    }
+  ]
+}

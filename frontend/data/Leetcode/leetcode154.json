@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode154",
+  "coding_practice": [
+    {
+      "title": "Find Minimum in Rotated Sorted Array II",
+      "description": "Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,4,4,5,6,7] might become:\n\n[4,5,6,7,0,1,4] if it was rotated 4 times.\n[0,1,4,4,5,6,7] if it was rotated 7 times.\nNotice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].\n\nGiven the sorted rotated array nums that may contain duplicates, return the minimum element of this array.\nYou must decrease the overall operation steps as much as possible.",
+      "examples": [
+        {
+          "input": "nums = [1,3,5]",
+          "output": "1"
+        },
+        {
+          "input": "nums = [2,2,2,0,1]",
+          "output": "0"
+        }
+      ],
+      "constraints": "n == nums.length\n1 <= n <= 5000\n-5000 <= nums[i] <= 5000\nnums is sorted and rotated between 1 and n times.",
+      "follow up": "This problem is similar to Find Minimum in 153.Rotated Sorted Array, but nums may contain duplicates. Would this affect the runtime complexity? How and why?",
+      "solution": "class Solution:\n    def findMin(self, nums):\n        left, right = 0, len(nums) - 1\n        while left < right:\n            mid = (left + right) // 2\n            if nums[mid] > nums[right]:\n                left = mid + 1\n            elif nums[mid] < nums[right]:\n                right = mid\n            else:\n                right -= 1\n        return nums[left]",
+      "explanation": "1. Initialize two pointers, left and right, at the start and end of the array.\n2. While left < right, compute mid index.\n3. If nums[mid] > nums[right], the minimum must be to the right of mid, set left = mid + 1.\n4. If nums[mid] < nums[right], the minimum is at mid or to the left, set right = mid.\n5. If nums[mid] == nums[right], decrement right by 1 to handle duplicates.\n6. Return nums[left] as the minimum element.",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

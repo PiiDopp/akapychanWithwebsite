@@ -1,0 +1,26 @@
+{
+  "ID": "leetcode126",
+  "coding_practice": [
+    {
+      "title": "Word Ladder II",
+      "description": "A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s_1 -> s_2 -> ... -> s_k such that:\n\nEvery adjacent pair of words differs by a single letter.\nEvery s_i for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.\ns_k == endWord\n\nGiven two words, beginWord and endWord, and a dictionary wordList, return all the shortest transformation sequences from beginWord to endWord, or an empty list if no such sequence exists. Each sequence should be returned as a list of the words [beginWord, s_1, s_2, ..., s_k].",
+      "examples": [
+        {
+          "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
+          "output": "[[\"hit\",\"hot\",\"dot\",\"dog\",\"cog\"],[\"hit\",\"hot\",\"lot\",\"log\",\"cog\"]]",
+          "explanation": "There are 2 shortest transformation sequences:\n\"hit\" -> \"hot\" -> \"dot\" -> \"dog\" -> \"cog\"\n\"hit\" -> \"hot\" -> \"lot\" -> \"log\" -> \"cog\""
+        },
+        {
+          "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
+          "output": "[]",
+          "explanation": "The endWord \"cog\" is not in wordList, therefore there is no valid transformation sequence."
+        }
+      ],
+      "constraints": "1 <= beginWord.length <= 5\nendWord.length == beginWord.length\n1 <= wordList.length <= 500\nwordList[i].length == beginWord.length\nbeginWord, endWord, and wordList[i] consist of lowercase English letters.\nbeginWord != endWord\nAll the words in wordList are unique.\nThe sum of all shortest transformation sequences does not exceed 10^5.",
+      "solution": "from collections import defaultdict, deque\n\nclass Solution:\n    def findLadders(self, beginWord, endWord, wordList):\n        wordSet = set(wordList)\n        if endWord not in wordSet:\n            return []\n\n        # BFS 找最短距離，紀錄每個單詞的前驅節點\n        layer = {}\n        layer[beginWord] = 0\n        parents = defaultdict(list)\n\n        queue = deque([beginWord])\n        while queue:\n            word = queue.popleft()\n            step = layer[word]\n            for i in range(len(word)):\n                for c in 'abcdefghijklmnopqrstuvwxyz':\n                    new_word = word[:i] + c + word[i+1:]\n                    if new_word in wordSet:\n                        if new_word not in layer:\n                            layer[new_word] = step + 1\n                            queue.append(new_word)\n                            parents[new_word].append(word)\n                        elif layer[new_word] == step + 1:\n                            parents[new_word].append(word)\n\n        res = []\n\n        def dfs(path, word):\n            if word == beginWord:\n                res.append(path[::-1])\n                return\n            for prev in parents[word]:\n                dfs(path + [prev], prev)\n\n        if endWord in parents:\n            dfs([endWord], endWord)\n\n        return res",
+      "explanation": "1. 使用 BFS 找到每個單詞到 beginWord 的最短距離，並記錄每個單詞的前驅節點。\n2. BFS 完成後，從 endWord 開始用 DFS 回溯，生成所有最短轉換序列。\n3. 返回結果列表，若無法到達 endWord，返回空列表。",
+      "tag": "611",
+      "difficult": "hard"
+    }
+  ]
+}

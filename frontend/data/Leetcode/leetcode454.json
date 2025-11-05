@@ -1,0 +1,25 @@
+{
+  "ID": "leetcode454",
+  "coding_practice": [
+    {
+      "title": "4Sum II",
+      "description": "Given four integer arrays A, B, C, and D all of length n, return the number of tuples (i, j, k, l) such that:\n\n0 <= i, j, k, l < n\nA[i] + B[j] + C[k] + D[l] == 0",
+      "examples": [
+        {
+          "input": "A = [1,2], B = [-2,-1], C = [-1,2], D = [0,2]",
+          "output": "2",
+          "explanation": "The two tuples are:\n1. (0, 0, 0, 1) -> nums1[0] + nums2[0] + nums3[0] + nums4[1] = 1 + (-2) + (-1) + 2 = 0\n2. (1, 1, 0, 0) -> nums1[1] + nums2[1] + nums3[0] + nums4[0] = 2 + (-1) + (-1) + 0 = 0"
+        },
+        {
+          "input": "A = [0], B = [0], C = [0], D = [0]",
+          "output": "1"
+        }
+      ],
+      "constraints": "n == A.length == B.length == C.length == D.length\n1 <= n <= 500\n-2^28 <= A[i], B[i], C[i], D[i] <= 2^28",
+      "solution": "from collections import Counter\n\nclass Solution:\n    def fourSumCount(self, A, B, C, D):\n        AB = Counter(a + b for a in A for b in B)\n        count = 0\n        for c in C:\n            for d in D:\n                count += AB.get(-(c + d), 0)\n        return count",
+      "explanation": "1. 將 A 和 B 的所有和計算出來並存入 Counter AB。\n2. 遍歷 C 和 D 的所有組合，查找 -(c + d) 是否在 AB 中。\n3. 將對應的次數累加，即為四數和為 0 的組合數。",
+      "tag": "611",
+      "difficult": "medium"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "ID": 210,
+  "Title": "變數基礎",
+  "Intro": "\t變數是程式設計中用來儲存資料的容器。在 Python 中，不需要事先宣告型別，只要指定一個名稱並賦值即可使用。變數命名時需遵守規則：名稱只能包含字母、數字與底線，且不能以數字開頭，也不能使用保留字。",
+  "exp": {
+    "cor_exp": [
+      "x = 10\nprint(x)  # 宣告變數並輸出",
+      "name = '小明'\nprint('你好, ' + name)  # 字串變數",
+      "user_age = 18\nprint('年齡:', user_age)  # 使用底線分隔命名"
+    ],
+    "mis_exp": [
+      "1x = 10  # 錯誤：變數不能以數字開頭",
+      "for = 5  # 錯誤：for 是保留字，不能當變數名稱",
+      "user-age = 20  # 錯誤：變數名稱不能包含減號"
+    ]
+  },
+  "practice": [
+    {
+      "question": "下列哪一個是正確的變數宣告並輸出？",
+      "options": [
+        "A. 1city = 'Taipei'\\nprint(1city)",
+        "B. city = 'Taipei'\\nprint(city)",
+        "C. for = 'Taipei'\\nprint(for)",
+        "D. city-name = 'Taipei'\\nprint(city-name)"
+      ],
+      "answer": "B",
+      "explanation": "變數名稱不能以數字開頭、不能是保留字、不能包含減號；B 的寫法正確且字串需加引號。"
+    },
+    {
+      "question": "執行下列程式碼會輸出什麼？\\n\\nnum1 = 5\\nnum2 = 7\\nprint(num1 + num2)",
+      "options": [
+        "A. 5 + 7",
+        "B. 57",
+        "C. 程式錯誤",
+        "D. 12"
+      ],
+      "answer": "D",
+      "explanation": "num1 與 num2 分別是 5 和 7，整數相加結果為 12。"
+    },
+    {
+      "question": "以下哪個變數命名是正確的？",
+      "options": [
+        "A. school_name = '國小'",
+        "B. 2school = '國小'",
+        "C. class = '國小'",
+        "D. school-name = '國小'"
+      ],
+      "answer": "A",
+      "explanation": "變數名稱可使用底線；不能以數字開頭、不能包含減號；class 是保留字不能使用。"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "ID": "leetcode420",
+  "coding_practice": [
+    {
+      "title": "Strong Password Checker",
+      "description": "A password is considered strong if the below conditions are all met:\n\nIt has at least 6 characters and at most 20 characters.\nIt contains at least one lowercase letter, at least one uppercase letter, and at least one digit.\nIt does not contain three repeating characters in a row (i.e., \"Baaabb0\" is weak, but \"Baaba0\" is strong).\nGiven a string password, return the minimum number of steps required to make password strong. if password is already strong, return 0.\n\nIn one step, you can:\n\nInsert one character to password,\nDelete one character from password, or\nReplace one character of password with another character.",
+      "examples": [
+        {
+          "input": "password = \"a\"",
+          "output": "5"
+        },
+        {
+          "input": "password = \"aA1\"",
+          "output": "3"
+        },
+        {
+          "input": "password = \"1337C0d3\"",
+          "output": "0"
+        }
+      ],
+      "constraints": "1 <= password.length <= 50\npassword consists of letters, digits, dot '.' or exclamation mark '!'",
+      "solution": "class Solution:\n    def strongPasswordChecker(self, s):\n        n = len(s)\n        has_lower = has_upper = has_digit = 0\n        for c in s:\n            if c.islower(): has_lower = 1\n            elif c.isupper(): has_upper = 1\n            elif c.isdigit(): has_digit = 1\n        missing_types = 3 - (has_lower + has_upper + has_digit)\n\n        replace = 0\n        one_mod = two_mod = 0\n        i = 2\n        while i < n:\n            if s[i] == s[i-1] == s[i-2]:\n                length = 2\n                while i < n and s[i] == s[i-1]:\n                    length += 1\n                    i += 1\n                replace += length // 3\n                if length % 3 == 0: one_mod += 1\n                elif length % 3 == 1: two_mod += 1\n            else:\n                i += 1\n\n        if n < 6:\n            return max(6 - n, missing_types)\n        elif n <= 20:\n            return max(replace, missing_types)\n        else:\n            delete = n - 20\n            # 優先刪除 mod 3 == 0\n            reduce = min(delete, one_mod)\n            replace -= reduce\n            delete -= reduce\n\n            # 再刪除 mod 3 == 1\n            reduce = min(max(delete, 0), two_mod * 2) // 2\n            replace -= reduce\n            delete -= reduce * 2\n\n            # 最後刪除其他\n            replace -= max(delete, 0) // 3\n\n            return (n - 20) + max(missing_types, replace)",
+      "explanation": "1. 計算密碼中是否缺少小寫、大寫、數字，missing_types = 3 - sum(...)\n2. 遍歷密碼，找出所有連續 >=3 的相同字符，累加每段需要的替換次數 replace，以及 mod3 的計數 one_mod, two_mod\n3. 密碼長度 <6：返回 max(6 - n, missing_types)\n4. 密碼長度 6~20：返回 max(replace, missing_types)\n5. 密碼長度 >20：\n   a. 刪除多餘字符 delete = n-20\n   b. 優先刪除 mod0、mod1、最後 mod2 段，減少替換次數\n   c. 返回 delete + max(missing_types, replace)",
+      "tag": "711",
+      "difficult": "hard"
+    }
+  ]
+}

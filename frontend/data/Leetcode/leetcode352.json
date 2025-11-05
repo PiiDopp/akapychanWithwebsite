@@ -1,0 +1,22 @@
+{
+  "ID": "leetcode352",
+  "coding_practice": [
+    {
+      "title": "Data Stream as Disjoint Intervals",
+      "description": "Given a data stream input of non-negative integers a_1, a_2, ..., a_n, summarize the numbers seen so far as a list of disjoint intervals.\n\nImplement the SummaryRanges class:\n\nSummaryRanges() Initializes the object with an empty stream.\nvoid addNum(int value) Adds the integer value to the stream.\nint[][] getIntervals() Returns a summary of the integers in the stream currently as a list of disjoint intervals [starti, endi]. The answer should be sorted by starti.",
+      "examples": [
+        {
+          "input": "[\"SummaryRanges\", \"addNum\", \"getIntervals\", \"addNum\", \"getIntervals\", \"addNum\", \"getIntervals\", \"addNum\", \"getIntervals\", \"addNum\", \"getIntervals\"]\n[[], [1], [], [3], [], [7], [], [2], [], [6], []]",
+          "output": "[null, null, [[1, 1]], null, [[1, 1], [3, 3]], null, [[1, 1], [3, 3], [7, 7]], null, [[1, 3], [7, 7]], null, [[1, 3], [6, 7]]]",
+          "explanation": "SummaryRanges summaryRanges = new SummaryRanges();\nsummaryRanges.addNum(1);      // arr = [1]\nsummaryRanges.getIntervals(); // return [[1, 1]]\nsummaryRanges.addNum(3);      // arr = [1, 3]\nsummaryRanges.getIntervals(); // return [[1, 1], [3, 3]]\nsummaryRanges.addNum(7);      // arr = [1, 3, 7]\nsummaryRanges.getIntervals(); // return [[1, 1], [3, 3], [7, 7]]\nsummaryRanges.addNum(2);      // arr = [1, 2, 3, 7]\nsummaryRanges.getIntervals(); // return [[1, 3], [7, 7]]\nsummaryRanges.addNum(6);      // arr = [1, 2, 3, 6, 7]\nsummaryRanges.getIntervals(); // return [[1, 3], [6, 7]]"
+        }
+      ],
+      "constraints": "0 <= value <= 10^4\nAt most 3 * 10^4 calls will be made to addNum and getIntervals.\nAt most 10^2 calls will be made to getIntervals.",
+      "follow up": "What if there are lots of merges and the number of disjoint intervals is small compared to the size of the data stream?",
+      "solution": "class SummaryRanges:\n\n    def __init__(self):\n        self.intervals = []\n\n    def addNum(self, val):\n        new_interval = [val, val]\n        res = []\n        placed = False\n        for start, end in self.intervals:\n            if end + 1 < val:\n                res.append([start, end])\n            elif val + 1 < start:\n                if not placed:\n                    res.append(new_interval)\n                    placed = True\n                res.append([start, end])\n            else:\n                # 合併區間\n                new_interval[0] = min(start, new_interval[0])\n                new_interval[1] = max(end, new_interval[1])\n        if not placed:\n            res.append(new_interval)\n        self.intervals = res\n\n    def getIntervals(self):\n        return self.intervals",
+      "explanation": "1. 初始化一個空列表 intervals 用來存儲不相交區間。\n2. addNum 方法處理新數字 val，分三種情況：\n   - 完全在左側 → 保留原區間。\n   - 完全在右側 → 若新區間尚未插入，插入，然後保留原區間。\n   - 與原區間有交集 → 擴展 new_interval。\n3. 遍歷結束後，如果新區間尚未插入，追加到結果。\n4. getIntervals 直接返回 intervals。\n5. 保證返回的區間按 start 排序。",
+      "tag": "631",
+      "difficult": "hard"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "ID": 1130,
+  "Title": "方法與行為（Method）",
+  "Intro": "\t在 Python 類別中，方法（Method）是定義在類別內的函數，用來描述物件的行為。方法的第一個參數必須是 self，代表物件本身。透過方法，物件可以存取自己的屬性並執行動作，使程式結構更清晰、可維護。",
+  "exp": {
+    "cor_exp": [
+      "# 定義方法並呼叫\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\n    def show_info(self):\n        print(f'{self.name} 的成績是 {self.score}')\n\ns1 = Student('Alice', 92)\ns1.show_info()  # Alice 的成績是 92",
+      "# 方法中修改屬性\nclass BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance\n\n    def deposit(self, amount):\n        self.balance += amount\n        print(f'存款 {amount} 元，餘額為 {self.balance} 元')\n\n    def withdraw(self, amount):\n        if amount > self.balance:\n            print('餘額不足！')\n        else:\n            self.balance -= amount\n            print(f'提款 {amount} 元，剩餘 {self.balance} 元')\n\nacc = BankAccount('Tom', 1000)\nacc.deposit(500)\nacc.withdraw(300)",
+      "# 方法回傳值\nclass Circle:\n    def __init__(self, radius):\n        self.radius = radius\n\n    def area(self):\n        return 3.14 * (self.radius ** 2)\n\nc = Circle(5)\nprint('圓面積：', c.area())"
+    ],
+    "mis_exp": [
+      "# 錯誤：方法未傳入 self\nclass Dog:\n    def bark():  # 少了 self\n        print('汪汪！')\n\nd = Dog()\nd.bark()  # TypeError：缺少 self 參數",
+      "# 錯誤：呼叫未定義的方法\nclass Car:\n    def start(self):\n        print('發動引擎')\n\nmy_car = Car()\nmy_car.stop()  # AttributeError：類別中沒有 stop 方法",
+      "# 錯誤：誤將方法當變數使用\nclass Student:\n    def say_hi(self):\n        print('Hi!')\n\ns = Student()\nprint(s.say_hi)  # 顯示方法記憶體位址，需加括號呼叫"
+    ]
+  },
+  "practice": [
+    {
+      "question": "執行下列程式結果為何？\n\nclass Cat:\n    def __init__(self, name):\n        self.name = name\n\n    def meow(self, times):\n        print(self.name, '喵～' * times)\n\nc = Cat('Mimi')\nc.meow(3)",
+      "options": [
+        "A. Mimi 喵～喵～喵～",
+        "B. 喵～喵～喵～",
+        "C. self.name 喵～喵～喵～",
+        "D. 程式錯誤"
+      ],
+      "answer": "A",
+      "explanation": "meow() 是帶參數的方法，會使用 self.name 並重複輸出三次『喵～』。"
+    },
+    {
+      "question": "執行下列程式結果為何？\n\nclass Account:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance\n\n    def deposit(self, money):\n        self.balance += money\n\nacc = Account('Amy', 1000)\nacc.deposit(500)\nprint(acc.balance)",
+      "options": [
+        "A. 500",
+        "B. 1000",
+        "C. 1500",
+        "D. 程式錯誤"
+      ],
+      "answer": "C",
+      "explanation": "呼叫 deposit() 會修改屬性 balance，1000 + 500 = 1500。"
+    },
+    {
+      "question": "關於方法（method）的敘述，下列何者正確？",
+      "options": [
+        "A. 方法定義時不需要 self",
+        "B. 方法無法修改屬性值",
+        "C. 方法是定義在類別中的函數，用來描述行為",
+        "D. 方法只能回傳整數"
+      ],
+      "answer": "C",
+      "explanation": "方法是類別內的函數，用來定義物件的行為，第一個參數必須是 self。"
+    }
+  ]
+}
