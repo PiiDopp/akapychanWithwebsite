@@ -16,7 +16,7 @@ from core import (
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
-    build_stdin_code_prompt, build_fix_code_prompt,
+    build_stdin_code_prompt, build_fix_code_prompt, build_hint_prompt,
     #omm
     interactive_chat_api, normalize_tests
 )
@@ -675,16 +675,56 @@ async def get_hint(request: Request):
         data = await request.json()
         problem_id = data.get("problem_id") or data.get("data_id")  # 相容舊版欄位
         user_code = data.get("code") or data.get("user_code")       # 改用 code
+        practice_idx = int(data.get("practice_idx") or 0)
+        data_path = data.get("data_path")
+        # 'mode' and 'source' are not used by the hint logic, but are part of the request
 
         if not problem_id or not user_code:
             raise HTTPException(status_code=400, detail="缺少 problem_id 或 code")
 
-        # TODO: 在此加入根據 problem_id 和 code 生成提示的邏輯
-        # hint_text = generate_hint_logic(problem_id, user_code)
+        # 1. 載入題目描述
+        problem_description = "（無法載入題目描述）"
+        try:
+            prob = load_problem_cases(
+                data_id=problem_id or "",
+                practice_idx=practice_idx,
+                data_path=data_path,
+                allowed_bases=ALLOWED_BASES,
+                lessons_dir_env=os.getenv("LESSONS_DIR"),
+            )
+            problem_description = prob.get("description", "無題目描述")
+            
+            # 嘗試獲取更詳細的描述或標題
+            if problem_description == "無題目描述":
+                problem_description = prob.get("title", "無題目描述")
+            
+            # 獲取範例測資作為額外上下文
+            tests = prob.get("tests", [])
+            if tests:
+                examples = "\n".join([
+                    f"範例 {i+1}:\n  輸入: {t.get('input')}\n  輸出: {t.get('expected')}" 
+                    for i, t in enumerate(tests[:2]) # 最多取 2 個範例
+                ])
+                problem_description += f"\n\n--- 範例 ---\n{examples}"
 
-        hint_text = f"這是有關於 {problem_id} 的提示 (此為存根回應)"
+        except Exception as e:
+            print(f"[警告] /hint 路由無法載入題目 ({problem_id}): {e}")
+            # 即使載入失敗，還是繼續，只是描述會比較少
+            pass
 
-        print(f"[STUB] /hint 路由被呼叫, problem_id: {problem_id}")
+        # 2. 建立提示 Prompt (目前不執行程式碼，未來可擴充)
+        error_message = None 
+        
+        hint_prompt = build_hint_prompt(
+            problem_description=problem_description,
+            user_code=user_code,
+            error_message=error_message
+        )
+
+        # 3. 呼叫模型 (run_model 已在 main.py 中定義)
+        hint_text = run_model(hint_prompt)
+
+        print(f"[INFO] /hint 路由被呼叫, problem_id: {problem_id}")
         return {"ok": True, "hint": hint_text}
 
     except Exception as e:

@@ -589,3 +589,27 @@ def normalize_tests(raw) -> list[dict]:
             norm.append({"input": inp, "output": out})
         # 其他型別略過
     return norm
+def build_hint_prompt(problem_description: str, user_code: str, error_message: Optional[str] = None) -> str:
+    """
+    建立一個用於生成程式碼提示的提示。
+    """
+    prompt_lines = [
+        "用繁體中文回答。\n"
+        "你是一位專業的程式解題助教。\n"
+        "任務：根據使用者提供的題目描述和他們不完整的/錯誤的程式碼，提供一個具體的、有建設性的「提示」，引導他們思考正確的方向。\n",
+        "**提示要求**：\n"
+        "1.  **不要** 直接給出完整解答或修正後的程式碼。\n"
+        "2.  針對程式碼中**最關鍵**的一個問題點提供指導。\n"
+        "3.  如果程式碼看起來完全離題，請提示他們重新閱讀題目描述的關鍵部分。\n"
+        "4.  如果提供了錯誤訊息，請優先針對錯誤訊息進行解釋和提示。\n"
+        "5.  提示應簡短、精確，控制在 2-3 句話內。\n",
+        f"--- 題目描述 ---\n{problem_description}\n",
+        f"--- 使用者的程式碼 (有問題) ---\n```python\n{user_code}```\n"
+    ]
+    
+    if error_message:
+        prompt_lines.append(f"--- 錯誤訊息/執行失敗日誌 ---\n{error_message}\n")
+    
+    prompt_lines.append("\n請根據上述資料，提供一個簡短的、引導性的提示：")
+    
+    return "".join(prompt_lines)
