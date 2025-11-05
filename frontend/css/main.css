@@ -77,7 +77,11 @@ body.sidebar-collapsed .mainBtn{
 .L-Unit {
   list-style: none;
   font-weight: 800;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none;         /* standard syntax */
+
 }
 .L-Unit div{
   font-size: 18px;
@@ -197,7 +201,10 @@ body.sidebar-collapsed .leftsideBtn img{
   min-height: 60vh;
   max-height: 96vh;
   padding: 12px;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none;         /* standard syntax */
   overflow: hidden auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable both-edges;
@@ -340,7 +347,11 @@ body.sidebar-collapsed .textContent {
 
 .textContent code[class*="language-"],
 .textContent pre[class*="language-"] {
-  user-select: text;
+  -webkit-user-select: text; /* Safari / iOS Safari / old Chrome */
+  -moz-user-select: text;    /* Firefox (old versions) */
+  -ms-user-select: text;     /* Internet Explorer / old Edge */
+  user-select: text;         /* Standard */
+
 }
 
 pre code {

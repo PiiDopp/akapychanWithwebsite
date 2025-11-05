@@ -94,7 +94,10 @@ body.sidebar-collapsed .changeBtn {
 .L-Unit {
   font-weight: 800;
   list-style: none;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none; 
   padding: 0;
 }
 .menuTitle {
@@ -438,7 +441,10 @@ body.sidebar-collapsed .leftsideBtn img {
   border: 1px solid #ddd;
   border-radius: 10px;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none; 
   background: #fff;
 }
 .q-btn.active {

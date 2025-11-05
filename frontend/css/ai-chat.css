@@ -56,7 +56,11 @@ html.is-leaving body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none;         /* standard syntax */
+
 }
 .chatbot header h2 {
   color: #333;
@@ -173,7 +177,11 @@ strong {
   margin: 0;
   width: auto;
   background: transparent;
-  user-select: none;
+  -webkit-user-select: none; /* for Safari, iOS Safari, older Chrome */
+  -moz-user-select: none;    /* for older Firefox */
+  -ms-user-select: none;     /* for older IE/Edge */
+  user-select: none;         /* standard syntax */
+
 }
 
 .toolbar .btn {
