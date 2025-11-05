@@ -119,7 +119,8 @@ async def chat(request: Request):
     messages: List[Dict[str, str]] = data.get("messages", [])
     last_user = next((m.get("content", "") for m in reversed(messages) if m.get("role") == "user"), "").strip()
 
-    m = re.match(r"^進入\s*模式\s*([123])", last_user)
+    # *** 新增 4 ***
+    m = re.match(r"^進入\s*模式\s*([1234])", last_user)
     if m:
         last_user = m.group(1)
 
@@ -130,7 +131,8 @@ async def chat(request: Request):
         "已返回主選單。\n\n請選擇模式：\n"
         "模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）\n"
         "模式 2｜程式驗證（貼上你的 Python 程式碼）\n"
-        "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n\n"
+        "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n"
+        "模式 4｜一般聊天\n\n" # *** 新增 4 ***
         "**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。"
     )
 
@@ -140,7 +142,8 @@ async def chat(request: Request):
         return {"text": MENU_TEXT}
 
     if not mode:
-        if last_user in {"1", "2", "3"}:
+        # *** 新增 4 ***
+        if last_user in {"1", "2", "3", "4"}:
             session["mode"] = last_user
             session["awaiting"] = True
             session["step"] = None
@@ -152,7 +155,12 @@ async def chat(request: Request):
                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
             if last_user == "3":
                 return {"text": "**模式 3｜程式解釋**\n\n請貼上要解釋的 Python 程式碼："}
+            # *** 新增 4 的進入點 ***
+            if last_user == "4":
+                session["step"] = "chat_loop"
+                return {"text": "**模式 4｜一般聊天**\n\n請輸入您想聊天的內容（輸入 'q' 可返回主選單）："}
 
+        # (保留) 預設行為：如果不在任何模式中，且輸入的不是模式指令，則視為一次性一般聊天
         if last_user:
             reply = interactive_chat_api(last_user)
             if not isinstance(reply, str):
@@ -453,6 +461,25 @@ async def chat(request: Request):
         session["step"] = "need"
         return {"text": "請描述你的需求："}
 
+    # *** 新增模式 4 處理邏輯 ***
+    # === 模式 4：一般聊天 ===
+    if mode == "4":
+        msg = last_user
+        
+        if not msg:
+             return {"text": "請輸入您想聊天的內容（輸入 'q' 可返回主選單）："}
+        
+        try:
+            reply = interactive_chat_api(msg)
+            if not isinstance(reply, str):
+                reply = str(reply)
+        except Exception as e:
+            reply = f"[一般聊天時發生錯誤] {e}"
+
+        # 保持在模式 4
+        session["step"] = "chat_loop" 
+        return {"text": reply + "\n\n(可繼續聊天，輸入 'q' 可返回主選單)"}
+
     # === 模式 2/3：一次性回應 ===
     try:
         if mode == "2":
@@ -460,10 +487,12 @@ async def chat(request: Request):
         elif mode == "3":
             output = run_mode_3(last_user)
         else:
+            # 這邊理論上不會被觸發，因為 mode 1 和 4 已經在前面處理
             output = "[錯誤] 未知模式"
     except Exception as e:
         output = f"[例外錯誤] {e}"
 
+    # 模式 2/3 執行完畢後自動退回主選單
     session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
     return {"text": output}
 
@@ -624,3 +653,54 @@ async def translate_api(req: Request):
         raise HTTPException(status_code=500, detail=f"翻譯失敗：{e}")
 
     return {"ok": True, "translation": translation}
+
+# ====== 新增 /hint 路由 (STUB) ======
+@app.post("/hint")
+async def get_hint(request: Request):
+    """
+    獲取提示 API (尚未實作)
+    入參(JSON):
+      { "problem_id": "...", "user_code": "..." }
+    回傳(JSON):
+      { "ok": true, "hint": "..." }
+    """
+    try:
+        data = await request.json()
+        problem_id = data.get("problem_id")
+        user_code = data.get("user_code")
+        
+        # TODO: 在此處加入根據 problem_id 和 user_code 生成提示的邏輯
+        # hint_text = generate_hint_logic(problem_id, user_code)
+        
+        hint_text = f"這是有關於 {problem_id} 的提示 (此為存根回應)"
+        
+        print(f"[STUB] /hint 路由被呼叫, problem_id: {problem_id}")
+        return {"ok": True, "hint": hint_text}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"獲取提示失敗：{e}")
+
+# ====== 新增 /answer 路由 (STUB) ======
+@app.post("/answer")
+async def get_answer(request: Request):
+    """
+    獲取解答 API (尚未實作)
+    入參(JSON):
+      { "problem_id": "..." }
+    回傳(JSON):
+      { "ok": true, "answer": "..." }
+    """
+    try:
+        data = await request.json()
+        problem_id = data.get("problem_id")
+        
+        # TODO: 在此處加入根據 problem_id 獲取標準解答的邏輯
+        # answer_code = get_solution_logic(problem_id)
+        
+        answer_code = f"# 這是 {problem_id} 的標準解答 (此為存根回應)\n\ndef solution():\n    pass"
+        
+        print(f"[STUB] /answer 路由被呼叫, problem_id: {problem_id}")
+        return {"ok": True, "answer": answer_code}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"獲取解答失敗：{e}")

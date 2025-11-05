@@ -213,8 +213,8 @@ def load_problem_cases(
     - 單元題目: /home/omm0102/AkaPyChan/frontend/data
     - LeetCode 題目: /home/omm0102/AkaPyChan/frontend/data/Leetcode
     """
-    UNIT_BASE = "/home/omm0102/AkaPyChan/frontend/data"
-    LEETCODE_BASE = "/home/omm0102/AkaPyChan/frontend/data/Leetcode"
+    UNIT_BASE = "/home/hcilab/webflow/frontend/data"
+    LEETCODE_BASE = "/home/hcilab/webflow/frontend/data/Leetcode"
 
     candidates: List[str] = []
 
