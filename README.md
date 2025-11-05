@@ -42,3 +42,7 @@ pip install -r requirements.txt
 python -m uvicorn main:app --reload
 uvicorn main:app --reload
 ```
+```bash
+npm install
+npm run dev
+```
