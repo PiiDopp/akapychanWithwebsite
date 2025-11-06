@@ -402,12 +402,70 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
-                result = validate_main_function(code)
-                text = result[1] if (isinstance(result, tuple) and len(result) == 2) else str(result)
-                return {"text": f"=== 程式執行/驗證結果 ===\n{text}\n\n"
+                # 1. 重新生成測資
+                print("[提示] 收到 VERIFY 指令，正在重新生成測資...")
+                test_prompt = build_test_prompt(need_text) # 使用 need_text
+                test_resp = run_model(test_prompt)
+                raw_tests = extract_json_block(test_resp)
+                json_tests = normalize_tests(raw_tests)
+                if not json_tests:
+                    json_tests = normalize_tests(parse_tests_from_text(need_text)) # fall back
+
+                ctx["tests"] = json_tests or [] # 存回 ctx
+                tests = ctx["tests"] # 更新本地變數 tests
+                history.append(f"重新生成測資 (共 {len(tests)} 筆)")
+                ctx["history"] = history
+                session["ctx"] = ctx # 確保 session 更新
+
+                if not tests:
+                    print("[警告] ⚠️ 未能提取新測資。")
+                    # 即使沒有測資，也執行一次空驗證
+                    ok, detail = validate_main_function(code, stdin_input="", expected_output=None)
+                    return {
+                        "text": (
+                            "=== 程式執行/驗證結果 (無新測資，空輸入) ===\n"
+                            f"{detail}\n\n"
+                            "請選擇您的下一步操作：\n"
+                            "  - 修改：直接輸入您的修正需求\n"
+                            "  - 驗證 VERIFY (將再次生成新測資)\n"
+                            "  - 解釋 EXPLAIN\n"
+                            "  - 完成 QUIT\n"
+                        )
+                    }
+                
+                print(f"[提示] ✅ 已成功提取 {len(tests)} 筆新測資。")
+
+                # 2. 執行驗證 (邏輯同 verify_prompt 的 'M')
+                report_lines = []
+                all_passed = True
+                report_lines.append("=== 程式執行/驗證結果 (依*新*測資逐筆) ===")
+                for i, t in enumerate(tests, 1):
+                    stdin_str = t.get("input", "") if isinstance(t, dict) else (str(t[0]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
+                    expected_str = t.get("output", "") if isinstance(t, dict) else (str(t[1]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
+
+                    input_display = " ".join((stdin_str or "").split())
+                    output_display = (expected_str or "").strip()
+                    report_lines.append(f"\n--- 測試案例 {i} ---")
+                    report_lines.append(f"輸入: {input_display}")
+                    report_lines.append(f"輸出: {output_display}")
+
+                    ok, detail = validate_main_function(
+                        code=code,
+                        stdin_input=stdin_str,
+                        expected_output=expected_str
+                    )
+                    report_lines.append("結果: [通過]" if ok else "結果: [失敗]")
+                    report_lines.append(f"你的輸出:\n{detail}")
+                    if not ok:
+                        all_passed = False
+
+                report_lines.append("\n" + "="*20)
+                report_lines.append("總結: [成功] 所有新測資均已通過。" if all_passed else "總結: [失敗] 部分新測資未通過。")
+                
+                return {"text": "\n".join(report_lines) + "\n\n"
                                 "請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
-                                "  - 驗證 VERIFY\n"
+                                "  - 驗證 VERIFY (將再次生成新測資)\n"
                                 "  - 解釋 EXPLAIN\n"
                                 "  - 完成 QUIT\n"}
 
