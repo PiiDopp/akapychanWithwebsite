@@ -157,6 +157,18 @@ def build_explain_prompt(user_need: str, code: str) -> str:
         "請輸出程式碼的功能說明："
     )
 
+def build_translate_prompt(text: str, target_language: str = "English") -> str:
+    """
+    建立一個用於翻譯的提示。
+    """
+    return (
+        f"你是一個專業的翻譯助理。\n"
+        f"任務：將以下文字翻譯成「{target_language}」。\n"
+        "⚠️ **重要**：請僅輸出翻譯後的文字，絕對不要輸出任何額外文字、解釋或引號。\n\n"
+        f"原文：\n{text}\n\n"
+        f"翻譯為「{target_language}」的結果："
+    )
+
 def interactive_langchain_chat():
     """
     使用 LangChain 的 ConversationChain 實現多輪對話模式。
