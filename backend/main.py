@@ -1,4 +1,3 @@
-# backend/main.py
 from __future__ import annotations
 
 # ====== 標準庫 / 第三方 ======
@@ -16,15 +15,14 @@ from core import (
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
-    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt,
-    #omm
+    build_stdin_code_prompt, build_fix_code_prompt, build_hint_prompt, build_specific_explain_prompt,
     interactive_chat_api, normalize_tests
 )
 from verify_and_explain import verify_and_explain_user_code
 from explain_user_code import explain_user_code
 from explain_error import explain_code_error
 
-# ====== 判題核心（LeetCode / STDIN）(omm)======
+# ====== 判題核心（LeetCode / STDIN）======
 from core.judge_core import (
     # 驗證器
     validate_stdin_code,
@@ -204,20 +202,11 @@ async def chat(request: Request):
                 test_prompt = build_test_prompt(ctx["need"])
                 test_resp = run_model(test_prompt)
                 raw_tests = extract_json_block(test_resp)
-                json_tests = normalize_tests(raw_tests) #將模型生成的JSON轉成統一格式
+                json_tests = normalize_tests(raw_tests) 
                 if not json_tests:
                     json_tests = normalize_tests(parse_tests_from_text(ctx["need"]))
 
-                # 存回 ctx，後面 verify 會用
                 ctx["tests"] = json_tests or []
-
-                if json_tests:
-                    print(f"[提示] ✅ 已成功提取 {len(json_tests)} 筆測資。")
-                    for i, t in enumerate(json_tests, 1):
-                        print(f"  {i}. 輸入: {repr(t['input'])} → 預期輸出: {repr(t['output'])}")
-                else:
-                    print("[警告] ⚠️ 未能從模型回覆中提取/正規化測資。以下是模型原文：")
-                    print(test_resp)
 
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
@@ -227,7 +216,6 @@ async def chat(request: Request):
                 code_resp = generate_response(code_prompt_string)
                 code_block = extract_code_block(code_resp)
 
-                # 若 extract_code_block 回傳 list，挑最像主程式的一段
                 if isinstance(code_block, list):
                     def _pick_python_code(blocks):
                         for b in blocks:
@@ -317,7 +305,6 @@ async def chat(request: Request):
 
             if choice == "M":
                 report_lines = []
-
                 if tests:
                     all_passed = True
                     report_lines.append("=== 程式執行/驗證結果（依測資逐筆） ===")
@@ -371,9 +358,7 @@ async def chat(request: Request):
                     )
                 }
             else:
-                return {"text": 
-                        "要執行程式（main 測試）嗎？\n"
-                        "**點「輸入框上方的按鈕」即可選擇。**"}
+                return {"text": "要執行程式（main 測試）嗎？\n**點「輸入框上方的按鈕」即可選擇。**"}
 
         if step == "modify_gate":
             ans = (msg or "").strip().lower()
@@ -391,6 +376,29 @@ async def chat(request: Request):
                 return {"text": f"開發模式結束。最終程式如下：\n```python\n{final_code}\n```"}
             else:
                 return {"text": "請輸入 y 或 n。"}
+        
+        # --- 新增步驟：等待使用者輸入具體解釋問題 ---
+        if step == "modify_explain_wait":
+            explain_query = (msg or "").strip()
+            code = ctx.get("code") or ""
+            need_text = ctx.get("need_text", "")
+
+            # 若使用者輸入 "ALL" 或留空(如果前端支援)，則全文解釋
+            # 這裡假設前端輸入框若留空可能不會送出，所以提示使用者輸入 'ALL'
+            if explain_query and explain_query.upper() != "ALL":
+                prompt = build_specific_explain_prompt(code, explain_query)
+            else:
+                prompt = build_explain_prompt(need_text, code)
+
+            resp = run_model(prompt)
+            # 解釋完畢，回到 modify_loop
+            session["step"] = "modify_loop"
+            return {"text": f"=== 程式碼解釋 ===\n{resp}\n\n"
+                            "請選擇您的下一步操作：\n"
+                            "  - 修改：直接輸入您的修正需求\n"
+                            "  - 驗證 VERIFY\n"
+                            "  - 解釋 EXPLAIN\n"
+                            "  - 完成 QUIT\n"}
 
         if step == "modify_loop":
             choice = (msg or "").strip()
@@ -403,23 +411,20 @@ async def chat(request: Request):
 
             if u in {"V", "VERIFY"}:
                 # 1. 重新生成測資
-                print("[提示] 收到 VERIFY 指令，正在重新生成測資...")
-                test_prompt = build_test_prompt(need_text) # 使用 need_text
+                test_prompt = build_test_prompt(need_text)
                 test_resp = run_model(test_prompt)
                 raw_tests = extract_json_block(test_resp)
                 json_tests = normalize_tests(raw_tests)
                 if not json_tests:
-                    json_tests = normalize_tests(parse_tests_from_text(need_text)) # fall back
+                    json_tests = normalize_tests(parse_tests_from_text(need_text))
 
-                ctx["tests"] = json_tests or [] # 存回 ctx
-                tests = ctx["tests"] # 更新本地變數 tests
+                ctx["tests"] = json_tests or []
+                tests = ctx["tests"]
                 history.append(f"重新生成測資 (共 {len(tests)} 筆)")
                 ctx["history"] = history
-                session["ctx"] = ctx # 確保 session 更新
+                session["ctx"] = ctx
 
                 if not tests:
-                    print("[警告] ⚠️ 未能提取新測資。")
-                    # 即使沒有測資，也執行一次空驗證
                     ok, detail = validate_main_function(code, stdin_input="", expected_output=None)
                     return {
                         "text": (
@@ -427,15 +432,13 @@ async def chat(request: Request):
                             f"{detail}\n\n"
                             "請選擇您的下一步操作：\n"
                             "  - 修改：直接輸入您的修正需求\n"
-                            "  - 驗證 VERIFY (將再次生成新測資)\n"
+                            "  - 驗證 VERIFY\n"
                             "  - 解釋 EXPLAIN\n"
                             "  - 完成 QUIT\n"
                         )
                     }
                 
-                print(f"[提示] ✅ 已成功提取 {len(tests)} 筆新測資。")
-
-                # 2. 執行驗證 (邏輯同 verify_prompt 的 'M')
+                # 2. 執行驗證
                 report_lines = []
                 all_passed = True
                 report_lines.append("=== 程式執行/驗證結果 (依*新*測資逐筆) ===")
@@ -449,15 +452,10 @@ async def chat(request: Request):
                     report_lines.append(f"輸入: {input_display}")
                     report_lines.append(f"輸出: {output_display}")
 
-                    ok, detail = validate_main_function(
-                        code=code,
-                        stdin_input=stdin_str,
-                        expected_output=expected_str
-                    )
+                    ok, detail = validate_main_function(code=code, stdin_input=stdin_str, expected_output=expected_str)
                     report_lines.append("結果: [通過]" if ok else "結果: [失敗]")
                     report_lines.append(f"你的輸出:\n{detail}")
-                    if not ok:
-                        all_passed = False
+                    if not ok: all_passed = False
 
                 report_lines.append("\n" + "="*20)
                 report_lines.append("總結: [成功] 所有新測資均已通過。" if all_passed else "總結: [失敗] 部分新測資未通過。")
@@ -465,19 +463,14 @@ async def chat(request: Request):
                 return {"text": "\n".join(report_lines) + "\n\n"
                                 "請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
-                                "  - 驗證 VERIFY (將再次生成新測資)\n"
-                                "  - 解釋 EXPLAIN\n"
-                                "  - 完成 QUIT\n"}
-
-            if u in {"E", "EXPLAIN"}:
-                explain_prompt = build_explain_prompt(need_text, code)
-                explain_resp = run_model(explain_prompt)
-                return {"text": f"=== 程式碼解釋 ===\n{explain_resp}\n\n"
-                                "請選擇您的下一步操作：\n"
-                                "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
                                 "  - 解釋 EXPLAIN\n"
                                 "  - 完成 QUIT\n"}
+
+            # --- 修改處：處理 'E' 指令，切換至等待問題步驟 ---
+            if u in {"E", "EXPLAIN"}:
+                session["step"] = "modify_explain_wait"
+                return {"text": "請輸入您想了解的具體部分 (若要解釋全文，請輸入 'ALL'):"}
 
             if u in {"Q", "QUIT"}:
                 final_code = ctx.get("code") or ""
@@ -526,7 +519,7 @@ async def chat(request: Request):
     return {"text": output}
 
 
-# ====== 判題 API（整合 judge_core）(omm)======
+# ====== 判題 API（整合 judge_core）======
 _here = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_BASES = [
     os.path.abspath(os.path.join(_here,"..", "..", "frontend", "data")),
@@ -554,19 +547,17 @@ async def judge(request: Request):
     practice_idx = int(payload.get("practice_idx") or 0)
     user_code = textwrap.dedent((payload.get("code") or "").strip())
     user_output_direct = payload.get("user_output")
-    data_path = payload.get("data_path")  # 例如 /Leetcode/leetcode1.json
+    data_path = payload.get("data_path")
     method_from_payload = (payload.get("method") or "").strip() or None
 
-    # LeetCode 進階參數（可選）
-    per_arg_build_raw = payload.get("per_arg_build")  # 例：["listnode","raw"]
-    expect_kind = payload.get("expect_kind")          # "listnode" / "btree" / None
+    per_arg_build_raw = payload.get("per_arg_build")
+    expect_kind = payload.get("expect_kind")
     float_tol = float(payload.get("float_tol", 1e-6))
     unordered = bool(payload.get("unordered", False))
 
     if not data_id and not data_path:
         raise HTTPException(status_code=400, detail="缺少 data_id 或 data_path")
 
-    # 載題（交給 judge_core）
     try:
         prob = load_problem_cases(
             data_id=data_id or "",
@@ -579,13 +570,8 @@ async def judge(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
     tests = prob["tests"]
-
     force_stdin = _should_force_stdin(data_id)
-    print(f"[DEBUG] data_id={data_id!r}, force_stdin={force_stdin}, "
-          f"payload.force_mode={payload.get('force_mode')!r}, "
-          f"prob.force_mode={prob.get('force_mode')!r}")
 
-    # A) 使用者直接提供輸出（僅單一測資）
     if isinstance(user_output_direct, str) and len(tests) == 1:
         expected = normalize(tests[0]["expected"])
         if normalize(user_output_direct) == expected:
@@ -596,7 +582,6 @@ async def judge(request: Request):
     if not user_code:
         raise HTTPException(status_code=400, detail="缺少 code 或 user_output")
 
-    # 嘗試 OJ（LeetCode）模式；若推不出 method/arg，就回退 STDIN
     payload_arg_names = payload.get("arg_names")
     if isinstance(payload_arg_names, list) and all(isinstance(x, str) for x in payload_arg_names):
         arg_names = payload_arg_names
@@ -606,10 +591,8 @@ async def judge(request: Request):
     method_name = method_from_payload or infer_method_name_from_code(user_code)
 
     def _build_core_tests() -> Optional[List[Tuple[str, tuple, Any]]]:
-        if force_stdin:
-            return None
-        if not arg_names or not method_name:
-            return None
+        if force_stdin: return None
+        if not arg_names or not method_name: return None
         try:
             return build_leetcode_tests_from_examples(method_name, tests, arg_names=arg_names)
         except Exception:
@@ -617,9 +600,7 @@ async def judge(request: Request):
 
     core_tests = _build_core_tests()
 
-    # 模式一：LeetCode / OJ
     if core_tests is not None:
-        print("[MODE] OJ]")
         per_arg_build: Optional[List[BuildSpec]] = None
         if isinstance(per_arg_build_raw, list):
             tmp_list: List[BuildSpec] = []
@@ -629,13 +610,9 @@ async def judge(request: Request):
             per_arg_build = tmp_list or None
 
         ok, runlog = validate_leetcode_code(
-            user_code,
-            core_tests,
-            class_name="Solution",
-            per_arg_build=per_arg_build,
-            expect_kind=expect_kind,
-            float_tol=float_tol,
-            unordered=unordered,
+            user_code, core_tests, class_name="Solution",
+            per_arg_build=per_arg_build, expect_kind=expect_kind,
+            float_tol=float_tol, unordered=unordered,
             user_need=prob.get("description", "")
         )
         if ok:
@@ -643,8 +620,6 @@ async def judge(request: Request):
         else:
             return {"ok": False, "verdict": "wrong", "suggestions": "❌ 測資未全過：\n\n" + runlog}
 
-    # 模式二：STDIN
-    print("[MODE] STDIN")
     stdin_examples = [{"input": t["input"], "output": t["expected"]} for t in tests]
     ok2, log2 = validate_stdin_code(user_code, stdin_examples, timeout_sec=5)
     if ok2:
@@ -652,16 +627,9 @@ async def judge(request: Request):
     else:
         return {"ok": False, "verdict": "wrong", "suggestions": log2}
 
-# ====== 翻譯 api(omm)======
+# ====== 翻譯 api ======
 @app.post("/translate")
 async def translate_api(req: Request):
-    """
-    翻譯 API
-    入參(JSON):
-      { "text": "...", "sourceLang": "英文", "targetLang": "繁體中文", "temperature": 0.2 }
-    回傳(JSON):
-      { "ok": true, "translation": "..." }
-    """
     data = await req.json()
     text = (data.get("text") or "").strip()
     source = (data.get("sourceLang") or "英文").strip()
@@ -676,7 +644,6 @@ async def translate_api(req: Request):
         "保持術語準確、語氣自然。只輸出譯文，不要解釋：\n\n"
         f"{text}"
     )
-
     try:
         translation = (generate_response(prompt) or "").strip()
     except Exception as e:
@@ -684,34 +651,18 @@ async def translate_api(req: Request):
 
     return {"ok": True, "translation": translation}
 
-# ====== 新增 /hint 路由 (STUB) ======
+# ====== 獲取提示 API ======
 @app.post("/hint")
 async def get_hint(request: Request):
-    """
-    獲取提示 API
-    入參(JSON):
-      {
-        "problem_id": "...",
-        "practice_idx": 1,
-        "code": "...",
-        "data_path": "...",
-        "mode": "stdin",
-        "source": "builtin"
-      }
-    回傳(JSON):
-      { "ok": true, "hint": "..." }
-    """
     try:
         data = await request.json()
         problem_id = data.get("problem_id") or data.get("data_id") 
         user_code = data.get("code") or data.get("user_code")
         practice_idx = int(data.get("practice_idx") or 0)
-        data_path = data.get("data_path")
 
         if not problem_id or not user_code:
             raise HTTPException(status_code=400, detail="缺少 problem_id 或 code")
 
-        # 🔹 先直接嘗試讀題目 JSON（依你要求的方式）
         possible_paths = [
             f"../frontend/data/{problem_id}.json",
             f"../frontend/data/Leetcode/{problem_id}.json",
@@ -720,11 +671,9 @@ async def get_hint(request: Request):
         if not filepath:
             raise HTTPException(status_code=404, detail=f"找不到 {problem_id}.json")
 
-        # 讀取 JSON
         with open(filepath, "r", encoding="utf-8") as f:
             content = json.load(f)
 
-        # 嘗試取得題目內容（支援 LeetCode 結構）
         if "coding_practice" in content:
             items = content.get("coding_practice", [])
             if items:
@@ -740,10 +689,8 @@ async def get_hint(request: Request):
             else:
                 problem_description = "（無法載入題目描述）"
         else:
-            # 備援一般題型
             problem_description = content.get("description") or content.get("title") or "（無法載入題目描述）"
 
-        # 🔹 額外：若 JSON 含有 explanation、follow up 也一起加進提示上下文
         explanation = None
         follow_up = None
         if "coding_practice" in content:
@@ -756,23 +703,19 @@ async def get_hint(request: Request):
         if follow_up:
             problem_description += f"\n\n--- 進階提示 ---\n{follow_up}"
 
-        # 2️⃣ 組合提示 prompt
-        error_message = None 
         hint_prompt = build_hint_prompt(
             problem_description=problem_description,
             user_code=user_code,
-            error_message=error_message
+            error_message=None
         )
-
-        # 3️⃣ 呼叫模型（run_model）
         hint_text = run_model(hint_prompt)
 
-        print(f"[INFO] /hint 路由被呼叫, problem_id: {problem_id}")
         return {"ok": True, "hint": hint_text}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取提示失敗：{e}")
-# ====== 新增 /answer 路由 (STUB) ======
+
+# ====== 獲取解答 API ======
 @app.post("/answer")
 async def get_answer(request: Request):
     try:
@@ -780,7 +723,6 @@ async def get_answer(request: Request):
         problem_id = data.get("problem_id")
         practice_idx = data.get("practice_idx", 0)
 
-        # 讀取對應題目的 JSON 檔案
         possible_paths = [
             f"../frontend/data/{problem_id}.json",
             f"../frontend/data/Leetcode/{problem_id}.json",
@@ -789,38 +731,25 @@ async def get_answer(request: Request):
         if not filepath:
             raise HTTPException(status_code=404, detail=f"找不到 {problem_id}.json")
 
-        # 讀取 JSON
         with open(filepath, "r", encoding="utf-8") as f:
             content = json.load(f)
 
-        # 取出題目陣列
         practices = content.get("coding_practice")
         if not practices:
             raise HTTPException(status_code=400, detail=f"檔案中沒有 coding_practice 資料")
 
-        # 防止 practice_idx 超出範圍
         if not (0 <= practice_idx < len(practices)):
-            raise HTTPException(
-                status_code=400,
-                detail=f"practice_idx {practice_idx} 超出範圍 (共有 {len(practices)} 題)"
-            )
+            raise HTTPException(status_code=400, detail=f"practice_idx 超出範圍")
 
-        # 抓出對應題目
         practice = practices[practice_idx]
         solution = practice.get("solution", "(無解答)")
         explanation = practice.get("explanation", "(無說明)")
 
-        print(f"[INFO] /answer 讀取成功: {filepath}")
-        return {
-            "ok": True,
-            "answer": solution,
-            "explanation": explanation,
-            "source_path": filepath  # 可用於除錯
-        }
+        return {"ok": True, "answer": solution, "explanation": explanation, "source_path": filepath}
 
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"題目 {problem_id} 的資料不存在")
     except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail=f"JSON 格式錯誤：{problem_id}.json")
+        raise HTTPException(status_code=500, detail=f"JSON 格式錯誤")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"獲取解答失敗：{e}")

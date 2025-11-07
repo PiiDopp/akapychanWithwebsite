@@ -544,6 +544,16 @@ def build_hint_prompt(problem_description: str, user_code: str, error_message: O
     
     return "".join(prompt_lines)
 
+def build_specific_explain_prompt(current_code: str, user_query: str) -> str:
+    """
+    針對使用者對特定程式碼片段的疑問，建立解釋用的 Prompt。
+    """
+    return (
+        f"這是目前的 Python 程式碼:\n```python\n{current_code}\n```\n"
+        f"使用者針對這段程式碼有以下具體問題或是想了解的部分:\n{user_query}\n"
+        f"請以專業但易懂的方式，用繁體中文為使用者進行解釋。"
+    )
+
 # ===================== 正規化測資(omm) =====================
 def _ensure_str(x) -> str:
     """確保值為字串（None 轉空字串）"""
