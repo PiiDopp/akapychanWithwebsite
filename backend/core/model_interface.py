@@ -8,6 +8,7 @@ from core.io_utils import ThinkingDots
 from typing import List, Optional, Tuple
 from core.code_extract import extract_code_block
 from core.validators import validate_main_function
+import json
 
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -167,6 +168,49 @@ def build_translate_prompt(text: str, target_language: str = "English") -> str:
         "⚠️ **重要**：請僅輸出翻譯後的文字，絕對不要輸出任何額外文字、解釋或引號。\n\n"
         f"原文：\n{text}\n\n"
         f"翻譯為「{target_language}」的結果："
+    )
+
+def build_initial_population_prompt(user_need: str, n: int = 5) -> str:
+    """
+    [GA] 產生初始族群：一次生成多個不同的測資。
+    """
+    return (
+        "用繁體中文回答。\n"
+        "你是一個專業的測試工程師。\n"
+        f"任務：根據以下需求，產生 {n} 組「多樣化」且「邊界條件」不同的測試案例。\n"
+        "請專注於不同的輸入類型、空值、極端值和典型值。\n"
+        "⚠️ **重要**：請僅輸出一個 JSON 陣列，格式如下，不要有任何額外文字：\n"
+        "```json\n[ [輸入1, 預期輸出1], [輸入2, 預期輸出2], ... ]\n```\n"
+        f"使用者需求:\n{user_need}\n\n"
+        "請產生初始測試族群："
+    )
+
+def build_crossover_prompt(user_need: str, parent1: list, parent2: list) -> str:
+    """
+    [GA] 交配 (Crossover)：結合兩個父代測資的特徵產生子代。
+    """
+    return (
+        "你是一個測試演化演算法的操作員。\n"
+        f"任務：參考以下兩個父代測資，結合它們的特徵（例如：輸入的結構、邊界情況、資料類型），產生一個新的、合法的子代測資，以測試此需求：{user_need}。\n"
+        f"父代 1: {json.dumps(parent1, ensure_ascii=False)}\n"
+        f"父代 2: {json.dumps(parent2, ensure_ascii=False)}\n"
+        "⚠️ 僅輸出一個新的 JSON 測資 `[新輸入, 新預期輸出]`，不要有其他文字。"
+    )
+
+def build_feedback_mutation_prompt(user_need: str, parent: list, code_snippet: str, uncovered_lines: set) -> str:
+    """
+    [GA] 突變 (Mutation)：根據「未覆蓋行」的回饋進行智慧突變。
+    """
+    uncovered_str = ", ".join(map(str, sorted(list(uncovered_lines))[:5])) # 最多顯示5行
+    
+    return (
+        "你是一個測試演化演算法的操作員。\n"
+        f"任務：對以下測資進行「突變」（微調），以嘗試執行到先前「未被覆蓋」的程式碼行。\n\n"
+        f"使用者需求:\n{user_need}\n\n"
+        f"程式碼片段 (包含未覆蓋行):\n```python\n{code_snippet}\n```\n\n"
+        f"原始測資 (此測資未能執行到以下行號): {json.dumps(parent, ensure_ascii=False)}\n"
+        f"**目標：產生一個新測資，使其能執行到行號 {uncovered_str} 附近的邏輯。**\n\n"
+        "⚠️ 僅輸出突變後的 JSON 測資 `[新輸入, 新預期輸出]`，不要有其他文字。"
     )
 
 def interactive_langchain_chat():
