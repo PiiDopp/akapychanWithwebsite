@@ -8,7 +8,6 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # ====== 你既有的核心（互動開發 / 驗證 / 解釋 用）======
-# [修改] 加入 generate_tests
 from core import (
     extract_code_block, generate_response,
     validate_main_function, validate_python_code,
@@ -66,7 +65,6 @@ def healthz():
     return {"ok": True}
 
 # ====== 內部會話狀態 ======
-# 結構：SESSIONS[chat_id] = { mode, awaiting, step, ctx:{...} }
 SESSIONS: Dict[str, Dict[str, Any]] = {}
 
 def run_model(prompt: str) -> str:
@@ -92,6 +90,15 @@ def run_mode_3(user_code: str) -> str:
         return "請貼上要解釋的 Python 程式碼。"
     return explain_user_code(user_code)
 
+# [新增] 輔助函數：標準化 stdin 輸入，處理列表形式的測資
+def _normalize_stdin(val: Any) -> str:
+    if val is None:
+        return ""
+    if isinstance(val, list):
+        # 如果是列表，將其元素用換行符連接，確保傳入的是多行純文本
+        return "\n".join(str(v) for v in val)
+    return str(val)
+
 # ====== 聊天入口（給前端）======
 @app.post("/chat")
 async def chat(request: Request):
@@ -115,7 +122,6 @@ async def chat(request: Request):
         "**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。"
     )
 
-    # 全域：輸入 'q' 回主選單
     if last_user.lower() == "q":
         session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
         return {"text": MENU_TEXT}
@@ -182,6 +188,7 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("接受虛擬碼")
 
+                # 1. 先產生測資 (使用 build_test_prompt)
                 test_prompt = build_test_prompt(ctx["need"])
                 test_resp = run_model(test_prompt)
                 raw_tests = extract_json_block(test_resp)
@@ -191,6 +198,7 @@ async def chat(request: Request):
 
                 ctx["tests"] = json_tests or []
 
+                # 2. 再產生程式碼
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
                     ctx.get("virtual_code", ""),
@@ -222,18 +230,6 @@ async def chat(request: Request):
                     "code": code_block,
                     "need_text": ctx["need"],
                 })
-
-                # === [修改 1 開始] 新增：初始程式碼產生後，立即使用 GA 增強測資 ===
-                try:
-                    print("[Mode 1] 正在使用 GA 生成初始驗證測資...")
-                    # 使用剛生成的 code_block 來跑 GA
-                    ga_tests = generate_tests(ctx["need"], code_block, mode="GA")
-                    if ga_tests:
-                        ctx["tests"] = ga_tests
-                        print(f"[Mode 1] GA 測資已更新: {len(ga_tests)} 筆")
-                except Exception as e:
-                    print(f"[Mode 1] GA 初始生成失敗，將使用基本測資: {e}")
-                # === [修改 1 結束] ===========================================
 
                 if "history" not in ctx:
                     ctx["history"] = []
@@ -305,11 +301,15 @@ async def chat(request: Request):
                     all_passed = True
                     report_lines.append("=== 程式執行/驗證結果（依測資逐筆） ===")
                     for i, t in enumerate(tests, 1):
-                        stdin_str = t.get("input", "") if isinstance(t, dict) else (str(t[0]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
-                        expected_str = t.get("output", "") if isinstance(t, dict) else (str(t[1]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
+                        # [修改] 使用 _normalize_stdin 處理輸入
+                        inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
+                        exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
+                        
+                        stdin_str = _normalize_stdin(inp_val)
+                        expected_str = _normalize_stdin(exp_val) # 輸出通常也是字串，用同樣方式正規化較保險
 
-                        input_display = " ".join((stdin_str or "").split())
-                        output_display = (expected_str or "").strip()
+                        input_display = stdin_str.replace("\n", "\\n")
+                        output_display = expected_str.strip()
                         report_lines.append(f"\n--- 測試案例 {i} ---")
                         report_lines.append(f"輸入: {input_display}")
                         report_lines.append(f"輸出: {output_display}")
@@ -402,36 +402,18 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
-                # === [修改 2 開始] 使用 GA 重新生成測資 ===
-                # 舊程式碼 (已註解或刪除):
-                # test_prompt = build_test_prompt(need_text)
-                # test_resp = run_model(test_prompt)
-                # raw_tests = extract_json_block(test_resp)
-                # json_tests = normalize_tests(raw_tests)
-                # if not json_tests:
-                #     json_tests = normalize_tests(parse_tests_from_text(need_text))
-                
-                # 新程式碼:
-                print("[Mode 1 VERIFY] 正在使用 GA 重新生成測資...")
-                try:
-                    # 傳入當前的 code 與需求，進行演化
-                    json_tests = generate_tests(need_text, code, mode="GA")
-                except Exception as e:
-                    print(f"[Mode 1 VERIFY] GA 生成失敗: {e}")
-                    json_tests = []
-
-                # 如果 GA 失敗 (回傳空)，嘗試退回舊方法 (可選，視您的需求決定是否保留 fallback)
+                print("[Mode 1 VERIFY] 正在重新生成測資 (Standard Prompt)...")
+                test_prompt = build_test_prompt(need_text)
+                test_resp = run_model(test_prompt)
+                raw_tests = extract_json_block(test_resp)
+                json_tests = normalize_tests(raw_tests)
                 if not json_tests:
-                     # fallback basic
-                     json_tests = generate_tests(need_text, mode="B")
+                    json_tests = normalize_tests(parse_tests_from_text(need_text))
 
                 ctx["tests"] = json_tests or []
                 tests = ctx["tests"]
-                history.append(f"GA 重新生成測資 (共 {len(tests)} 筆)")
-                # === [修改 2 結束] ========================
+                history.append(f"重新生成測資 (共 {len(tests)} 筆)")
 
-                ctx["history"] = history
-                session["ctx"] = ctx
                 ctx["history"] = history
                 session["ctx"] = ctx
 
@@ -453,11 +435,15 @@ async def chat(request: Request):
                 all_passed = True
                 report_lines.append("=== 程式執行/驗證結果 (依*新*測資逐筆) ===")
                 for i, t in enumerate(tests, 1):
-                    stdin_str = t.get("input", "") if isinstance(t, dict) else (str(t[0]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
-                    expected_str = t.get("output", "") if isinstance(t, dict) else (str(t[1]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
+                    # [修改] 使用 _normalize_stdin 處理輸入
+                    inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
+                    exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
+                    
+                    stdin_str = _normalize_stdin(inp_val)
+                    expected_str = _normalize_stdin(exp_val)
 
-                    input_display = " ".join((stdin_str or "").split())
-                    output_display = (expected_str or "").strip()
+                    input_display = stdin_str.replace("\n", "\\n")
+                    output_display = expected_str.strip()
                     report_lines.append(f"\n--- 測試案例 {i} ---")
                     report_lines.append(f"輸入: {input_display}")
                     report_lines.append(f"輸出: {output_display}")
@@ -512,7 +498,7 @@ async def chat(request: Request):
         session["step"] = "need"
         return {"text": "請描述你的需求："}
 
-    # === [更新] 模式 2：程式驗證 (對齊 CLI 邏輯) ===
+    # === 模式 2：程式驗證 ===
     if mode == "2":
         ctx = session.get("ctx") or {}
         step = session.get("step") or "code"
@@ -538,13 +524,17 @@ async def chat(request: Request):
             user_code = ctx["code"]
             report_lines = []
 
-            # 1. 嘗試生成測資 (GA模式)
+            # 1. 嘗試生成測資 (Standard Prompt 模式)
             json_tests = []
             if need_text:
-                # 通知前端正在處理（若前端支援串流顯示更好，此處僅能一次返回）
-                report_lines.append("[處理中] 正在使用演化演算法 (GA) 生成高品質測資...\n")
+                report_lines.append("[處理中] 正在生成驗證測資...\n")
                 try:
-                    json_tests = generate_tests(need_text, user_code, mode="GA")
+                    test_prompt = build_test_prompt(need_text)
+                    test_resp = run_model(test_prompt)
+                    raw_tests = extract_json_block(test_resp)
+                    json_tests = normalize_tests(raw_tests)
+                    if not json_tests:
+                         json_tests = normalize_tests(parse_tests_from_text(need_text))
                 except Exception as e:
                     report_lines.append(f"[警告] 測資生成失敗: {e}\n")
                     json_tests = []
@@ -555,15 +545,12 @@ async def chat(request: Request):
                 all_passed = True
                 failed = False
                 for i, t in enumerate(json_tests, 1):
-                    # t 預期為 [input, output]
-                    if not isinstance(t, list) or len(t) < 2:
-                        continue
+                    # [修改] 使用 _normalize_stdin 處理輸入
+                    inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
+                    exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
                     
-                    inp_val = t[0] if t[0] is not None else ""
-                    exp_val = t[1] if t[1] is not None else ""
-                    
-                    inp_str = str(inp_val)
-                    exp_str = str(exp_val)
+                    inp_str = _normalize_stdin(inp_val)
+                    exp_str = _normalize_stdin(exp_val)
 
                     ok, actual_out = validate_main_function(user_code, inp_str, exp_str)
                     
@@ -572,9 +559,10 @@ async def chat(request: Request):
                     else:
                         all_passed = False
                         failed = True
+                        # [修改] 顯示時將換行替換為 \n 以便閱讀
                         report_lines.append(f"❌ 測試 {i}: 失敗")
-                        report_lines.append(f"   輸入: {inp_str}")
-                        report_lines.append(f"   期望: {exp_str}")
+                        report_lines.append(f"   輸入: {inp_str.replace('\n', '\\n')}")
+                        report_lines.append(f"   期望: {exp_str.strip()}")
                         report_lines.append(f"   實際: {actual_out}\n")
 
                 report_lines.append("\n" + "="*20)
