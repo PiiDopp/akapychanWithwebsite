@@ -8,17 +8,18 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # ====== 你既有的核心（互動開發 / 驗證 / 解釋 用）======
+# [修改] 加入 generate_tests
 from core import (
     extract_code_block, generate_response,
     validate_main_function, validate_python_code,
     extract_json_block, parse_tests_from_text,
+    generate_tests
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
     build_stdin_code_prompt, build_fix_code_prompt, build_hint_prompt, build_specific_explain_prompt,
     interactive_chat_api, normalize_tests
 )
-from verify_and_explain import verify_and_explain_user_code
 from explain_user_code import explain_user_code
 from explain_error import explain_code_error
 
@@ -85,24 +86,6 @@ def _mode1_generate_virtual_code(ctx: Dict[str, Any]) -> str:
     prompt = build_virtual_code_prompt(need_text or (ctx.get("need") or ""))
     return run_model(prompt)
 
-def run_mode_2(user_code: str) -> str:
-    user_code = (user_code or "").strip()
-    if not user_code:
-        return "請貼上要驗證的 Python 程式碼。"
-
-    result = verify_and_explain_user_code(user_code)
-    if "錯誤" in result or "Traceback" in result or "失敗" in result:
-        try:
-            fallback_result = explain_code_error(user_code)
-            if hasattr(fallback_result, "explanation"):
-                result += f"\n\n[分析結果]\n{fallback_result.explanation}"
-            else:
-                result += f"\n\n[分析結果]\n{fallback_result}"
-        except Exception as e:
-            result += f"\n\n[分析失敗] {e}"
-
-    return result
-
 def run_mode_3(user_code: str) -> str:
     user_code = (user_code or "").strip()
     if not user_code:
@@ -127,7 +110,7 @@ async def chat(request: Request):
     MENU_TEXT = (
         "已返回主選單。\n\n請選擇模式：\n"
         "模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）\n"
-        "模式 2｜程式驗證（貼上你的 Python 程式碼）\n"
+        "模式 2｜程式驗證（貼程式碼 → 貼需求 → AI 自動生成測資並驗證）\n"
         "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n\n"
         "**點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。"
     )
@@ -147,6 +130,7 @@ async def chat(request: Request):
                 session["step"] = "need"
                 return {"text": "**模式 1｜互動開發**\n\n請描述你的功能需求（一句或一段話即可）。"}
             if last_user == "2":
+                session["step"] = "code"
                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
             if last_user == "3":
                 return {"text": "**模式 3｜程式解釋**\n\n請貼上要解釋的 Python 程式碼："}
@@ -173,8 +157,7 @@ async def chat(request: Request):
             hist.append(item)
             ctx["history"] = hist
 
-        if not msg:
-            session["step"] = "need"
+        if not msg and step == "need":
             return {"text": "**模式 1｜互動開發**\n\n請描述你的功能需求（一句或一段話即可）。"}
 
         if step == "need":
@@ -377,21 +360,17 @@ async def chat(request: Request):
             else:
                 return {"text": "請輸入 y 或 n。"}
         
-        # --- 新增步驟：等待使用者輸入具體解釋問題 ---
         if step == "modify_explain_wait":
             explain_query = (msg or "").strip()
             code = ctx.get("code") or ""
             need_text = ctx.get("need_text", "")
 
-            # 若使用者輸入 "ALL" 或留空(如果前端支援)，則全文解釋
-            # 這裡假設前端輸入框若留空可能不會送出，所以提示使用者輸入 'ALL'
             if explain_query and explain_query.upper() != "ALL":
                 prompt = build_specific_explain_prompt(code, explain_query)
             else:
                 prompt = build_explain_prompt(need_text, code)
 
             resp = run_model(prompt)
-            # 解釋完畢，回到 modify_loop
             session["step"] = "modify_loop"
             return {"text": f"=== 程式碼解釋 ===\n{resp}\n\n"
                             "請選擇您的下一步操作：\n"
@@ -410,7 +389,6 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
-                # 1. 重新生成測資
                 test_prompt = build_test_prompt(need_text)
                 test_resp = run_model(test_prompt)
                 raw_tests = extract_json_block(test_resp)
@@ -438,7 +416,6 @@ async def chat(request: Request):
                         )
                     }
                 
-                # 2. 執行驗證
                 report_lines = []
                 all_passed = True
                 report_lines.append("=== 程式執行/驗證結果 (依*新*測資逐筆) ===")
@@ -467,7 +444,6 @@ async def chat(request: Request):
                                 "  - 解釋 EXPLAIN\n"
                                 "  - 完成 QUIT\n"}
 
-            # --- 修改處：處理 'E' 指令，切換至等待問題步驟 ---
             if u in {"E", "EXPLAIN"}:
                 session["step"] = "modify_explain_wait"
                 return {"text": "請輸入您想了解的具體部分 (若要解釋全文，請輸入 'ALL'):"}
@@ -477,7 +453,6 @@ async def chat(request: Request):
                 session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
                 return {"text": f"已結束互動式修改模式。最終程式如下：\n```python\n{final_code}\n```"}
 
-            # 修改 / 重構
             modification_request = choice
             fix_prompt_string = build_fix_code_prompt(
                 need_text,
@@ -498,17 +473,118 @@ async def chat(request: Request):
                 return {"text": f"=== 程式碼（新版本） ===\n```python\n{new_code}\n```\n"
                                 "請輸入下一步（修改 / VERIFY / EXPLAIN / QUIT）"}
             else:
-                return {"text": "模型無法生成修正後的程式碼，請輸入更明確的修改需求。\n"
+                return {"text": "模型無法生成修正後的程式碼，請重試或輸入更明確的修改需求。\n"
                                 "或輸入 VERIFY / EXPLAIN / QUIT"}
 
         session["step"] = "need"
         return {"text": "請描述你的需求："}
 
-    # === 模式 2/3：一次性回應 ===
+    # === [更新] 模式 2：程式驗證 (對齊 CLI 邏輯) ===
+    if mode == "2":
+        ctx = session.get("ctx") or {}
+        step = session.get("step") or "code"
+        msg = last_user
+
+        # 狀態 1：等待程式碼
+        if step == "code":
+            if not msg or not msg.strip():
+                session["step"] = "code"
+                return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
+            
+            ctx["code"] = msg
+            session["ctx"] = ctx
+            session["step"] = "need"
+            return {"text": "已收到程式碼。\n請輸入這段程式碼的「需求說明」，AI 將以此生成測資來驗證。\n(若不提供，請直接輸入 'skip' 或 '無')"}
+
+        # 狀態 2：等待需求並執行驗證
+        if step == "need":
+            need_text = msg.strip()
+            if need_text.lower() in ["skip", "no", "無", ""]:
+                need_text = ""
+            
+            user_code = ctx["code"]
+            report_lines = []
+
+            # 1. 嘗試生成測資 (GA模式)
+            json_tests = []
+            if need_text:
+                # 通知前端正在處理（若前端支援串流顯示更好，此處僅能一次返回）
+                report_lines.append("[處理中] 正在使用演化演算法 (GA) 生成高品質測資...\n")
+                try:
+                    json_tests = generate_tests(need_text, user_code, mode="GA")
+                except Exception as e:
+                    report_lines.append(f"[警告] 測資生成失敗: {e}\n")
+                    json_tests = []
+
+            # 2. 執行驗證
+            if json_tests:
+                report_lines.append(f"✅ 已生成 {len(json_tests)} 筆測資，開始驗證...\n")
+                all_passed = True
+                failed = False
+                for i, t in enumerate(json_tests, 1):
+                    # t 預期為 [input, output]
+                    if not isinstance(t, list) or len(t) < 2:
+                        continue
+                    
+                    inp_val = t[0] if t[0] is not None else ""
+                    exp_val = t[1] if t[1] is not None else ""
+                    
+                    inp_str = str(inp_val)
+                    exp_str = str(exp_val)
+
+                    ok, actual_out = validate_main_function(user_code, inp_str, exp_str)
+                    
+                    if ok:
+                        report_lines.append(f"✅ 測試 {i}: 通過")
+                    else:
+                        all_passed = False
+                        failed = True
+                        report_lines.append(f"❌ 測試 {i}: 失敗")
+                        report_lines.append(f"   輸入: {inp_str}")
+                        report_lines.append(f"   期望: {exp_str}")
+                        report_lines.append(f"   實際: {actual_out}\n")
+
+                report_lines.append("\n" + "="*20)
+                if all_passed:
+                    report_lines.append("總結: [成功] 通過所有 AI 生成的測資。")
+                else:
+                    report_lines.append("總結: [失敗] 未通過部分測資。")
+                    # 失敗時自動解釋
+                    try:
+                        report_lines.append("\n=== 錯誤分析 ===\n(正在分析錯誤原因...)\n")
+                        err_analysis = explain_code_error(user_code)
+                        if hasattr(err_analysis, "explanation"):
+                             report_lines.append(err_analysis.explanation)
+                        else:
+                             report_lines.append(str(err_analysis))
+                    except Exception as e:
+                        report_lines.append(f"[分析失敗] {e}")
+
+            else:
+                # 無需求或生成失敗，僅執行一次
+                report_lines.append("（未提供需求或無法生成測資，僅執行程式一次）\n")
+                ok, out_msg = validate_main_function(user_code, stdin_input=None, expected_output=None)
+                if ok:
+                    report_lines.append("=== 執行成功 (Exit 0) ===\n輸出:\n" + out_msg)
+                else:
+                    report_lines.append("=== 執行失敗 (Non-zero exit) ===\n錯誤訊息:\n" + out_msg)
+                    try:
+                        report_lines.append("\n=== 錯誤分析 ===\n")
+                        err_analysis = explain_code_error(user_code)
+                        if hasattr(err_analysis, "explanation"):
+                             report_lines.append(err_analysis.explanation)
+                        else:
+                             report_lines.append(str(err_analysis))
+                    except Exception as e:
+                        report_lines.append(f"[分析失敗] {e}")
+
+            # 結束 Mode 2 會話，重置狀態
+            session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+            return {"text": "\n".join(report_lines)}
+
+    # === 模式 3：一次性回應 ===
     try:
-        if mode == "2":
-            output = run_mode_2(last_user)
-        elif mode == "3":
+        if mode == "3":
             output = run_mode_3(last_user)
         else:
             output = "[錯誤] 未知模式"

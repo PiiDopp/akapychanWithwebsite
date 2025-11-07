@@ -9,7 +9,7 @@ from typing import List, Dict, Any, Optional, Tuple, Set
 
 # 導入新的 GA 提示
 from core.model_interface import (
-    call_ollama_cli, 
+    generate_response, 
     build_virtual_code_prompt,
     build_initial_population_prompt, 
     build_crossover_prompt, 
@@ -161,7 +161,7 @@ def generate_tests_hybrid_ga(user_need: str, code: str, generations=3, pop_size=
             if random.random() < 0.6 and len(elites) >= 2: # 60% 機率交配
                 p1, p2 = random.sample(elites, 2)
                 prompt = build_crossover_prompt(user_need, p1[0], p2[0])
-                resp = call_ollama_cli(prompt) 
+                resp = generate_response(prompt) 
                 child = extract_json_block(resp)
             else: # 40% 機率突變 (回饋驅動)
                 parent_ind, parent_fitness, parent_uncovered = random.choice(elites)
@@ -175,7 +175,7 @@ def generate_tests_hybrid_ga(user_need: str, code: str, generations=3, pop_size=
                     snippet = _get_code_snippet(code, parent_uncovered)
                     prompt = build_feedback_mutation_prompt(user_need, parent_ind, snippet, parent_uncovered)
                 
-                resp = call_ollama_cli(prompt)
+                resp = generate_response(prompt)
                 child = extract_json_block(resp)
             
             # 處理 LLM 回傳的格式
@@ -236,7 +236,7 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
     try:
         print("     [階段 1] 正在生成虛擬碼...")
         vc_prompt = build_virtual_code_prompt(user_need) #
-        vc_resp = call_ollama_cli(vc_prompt) #
+        vc_resp = generate_response(vc_prompt) #
         virtual_code = vc_resp 
         result["virtual_code"] = virtual_code
 
@@ -246,7 +246,7 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
             return result
 
     except Exception as e:
-        print(f"     [錯誤] 'call_ollama_cli' (虛擬碼階段) 失敗: {e}")
+        print(f"     [錯誤] 'generate_response' (虛擬碼階段) 失敗: {e}")
         result["error"] = f"Virtual code generation failed: {e}"
         return result
 
@@ -290,10 +290,10 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
 
         code_prompt_string = "".join(code_prompt_lines)
 
-        code_resp = call_ollama_cli(code_prompt_string) #
+        code_resp = generate_response(code_prompt_string) #
 
     except Exception as e:
-        print(f"     [錯誤] 'call_ollama_cli' (程式碼階段) 失敗: {e}")
+        print(f"     [錯誤] 'generate_response' (程式碼階段) 失敗: {e}")
         result["error"] = f"Code generation failed: {e}"
         return result
 
