@@ -1,23 +1,58 @@
 import re
 import json
-from typing import Optional
-
+from typing import Optional, Any, List, Dict, Union
 
 def extract_code_block(model_output: str) -> Optional[str]:
+    # (維持原樣)
     m = re.search(r"```python\n(.*?)```", model_output, re.DOTALL)
-    return m.group(1).strip() if m else None
+    if m:
+        return m.group(1).strip()
+    # 有時候模型會忘記寫 python，只寫 ```
+    m2 = re.search(r"```\n(.*?)```", model_output, re.DOTALL)
+    return m2.group(1).strip() if m2 else None
 
+def extract_json_block(text: str) -> Union[List, Dict, None]:
+    """
+    強健的 JSON 提取器。
+    優先嘗試提取 ```json ... ``` 區塊，
+    失敗時嘗試提取文字中第一個 '[' 或 '{' 到最後一個 ']' 或 '}' 的內容。
+    """
+    if not text:
+        return None
 
-def extract_json_block(model_output: str) -> list:
-    m = re.search(r"```json\n(.*?)```", model_output, re.DOTALL)
-    if not m:
-        return []
+    # 1. 嘗試標準的 Markdown 區塊 (允許 ```json 或單純 ```)
+    match = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL)
+    if match:
+        block_content = match.group(1).strip()
+        try:
+            return json.loads(block_content)
+        except json.JSONDecodeError:
+            # 如果區塊內不是合法 JSON，繼續往下嘗試其他方法
+            pass
+
+    # 2. Fallback：嘗試在雜訊中尋找 JSON 結構
+    # 尋找最外層的 [ ] 或 { }
     try:
-        content = m.group(1).strip()
-        return json.loads(content)
+        # 找到第一個 '[' 或 '{'
+        start_match = re.search(r'[\[\{]', text)
+        if start_match:
+            start_index = start_match.start()
+            # 從後面找最後一個 ']' 或 '}'
+            # (這裡簡單處理，假設最後出現的括號是結尾)
+            end_index = -1
+            for i in range(len(text) - 1, start_index, -1):
+                if text[i] in [']', '}']:
+                    end_index = i + 1
+                    break
+            
+            if end_index != -1:
+                candidate = text[start_index:end_index]
+                return json.loads(candidate)
     except Exception:
-        print("[警告] JSON 解析失敗，請檢查模型輸出格式。")
-        return []
+        pass
+
+    print(f"[警告] 無法從模型輸出中提取 JSON。原始輸出前 100 字: {text[:100]!r}...")
+    return None
 
 
 def parse_tests_from_text(user_need: str, func_name: str = "solution_func"):

@@ -170,19 +170,24 @@ def build_translate_prompt(text: str, target_language: str = "English") -> str:
         f"翻譯為「{target_language}」的結果："
     )
 
-def build_initial_population_prompt(user_need: str, n: int = 5) -> str:
-    """
-    [GA] 產生初始族群：一次生成多個不同的測資。
-    """
+def build_initial_population_prompt(user_need: str, n=6) -> str:
     return (
-        "用繁體中文回答。\n"
-        "你是一個專業的測試工程師。\n"
-        f"任務：根據以下需求，產生 {n} 組「多樣化」且「邊界條件」不同的測試案例。\n"
-        "請專注於不同的輸入類型、空值、極端值和典型值。\n"
-        "⚠️ **重要**：請僅輸出一個 JSON 陣列，格式如下，不要有任何額外文字：\n"
-        "```json\n[ [輸入1, 預期輸出1], [輸入2, 預期輸出2], ... ]\n```\n"
-        f"使用者需求:\n{user_need}\n\n"
-        "請產生初始測試族群："
+        f"你是一個專業的軟體測試工程師。\n"
+        f"請針對以下需求，設計 {n} 組「邊界測試案例」與「一般測試案例」。\n"
+        f"需求：{user_need}\n\n"
+        "規則：\n"
+        "1. 每一組測資必須包含 [輸入字串, 預期輸出字串]。\n"
+        "2. 輸入與輸出都必須是字串格式，如果是多行輸入請用 \\n 連接。\n"
+        "3. 專注於邊界情況 (例如: 空輸入、最大值、最小值、特殊字元)。\n"
+        "4. 絕對不要輸出任何解釋文字，只輸出 JSON。\n"
+        "5. ⚠️務必使用 Markdown 程式碼區塊包住 JSON 輸出。\n\n"
+        "輸出範例格式：\n"
+        "```json\n"
+        "[\n"
+        "  [\"輸入1\", \"輸出1\"],\n"
+        "  [\"輸入2\", \"輸出2\"]\n"
+        "]\n"
+        "```\n"
     )
 
 def build_crossover_prompt(user_need: str, parent1: list, parent2: list) -> str:

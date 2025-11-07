@@ -222,6 +222,19 @@ async def chat(request: Request):
                     "code": code_block,
                     "need_text": ctx["need"],
                 })
+
+                # === [修改 1 開始] 新增：初始程式碼產生後，立即使用 GA 增強測資 ===
+                try:
+                    print("[Mode 1] 正在使用 GA 生成初始驗證測資...")
+                    # 使用剛生成的 code_block 來跑 GA
+                    ga_tests = generate_tests(ctx["need"], code_block, mode="GA")
+                    if ga_tests:
+                        ctx["tests"] = ga_tests
+                        print(f"[Mode 1] GA 測資已更新: {len(ga_tests)} 筆")
+                except Exception as e:
+                    print(f"[Mode 1] GA 初始生成失敗，將使用基本測資: {e}")
+                # === [修改 1 結束] ===========================================
+
                 if "history" not in ctx:
                     ctx["history"] = []
                 _append_history(f"測資筆數: {len(ctx['tests'])}")
@@ -389,16 +402,36 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
-                test_prompt = build_test_prompt(need_text)
-                test_resp = run_model(test_prompt)
-                raw_tests = extract_json_block(test_resp)
-                json_tests = normalize_tests(raw_tests)
+                # === [修改 2 開始] 使用 GA 重新生成測資 ===
+                # 舊程式碼 (已註解或刪除):
+                # test_prompt = build_test_prompt(need_text)
+                # test_resp = run_model(test_prompt)
+                # raw_tests = extract_json_block(test_resp)
+                # json_tests = normalize_tests(raw_tests)
+                # if not json_tests:
+                #     json_tests = normalize_tests(parse_tests_from_text(need_text))
+                
+                # 新程式碼:
+                print("[Mode 1 VERIFY] 正在使用 GA 重新生成測資...")
+                try:
+                    # 傳入當前的 code 與需求，進行演化
+                    json_tests = generate_tests(need_text, code, mode="GA")
+                except Exception as e:
+                    print(f"[Mode 1 VERIFY] GA 生成失敗: {e}")
+                    json_tests = []
+
+                # 如果 GA 失敗 (回傳空)，嘗試退回舊方法 (可選，視您的需求決定是否保留 fallback)
                 if not json_tests:
-                    json_tests = normalize_tests(parse_tests_from_text(need_text))
+                     # fallback basic
+                     json_tests = generate_tests(need_text, mode="B")
 
                 ctx["tests"] = json_tests or []
                 tests = ctx["tests"]
-                history.append(f"重新生成測資 (共 {len(tests)} 筆)")
+                history.append(f"GA 重新生成測資 (共 {len(tests)} 筆)")
+                # === [修改 2 結束] ========================
+
+                ctx["history"] = history
+                session["ctx"] = ctx
                 ctx["history"] = history
                 session["ctx"] = ctx
 

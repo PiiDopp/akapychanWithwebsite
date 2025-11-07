@@ -4,7 +4,8 @@ import traceback
 import random
 import sys
 import io
-import trace # 導入 trace 模組
+import trace
+import textwrap
 from typing import List, Dict, Any, Optional, Tuple, Set
 
 # 導入新的 GA 提示
@@ -17,9 +18,8 @@ from core.model_interface import (
 )
 from core.validators import validate_main_function, _normalize_output
 from core.code_extract import extract_code_block, extract_json_block
-from core.model_interface import generate_response
 
-# === 新增：適應度評估函式 (Fitness Function) ===
+# === 適應度評估函式 (Fitness Function) ===
 def _get_code_snippet(code: str, line_nums: Set[int], context=2) -> str:
     """輔助函式：從程式碼中提取未覆蓋行及其上下文"""
     lines = code.splitlines()
@@ -41,62 +41,71 @@ def _calculate_fitness(code: str, test_input: str) -> Tuple[float, Set[int]]:
     code_lines = set(range(1, code.count('\n') + 2))
     covered_lines = set()
     
+    # [修改 1] 使用看起來像真實檔案的名稱，避免被 trace 過濾
+    VIRTUAL_FILENAME = "ga_sandbox.py"
+
     # 1. 準備執行環境
-    # 將使用者程式碼包裝成一個可被 trace 的函式
+    indented_code = textwrap.indent(code, '        ')
+    
+    # 我們在 wrapper 中加入標記行，方便定位
     wrapped_code = f"""
 import sys
 import io
-# --- 確保輔助函式存在 ---
-# (若您的 validators.py 中有依賴，也需在此處加入)
-# ---------------------
 
 def target_func():
     # 模擬 stdin
     sys.stdin = io.StringIO({repr(str(test_input))})
     try:
-        # --- 使用者程式碼 ---
-{code}
-        # -------------------
+        # --- User Code Start (Line 10) ---
+{indented_code}
+        # --- User Code End ---
     except Exception:
-        pass # 捕捉執行期錯誤以免中斷 trace
+        pass
 """
     
-    # 2. 使用 trace 模組執行並計算覆蓋行數
-    tracer = trace.Trace(count=0, trace=1) # trace=1 啟用行追蹤
+    # 2. 使用 trace 模組執行
+    # ignoredirs=[sys.prefix, sys.exec_prefix] 可以減少追蹤標準庫，提高效能
+    tracer = trace.Trace(count=1, trace=0, ignoredirs=[sys.prefix, sys.exec_prefix])
     
     try:
         namespace = {"io": io, "sys": sys}
-        exec(wrapped_code, namespace)
+        # 強制指定檔名進行編譯
+        compiled = compile(wrapped_code, VIRTUAL_FILENAME, 'exec')
+        exec(compiled, namespace)
         
-        # 執行追蹤
+        # 執行目標函式並追蹤
         tracer.runfunc(namespace['target_func'])
         
         # 3. 收集覆蓋結果
         results = tracer.results()
         
-        # 收集所有被執行的行號
-        # results.measured 是一個 {filename: {lineno, ...}} 的 dict
-        for filename, lines in results.measured.items():
-            if "string" in filename: # 我們只關心 exec 的程式碼
-                covered_lines.update(lines)
+        # 從結果中找出我們的虛擬檔案
+        if VIRTUAL_FILENAME in results.counts:
+            for (filename, lineno), count in results.counts.items():
+                if filename == VIRTUAL_FILENAME and count > 0:
+                    # 扣除 wrapper header 的行數 (約 9 行)
+                    # 實際使用者程式碼從 wrapped_code 的第 10 行開始
+                    actual_lineno = lineno - 9
+                    if actual_lineno > 0:
+                        covered_lines.add(actual_lineno)
 
-        # 4. 計算適應度
-        # 適應度 = 覆蓋的行數
         fitness = len(covered_lines)
         uncovered_lines = code_lines - covered_lines
         
-        # print(f"[Fitness] Input: {repr(test_input)}, Score: {fitness}, Uncovered: {uncovered_lines}")
-        return fitness, uncovered_lines
+        # [修改 2] 啟用除錯：如果 fitness 為 0，印出到底追蹤到了什麼
+        if fitness == 0 and random.random() < 0.1: # 只在 10% 的失敗情況下印出，避免洗版
+             traced_files = set(f for f, l in results.counts.keys())
+             print(f"    [DEBUG-GA] Fitness 0 for input {test_input!r}. Traced files: {list(traced_files)[:5]}...")
+
+        return float(fitness), uncovered_lines
 
     except Exception as e:
-        # print(f"[Fitness Error] {e}")
-        return 0.0, code_lines # 執行失敗，給予 0 分
+        # print(f"[Fitness Calculation Error] {e}")
+        return 0.0, code_lines
 
-
-# === 核心修改：基於 GA 的測試生成 ===
+# === 基於 GA 的測試生成 (以下保持不變) ===
 
 def _generate_tests_basic(user_need: str) -> List[list]:
-    """舊版：一次性提示生成，作為備用"""
     sys_prompt = build_initial_population_prompt(user_need, n=5)
     resp = generate_response(sys_prompt)
     json_tests = extract_json_block(resp)
@@ -105,12 +114,8 @@ def _generate_tests_basic(user_need: str) -> List[list]:
     return []
 
 def generate_tests_hybrid_ga(user_need: str, code: str, generations=3, pop_size=6) -> List[List[str]]:
-    """
-    (新) 使用 GA + LLM 混合方法生成高品質測資。
-    """
     print(f"\n[GA] 啟動演化式測試生成 (Generations={generations}, Pop={pop_size})...")
     
-    # 1. 初始化族群 (Initial Population)
     init_prompt = build_initial_population_prompt(user_need, n=pop_size)
     init_resp = generate_response(init_prompt)
     population = extract_json_block(init_resp)
@@ -119,99 +124,101 @@ def generate_tests_hybrid_ga(user_need: str, code: str, generations=3, pop_size=
         print("[GA] 初始化失敗，回退到基本模式。")
         return _generate_tests_basic(user_need)
         
-    population = [p for p in population if isinstance(p, list) and len(p) >= 2]
+    valid_pop = []
+    for p in population:
+        if isinstance(p, list) and len(p) >= 1:
+             inp = str(p[0])
+             out = str(p[1]) if len(p) > 1 else ""
+             valid_pop.append([inp, out])
+    population = valid_pop
+
     if not population:
-        print("[GA] 初始化測資格式錯誤，回退到基本模式。")
+        print("[GA] 初始化後無有效測資，回退到基本模式。")
         return _generate_tests_basic(user_need)
 
-    total_uncovered_lines = set()
     best_fitness_overall = -1.0
     
     for gen in range(generations):
         print(f"  [GA] Generation {gen+1}/{generations}...")
         
-        # 2. 評估適應度 (Evaluation)
         scored_pop = []
         all_uncovered_this_gen = set()
         
         for individual in population:
-            inp, outp = str(individual[0]), str(individual[1])
+            inp = individual[0]
             fitness, uncovered = _calculate_fitness(code, inp)
             scored_pop.append((individual, fitness, uncovered))
             all_uncovered_this_gen.update(uncovered)
         
-        # 依適應度排序 (高的在前)
         scored_pop.sort(key=lambda x: x[1], reverse=True)
-        total_uncovered_lines = all_uncovered_this_gen
         
         best_individual, best_fitness, best_uncovered = scored_pop[0]
         if best_fitness > best_fitness_overall:
             best_fitness_overall = best_fitness
             
         print(f"    > Best Fitness: {best_fitness:.1f} (Input: {best_individual[0]!r})")
-        print(f"    > Total Uncovered Lines in this Gen: {len(total_uncovered_lines)}")
 
-        # 3. 選擇 (Selection) - 保留前 50% 精英
         elite_count = max(2, int(pop_size * 0.5))
-        elites = scored_pop[:elite_count] # 保留 (individual, fitness, uncovered)
-        next_gen = [x[0] for x in elites] # 下一代只包含 individual
+        elites = scored_pop[:elite_count]
+        next_gen = [x[0] for x in elites]
         
-        # 4. 繁殖 (Reproduction: Crossover & Mutation)
         while len(next_gen) < pop_size:
-            if random.random() < 0.6 and len(elites) >= 2: # 60% 機率交配
-                p1, p2 = random.sample(elites, 2)
+            if random.random() < 0.6 and len(elites) >= 2:
+                p1 = random.choice(elites)[0]
+                p2 = random.choice(elites)[0]
+                if p1 == p2 and len(elites) > 2:
+                     p2 = elites[1][0] if p1 == elites[0][0] else elites[0][0]
+
                 prompt = build_crossover_prompt(user_need, p1[0], p2[0])
                 resp = generate_response(prompt) 
-                child = extract_json_block(resp)
-            else: # 40% 機率突變 (回饋驅動)
-                parent_ind, parent_fitness, parent_uncovered = random.choice(elites)
-                if not parent_uncovered: # 如果此精英已全覆蓋，則隨機選一個未覆蓋的
-                    parent_uncovered = total_uncovered_lines
-                
-                if not parent_uncovered: # 如果真的全覆蓋了
-                    print("    > [GA] 程式碼似乎已完全覆蓋，執行隨機突變。")
-                    prompt = build_feedback_mutation_prompt(user_need, parent_ind, "print('...')", {"... 目標是產生隨機邊界值 ..."})
+                children = extract_json_block(resp)
+                if isinstance(children, list):
+                    if children and isinstance(children[0], list):
+                        for child in children:
+                             if len(next_gen) < pop_size: next_gen.append(child)
+                    else:
+                         next_gen.append(children)
+
+            else:
+                parent_ind, _, parent_uncovered = random.choice(elites)
+                target_lines = parent_uncovered if parent_uncovered else all_uncovered_this_gen
+                if not target_lines:
+                     snippet = "已全覆蓋，請嘗試極端邊界值"
                 else:
-                    snippet = _get_code_snippet(code, parent_uncovered)
-                    prompt = build_feedback_mutation_prompt(user_need, parent_ind, snippet, parent_uncovered)
-                
+                     snippet = _get_code_snippet(code, target_lines)
+
+                prompt = build_feedback_mutation_prompt(user_need, parent_ind[0], snippet, target_lines)
                 resp = generate_response(prompt)
                 child = extract_json_block(resp)
-            
-            # 處理 LLM 回傳的格式
-            if child and isinstance(child, list):
-                 if len(child) > 0 and isinstance(child[0], list): # 回傳了 [[...], [...]]
-                     next_gen.append(child[0])
-                 elif len(child) == 2 and not isinstance(child[0], list): # 回傳了 [inp, out]
+                if isinstance(child, list):
                      next_gen.append(child)
+            
+        population = []
+        for p in next_gen:
+             if isinstance(p, list) and len(p) >= 1:
+                 inp = str(p[0])
+                 out = str(p[1]) if len(p) > 1 else ""
+                 population.append([inp, out])
         
-        population = next_gen[:pop_size]
+        while len(population) < pop_size:
+             population.append(["", ""])
 
-    print(f"[GA] 演化完成。最終族群：")
-    for i, p in enumerate(population):
-        print(f"  {i+1}. {p[0]!r}")
+    print(f"[GA] 演化完成。最終族群前 3 名：")
+    for i, p in enumerate(population[:3]):
+        print(f"  {i+1}. Input: {p[0]!r}")
+        
     return population
 
 def generate_tests(user_need: str, code: str = None, mode: str = "GA") -> List[Any]:
-    """
-    (路由) 自動生成測資。
-    mode="GA": (推薦) 使用演化演算法 (GA) + LLM。需要 code 參數。
-    mode="B" (Basic): 舊版單次生成。
-    """
     if mode.upper() == "GA" and code and user_need:
         try:
             return generate_tests_hybrid_ga(user_need, code)
         except Exception as e:
-            print(f"[GA 嚴重錯誤] GA 測試生成失敗: {e}. 回退到基本模式。")
+            print(f"[GA Error] {e}, falling back to basic mode.")
+            # traceback.print_exc()
             return _generate_tests_basic(user_need)
     else:
-        # 如果沒有 code 或 user_need，或模式設為 B，則使用基本模式
         return _generate_tests_basic(user_need)
-
-
-# ... (generate_and_validate 函式保持不變) ...
-# 注意：generate_and_validate 似乎沒有被 main.py 使用，而是被 testrun.py 使用。
-# 我們保持其原樣，僅修改 main.py 會呼叫的 generate_tests
 
 
 def generate_and_validate(user_need: str, examples: List[Dict[str, str]], solution: Optional[str]) -> Dict[str, Any]:
