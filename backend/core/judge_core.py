@@ -303,6 +303,7 @@ def list_to_listnode(a: Iterable[int]) -> Optional[ListNode]:
     return head
 
 def listnode_to_list(head: Any) -> list[int]:
+    """將 ListNode 轉回 list。支援 Duck Typing。"""
     out = []
     cur = head
     while cur is not None and hasattr(cur, 'val'):
@@ -324,6 +325,7 @@ def list_to_btree(level: Iterable[Optional[int]]) -> Optional[TreeNode]:
     return nodes[0]
 
 def btree_to_list(root: Any) -> list[Optional[int]]:
+    """將 TreeNode 轉回 list (BFS)。支援 Duck Typing。"""
     if not root: return []
     q = [root]
     out: list[Optional[int]] = []
@@ -410,42 +412,67 @@ def _build_arg(arg: Any, spec: Optional[BuildSpec]) -> Any:
         return list_to_btree(arg)
     raise ValueError(f"Unknown BuildSpec kind: {spec.kind}")
 
-# ========== 1) STDIN 模式 ==========
+# ========== 1) STDIN 模式 (詳細輸出版) ==========
 
 def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5) -> tuple[bool, str]:
     log = io.StringIO()
     full_code = JUDGE_PRELUDE + "\n" + code
     with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as tmp:
         tmp.write(full_code.encode("utf-8")); tmp.flush(); path = tmp.name
+    
+    passed_count = 0
+    t0 = time.perf_counter()
+
     try:
         for idx, ex in enumerate(examples, 1):
-            p = subprocess.run(
-                [sys.executable, path],
-                input=ex.get("input",""),
-                text=True,
-                capture_output=True,
-                timeout=timeout_sec,
-                cwd=os.path.dirname(path)
-            )
-            if p.returncode != 0:
-                print(f"[錯誤] 第 {idx} 筆：程式執行失敗", file=log)
-                if p.stderr:
-                    print(p.stderr[:400], file=log)
-                return False, log.getvalue()
-            out = normalize(p.stdout)
+            inp = ex.get("input", "")
             exp_raw = ex.get("output", ex.get("expected", ""))
             exp = normalize(exp_raw)
-            if out != exp:
-                print(f"[錯誤] 第 {idx} 筆：輸出不符", file=log)
-                print(f"【Input】\n{ex.get('input','')}", file=log)
-                print(f"【Your Output】\n{out}", file=log)
-                print(f"【Expected】\n{exp}", file=log)
-                return False, log.getvalue()
-        print("[成功] 所有 STDIN 測資通過 ✅", file=log)
-        return True, log.getvalue()
-    except subprocess.TimeoutExpired:
-        print("[錯誤] 程式執行逾時", file=log)
-        return False, log.getvalue()
+
+            print(f"[測試#{idx}]", file=log)
+            # 使用 textwrap.indent 讓多行輸入/輸出更易讀
+            print(f"  輸入內容:\n{textwrap.indent(inp, '    ')}", file=log)
+
+            try:
+                p = subprocess.run(
+                    [sys.executable, path],
+                    input=inp,
+                    text=True,
+                    capture_output=True,
+                    timeout=timeout_sec,
+                    cwd=os.path.dirname(path)
+                )
+                if p.returncode != 0:
+                    print(f"  結果: ❌ 執行失敗 (Exit code {p.returncode})", file=log)
+                    if p.stderr:
+                         print(f"  錯誤訊息:\n{textwrap.indent(p.stderr.strip(), '    ')}", file=log)
+                    print("", file=log)
+                    continue
+                
+                out = normalize(p.stdout)
+                if out == exp:
+                    passed_count += 1
+                    print("  結果: ✅ 通過", file=log)
+                else:
+                    print("  結果: ❌ 失敗 (輸出不符)", file=log)
+                
+                print(f"  預期輸出:\n{textwrap.indent(exp, '    ')}", file=log)
+                print(f"  實際輸出:\n{textwrap.indent(out, '    ')}", file=log)
+                print("", file=log)
+
+            except subprocess.TimeoutExpired:
+                print(f"  結果: ❌ 執行逾時 (> {timeout_sec}s)", file=log)
+                print("", file=log)
+
+        dt = time.perf_counter() - t0
+        print(f"=== 測試完成 ({passed_count}/{len(examples)}) ===", file=log)
+        if passed_count == len(examples):
+            print(f"[成功] 所有測資通過 ✅（{dt:.4f}s）", file=log)
+        else:
+            print(f"[警告] 部分測資未通過 ❌（{dt:.4f}s）", file=log)
+            
+        return passed_count == len(examples), log.getvalue()
+
     finally:
         try: os.unlink(path)
         except: pass
@@ -507,17 +534,14 @@ def validate_leetcode_code(
                 print(f"[錯誤] 測試#{i}: 找不到方法 {method_name}", file=log)
                 continue
 
-            # [新增] 智慧參數解包：如果傳入的參數數量不符，但剛好被包在一個列表/元組中，嘗試解包
+            # 智慧參數解包
             try:
                 sig = inspect.signature(meth)
-                # 計算實際需要的參數數量（排除有預設值的參數）
                 params = list(sig.parameters.values())
                 needed_count = len([p for p in params if p.default == inspect.Parameter.empty])
-
                 # 如果只傳入 1 個參數，但函式需要 >1 個，且這 1 個參數本身是列表/元組，且長度剛好符合需求
                 if len(args) == 1 and needed_count > 1 and isinstance(args[0], (list, tuple)):
                      if len(args[0]) == needed_count:
-                          # print(f"DEBUG: Auto-unpacking arguments: {args[0]}", file=sys.stderr)
                           args = tuple(args[0])
             except Exception:
                 pass
@@ -530,9 +554,10 @@ def validate_leetcode_code(
             else:
                 built_args = args
 
-            # 在呼叫前先印出輸入，方便除錯
             print(f"[測試#{i}]", file=log)
-            print(f"  輸入: {method_name}{built_args}", file=log)
+            # 格式化輸入參數顯示
+            args_str = ", ".join(repr(a) for a in built_args)
+            print(f"  輸入: {method_name}({args_str})", file=log)
 
             try:
                 got = meth(*built_args)
