@@ -2,225 +2,201 @@ import re
 import json
 import traceback
 import random
-import sys
-import io
-import trace
-import textwrap
-from typing import List, Dict, Any, Optional, Tuple, Set
+from typing import List, Dict, Any, Optional
+from io import StringIO
+import unittest.mock as mock
 
-# 導入新的 GA 提示
 from core.model_interface import (
-    generate_response, 
-    build_virtual_code_prompt,
-    build_initial_population_prompt, 
-    build_crossover_prompt, 
-    build_feedback_mutation_prompt
+    call_ollama_cli, build_virtual_code_prompt, generate_response,
+    build_cot_test_prompt, build_mutation_killing_prompt,
+    build_ga_crossover_prompt, build_ga_mutation_prompt,
+    build_high_confidence_test_prompt, build_test_verification_prompt
 )
 from core.validators import validate_main_function, _normalize_output
 from core.code_extract import extract_code_block, extract_json_block
+from core.mutation_runner import MutationRunner
 
-# === 適應度評估函式 (Fitness Function) ===
-def _get_code_snippet(code: str, line_nums: Set[int], context=2) -> str:
-    """輔助函式：從程式碼中提取未覆蓋行及其上下文"""
-    lines = code.splitlines()
-    snippet_lines = set()
-    
-    for line_num in line_nums:
-        start = max(0, line_num - context - 1)
-        end = min(len(lines), line_num + context)
-        for i in range(start, end):
-            snippet_lines.add(i)
-            
-    return "\n".join([f"{i+1: >4}: {lines[i]}" for i in sorted(list(snippet_lines))])
-
-def _calculate_fitness(code: str, test_input: str) -> Tuple[float, Set[int]]:
+def json_to_unittest(json_tests: list) -> str:
     """
-    計算測資的適應度 (Fitness)。
-    返回: (分數, 未覆蓋的行號集合)
+    將 JSON 測資轉換為 MutPy 可執行的 unittest 程式碼字串。
+    [改進] 使用 patch('sys.stdin', StringIO(user_input)) 以同時支援 input() 和 sys.stdin.read()。
     """
-    code_lines = set(range(1, code.count('\n') + 2))
-    covered_lines = set()
-    
-    # [修改 1] 使用看起來像真實檔案的名稱，避免被 trace 過濾
-    VIRTUAL_FILENAME = "ga_sandbox.py"
+    code_lines = [
+        "import unittest",
+        "from unittest.mock import patch",
+        "from io import StringIO",
+        "import sys",
+        "",
+        # 預先定義一個可能需要的 main，避免 import 錯誤
+        "from solution import main as target_main" if "from solution" not in "".join(json_tests) else "", 
+        "",
+        "class TestSolution(unittest.TestCase):"
+    ]
 
-    # 1. 準備執行環境
-    indented_code = textwrap.indent(code, '        ')
-    
-    # 我們在 wrapper 中加入標記行，方便定位
-    wrapped_code = f"""
-import sys
-import io
-
-def target_func():
-    # 模擬 stdin
-    sys.stdin = io.StringIO({repr(str(test_input))})
-    try:
-        # --- User Code Start (Line 10) ---
-{indented_code}
-        # --- User Code End ---
-    except Exception:
-        pass
-"""
-    
-    # 2. 使用 trace 模組執行
-    # ignoredirs=[sys.prefix, sys.exec_prefix] 可以減少追蹤標準庫，提高效能
-    tracer = trace.Trace(count=1, trace=0, ignoredirs=[sys.prefix, sys.exec_prefix])
-    
-    try:
-        namespace = {"io": io, "sys": sys}
-        # 強制指定檔名進行編譯
-        compiled = compile(wrapped_code, VIRTUAL_FILENAME, 'exec')
-        exec(compiled, namespace)
-        
-        # 執行目標函式並追蹤
-        tracer.runfunc(namespace['target_func'])
-        
-        # 3. 收集覆蓋結果
-        results = tracer.results()
-        
-        # 從結果中找出我們的虛擬檔案
-        if VIRTUAL_FILENAME in results.counts:
-            for (filename, lineno), count in results.counts.items():
-                if filename == VIRTUAL_FILENAME and count > 0:
-                    # 扣除 wrapper header 的行數 (約 9 行)
-                    # 實際使用者程式碼從 wrapped_code 的第 10 行開始
-                    actual_lineno = lineno - 9
-                    if actual_lineno > 0:
-                        covered_lines.add(actual_lineno)
-
-        fitness = len(covered_lines)
-        uncovered_lines = code_lines - covered_lines
-        
-        # [修改 2] 啟用除錯：如果 fitness 為 0，印出到底追蹤到了什麼
-        if fitness == 0 and random.random() < 0.1: # 只在 10% 的失敗情況下印出，避免洗版
-             traced_files = set(f for f, l in results.counts.keys())
-             print(f"    [DEBUG-GA] Fitness 0 for input {test_input!r}. Traced files: {list(traced_files)[:5]}...")
-
-        return float(fitness), uncovered_lines
-
-    except Exception as e:
-        # print(f"[Fitness Calculation Error] {e}")
-        return 0.0, code_lines
-
-# === 基於 GA 的測試生成 (以下保持不變) ===
-
-def _generate_tests_basic(user_need: str) -> List[list]:
-    sys_prompt = build_initial_population_prompt(user_need, n=5)
-    resp = generate_response(sys_prompt)
-    json_tests = extract_json_block(resp)
-    if json_tests and isinstance(json_tests, list):
-        return [t for t in json_tests if isinstance(t, list) and len(t) == 2]
-    return []
-
-def generate_tests_hybrid_ga(user_need: str, code: str, generations=3, pop_size=6) -> List[List[str]]:
-    print(f"\n[GA] 啟動演化式測試生成 (Generations={generations}, Pop={pop_size})...")
-    
-    init_prompt = build_initial_population_prompt(user_need, n=pop_size)
-    init_resp = generate_response(init_prompt)
-    population = extract_json_block(init_resp)
-    
-    if not population or not isinstance(population, list):
-        print("[GA] 初始化失敗，回退到基本模式。")
-        return _generate_tests_basic(user_need)
-        
-    valid_pop = []
-    for p in population:
-        if isinstance(p, list) and len(p) >= 1:
-             inp = str(p[0])
-             out = str(p[1]) if len(p) > 1 else ""
-             valid_pop.append([inp, out])
-    population = valid_pop
-
-    if not population:
-        print("[GA] 初始化後無有效測資，回退到基本模式。")
-        return _generate_tests_basic(user_need)
-
-    best_fitness_overall = -1.0
-    
-    for gen in range(generations):
-        print(f"  [GA] Generation {gen+1}/{generations}...")
-        
-        scored_pop = []
-        all_uncovered_this_gen = set()
-        
-        for individual in population:
-            inp = individual[0]
-            fitness, uncovered = _calculate_fitness(code, inp)
-            scored_pop.append((individual, fitness, uncovered))
-            all_uncovered_this_gen.update(uncovered)
-        
-        scored_pop.sort(key=lambda x: x[1], reverse=True)
-        
-        best_individual, best_fitness, best_uncovered = scored_pop[0]
-        if best_fitness > best_fitness_overall:
-            best_fitness_overall = best_fitness
+    for i, test in enumerate(json_tests):
+        if not isinstance(test, list) or len(test) < 2:
+            continue
             
-        print(f"    > Best Fitness: {best_fitness:.1f} (Input: {best_individual[0]!r})")
-
-        elite_count = max(2, int(pop_size * 0.5))
-        elites = scored_pop[:elite_count]
-        next_gen = [x[0] for x in elites]
+        inp = str(test[0]).replace('\\', '\\\\').replace("'", "\\'").replace('"', '\\"')
+        exp = str(test[1]).replace('\\', '\\\\').replace("'", "\\'").replace('"', '\\"')
         
-        while len(next_gen) < pop_size:
-            if random.random() < 0.6 and len(elites) >= 2:
-                p1 = random.choice(elites)[0]
-                p2 = random.choice(elites)[0]
-                if p1 == p2 and len(elites) > 2:
-                     p2 = elites[1][0] if p1 == elites[0][0] else elites[0][0]
-
-                prompt = build_crossover_prompt(user_need, p1[0], p2[0])
-                resp = generate_response(prompt) 
-                children = extract_json_block(resp)
-                if isinstance(children, list):
-                    if children and isinstance(children[0], list):
-                        for child in children:
-                             if len(next_gen) < pop_size: next_gen.append(child)
+        test_method = f"""
+    def test_case_{i+1}(self):
+        user_input = '{inp}'
+        expected_output = '{exp}'
+        with patch('sys.stdout', new=StringIO()) as fake_out:
+            # [修正] 同時 Mock sys.stdin，支援兩種讀取方式
+            with patch('sys.stdin', StringIO(user_input)):
+                try:
+                    # 嘗試呼叫被測模組的 main()
+                    if 'target_main' in globals():
+                        target_main()
+                    elif 'main' in globals():
+                        main()
                     else:
-                         next_gen.append(children)
+                        # 如果沒有 main，嘗試直接執行模組層級代碼 (較少見但可能)
+                        pass
+                except StopIteration: 
+                    pass 
+                except SystemExit:
+                    pass
+                    
+        actual = fake_out.getvalue().strip()
+        expected = expected_output.strip()
+        # 簡單的斷言訊息
+        msg = f"Input: {{user_input!r}}\\nExpected: {{expected!r}}\\nGot: {{actual!r}}"
+        self.assertEqual(actual, expected, msg=msg)
+"""
+        code_lines.append(test_method)
 
-            else:
-                parent_ind, _, parent_uncovered = random.choice(elites)
-                target_lines = parent_uncovered if parent_uncovered else all_uncovered_this_gen
-                if not target_lines:
-                     snippet = "已全覆蓋，請嘗試極端邊界值"
+    return "\n".join(code_lines)
+
+def generate_tests(user_need: str, code: str, mode: str = "B") -> list[tuple]:
+    """
+    自動生成測資。
+    mode="B": 標準模式
+    mode="ACC": 高準確度模式 (雙重驗證)
+    mode="GA": 遺傳演算法模式
+    mode="MuTAP": 變異測試模式
+    """
+    func_name = "solution" # 簡化，預設使用 solution
+
+    tests = []
+    print(f"[generate_tests] 正在以模式 '{mode}' 生成測資...")
+
+    # =========================================
+    # 模式 A: 高準確度模式 (ACC) - 獨立路徑
+    # =========================================
+    if mode.upper() == "ACC":
+        print("[ACC] 啟動高信心生成與雙重驗證機制...")
+        prompt = build_high_confidence_test_prompt(user_need)
+        resp = generate_response(prompt)
+        candidates = extract_json_block(resp) or []
+        
+        if not candidates:
+             # 嘗試用 regex 抓取
+             m = re.findall(r"\[\s*\[.*?\]\s*\]", resp, re.DOTALL)
+             if m:
+                 try: candidates = json.loads(m[0])
+                 except: pass
+
+        print(f"[ACC] 初始生成了 {len(candidates)} 個候選測資，開始逐一驗證...")
+        verified_count = 0
+        for i, cand in enumerate(candidates):
+            if isinstance(cand, list) and len(cand) >= 2:
+                inp, exp = cand[0], cand[1]
+                # 簡化顯示
+                inp_show = str(inp)[:15] + "..." if len(str(inp)) > 15 else str(inp)
+                exp_show = str(exp)[:15] + "..." if len(str(exp)) > 15 else str(exp)
+                print(f"  > 驗證候選 {i+1}: Input='{inp_show}' | Expected='{exp_show}'")
+                
+                verify_prompt = build_test_verification_prompt(user_need, inp, exp)
+                verify_resp = generate_response(verify_prompt)
+                
+                if "VERDICT: PASS" in verify_resp:
+                    tests.append((func_name, [inp], exp))
+                    print("    -> [通過] 驗證成功，已加入測資集。✅")
+                    verified_count += 1
                 else:
-                     snippet = _get_code_snippet(code, target_lines)
+                     print("    -> [剔除] 驗證失敗，信心不足。❌")
 
-                prompt = build_feedback_mutation_prompt(user_need, parent_ind[0], snippet, target_lines)
-                resp = generate_response(prompt)
-                child = extract_json_block(resp)
-                if isinstance(child, list):
-                     next_gen.append(child)
-            
-        population = []
-        for p in next_gen:
-             if isinstance(p, list) and len(p) >= 1:
-                 inp = str(p[0])
-                 out = str(p[1]) if len(p) > 1 else ""
-                 population.append([inp, out])
-        
-        while len(population) < pop_size:
-             population.append(["", ""])
+        print(f"[ACC] 最終保留了 {verified_count}/{len(candidates)} 個高準確度測資。")
+        return tests # ACC 模式在此結束，不執行後續
 
-    print(f"[GA] 演化完成。最終族群前 3 名：")
-    for i, p in enumerate(population[:3]):
-        print(f"  {i+1}. Input: {p[0]!r}")
-        
-    return population
+    # =========================================
+    # 模式 B/GA/MuTAP: 共用初始生成路徑
+    # =========================================
+    prompt = build_cot_test_prompt(user_need)
+    resp = generate_response(prompt)
+    extracted_json = extract_json_block(resp)
+    if not extracted_json:
+         m = re.findall(r"\[\s*\[.*?\]\s*\]", resp, re.DOTALL)
+         if m:
+             try: extracted_json = json.loads(m[0])
+             except: pass
 
-def generate_tests(user_need: str, code: str = None, mode: str = "GA") -> List[Any]:
-    if mode.upper() == "GA" and code and user_need:
-        try:
-            return generate_tests_hybrid_ga(user_need, code)
-        except Exception as e:
-            print(f"[GA Error] {e}, falling back to basic mode.")
-            # traceback.print_exc()
-            return _generate_tests_basic(user_need)
-    else:
-        return _generate_tests_basic(user_need)
+    if extracted_json:
+        for t in extracted_json:
+            if isinstance(t, list) and len(t) >= 2:
+                tests.append((func_name, [t[0]], t[1]))
+    
+    print(f"[generate_tests] 初始種群大小: {len(tests)}")
 
+    # --- GA 演化 (僅 GA 模式) ---
+    if mode.upper() == "GA" and len(tests) >= 2:
+        print("\n[GA] 進入遺傳演算法演化循環...")
+        GENERATIONS = 1       # 為了速度先設為 1 代
+        OFFSPRING_PER_GEN = 2 # 每代產生 2 個子代
+        current_population = [[t[1][0], t[2]] for t in tests]
 
+        for gen in range(GENERATIONS):
+            print(f"  > [GA] 第 {gen+1} 代演化中...")
+            for _ in range(OFFSPRING_PER_GEN):
+                if random.random() > 0.3: # 交配
+                    parents = random.sample(current_population, 2)
+                    ga_prompt = build_ga_crossover_prompt(user_need, parents[0], parents[1])
+                    op = "交配"
+                else: # 突變
+                    parent = random.choice(current_population)
+                    ga_prompt = build_ga_mutation_prompt(user_need, parent)
+                    op = "突變"
+                
+                ga_resp = generate_response(ga_prompt)
+                child = extract_json_block(ga_resp)
+                if child and isinstance(child, list) and len(child) >= 2:
+                     # 簡單去重
+                     if not any(str(existing[0]) == str(child[0]) for existing in current_population):
+                         current_population.append([child[0], child[1]])
+                         print(f"    [GA] ({op}) 產生新測資: Input='{str(child[0])[:10]}...'")
+
+        tests = [(func_name, [p[0]], p[1]) for p in current_population]
+        print(f"[GA] 演化完成，最終測資數: {len(tests)}")
+
+    # --- MuTAP 增強 (僅 MuTAP 模式) ---
+    elif mode.upper() == "MUTAP" and code.strip() and tests:
+        print("\n[MuTAP] 進入變異測試增強循環...")
+        current_json_tests = [[t[1][0], t[2]] for t in tests]
+        unittest_code = json_to_unittest(current_json_tests)
+        runner = MutationRunner(target_code=code, test_code=unittest_code)
+        survivors = runner.find_surviving_mutants()
+
+        if survivors:
+             print(f"[MuTAP] 發現 {len(survivors)} 個存活變異體，嘗試生成殺手測資...")
+             for i, mutant in enumerate(survivors[:2]): # 限制處理 2 個
+                 kill_prompt = build_mutation_killing_prompt(code, json.dumps(current_json_tests, ensure_ascii=False), mutant)
+                 kill_resp = generate_response(kill_prompt)
+                 new_tests = extract_json_block(kill_resp)
+                 if new_tests:
+                     for nt in new_tests:
+                         if isinstance(nt, list) and len(nt) >= 2:
+                             tests.append((func_name, [nt[0]], nt[1]))
+                             print(f"    [MuTAP] + 新增殺手測資: Input='{str(nt[0])[:10]}...'")
+        else:
+            print("[MuTAP] 未發現存活變異體或執行失敗。")
+
+    return tests
+
+# ... (保留 generate_and_validate, generate_tests_with_oracle 不變) ...
 def generate_and_validate(user_need: str, examples: List[Dict[str, str]], solution: Optional[str]) -> Dict[str, Any]:
     """
     (從 testrun.py 移入)
@@ -243,7 +219,7 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
     try:
         print("     [階段 1] 正在生成虛擬碼...")
         vc_prompt = build_virtual_code_prompt(user_need) #
-        vc_resp = generate_response(vc_prompt) #
+        vc_resp = call_ollama_cli(vc_prompt) #
         virtual_code = vc_resp 
         result["virtual_code"] = virtual_code
 
@@ -253,7 +229,7 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
             return result
 
     except Exception as e:
-        print(f"     [錯誤] 'generate_response' (虛擬碼階段) 失敗: {e}")
+        print(f"     [錯誤] 'call_ollama_cli' (虛擬碼階段) 失敗: {e}")
         result["error"] = f"Virtual code generation failed: {e}"
         return result
 
@@ -297,10 +273,10 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
 
         code_prompt_string = "".join(code_prompt_lines)
 
-        code_resp = generate_response(code_prompt_string) #
+        code_resp = call_ollama_cli(code_prompt_string) #
 
     except Exception as e:
-        print(f"     [錯誤] 'generate_response' (程式碼階段) 失敗: {e}")
+        print(f"     [錯誤] 'call_ollama_cli' (程式碼階段) 失敗: {e}")
         result["error"] = f"Code generation failed: {e}"
         return result
 
@@ -434,3 +410,43 @@ def generate_and_validate(user_need: str, examples: List[Dict[str, str]], soluti
              print("     [總結] 部分或全部範例驗證失敗 ❌")
 
     return result
+
+def generate_tests_with_oracle(user_need: str, reference_code: str, num_tests: int = 5) -> list:
+    """
+    [高準確率模式] 利用參考解法 (Oracle) 自動計算預期輸出。
+    1. 要求 LLM 僅生成具備高覆蓋率的「輸入 (stdin)」。
+    2. 執行 reference_code 以獲取絕對正確的「輸出 (stdout)」。
+    """
+    sys_prompt = (
+        "你是一位專業的測試工程師。請分析以下程式需求，生成一組具備高覆蓋率的「純輸入」資料。\n"
+        "請專注於設計各種邊界情況 (Edge Cases) 與極端輸入，以確保程式的穩健性。\n"
+        f"需求描述:\n{user_need}\n\n"
+        "請直接輸出一個 JSON 格式的字串陣列 (List of Strings)，每一項代表一次完整的標準輸入 (stdin) 內容。\n"
+        "不需要任何解釋或其他文字。\n"
+        "格式範例: [\"輸入1第一行\\n輸入1第二行\", \"輸入2僅一行\", \"1 2 3\\n4 5 6\"]\n"
+    )
+    
+    print("     [Oracle] 正在生成高覆蓋率輸入...")
+    resp = generate_response(sys_prompt)
+    inputs = extract_json_block(resp)
+
+    if not inputs or not isinstance(inputs, list):
+        print(f"     [Oracle 警告] 無法從模型回覆中提取輸入列表。")
+        return []
+
+    valid_tests = []
+    print(f"     [Oracle] 正在透過參考解法計算 {len(inputs)} 組標準答案...")
+
+    for i, inp in enumerate(inputs):
+        stdin_input = str(inp)
+        # 執行參考解法來獲取標準輸出
+        # 注意：這要求 reference_code 必須是完整的可執行腳本 (包含讀取 stdin 的部分)
+        success, oracle_output = validate_main_function(reference_code, stdin_input, expected_output=None)
+
+        if success:
+            # 成功獲得 Oracle 輸出，這組測資是可信的
+            valid_tests.append([stdin_input, oracle_output.strip()])
+        else:
+             print(f"     [Oracle 失敗] 參考解法無法處理第 {i+1} 組輸入，已略過。")
+
+    return valid_tests[:num_tests]

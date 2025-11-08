@@ -11,8 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from core import (
     extract_code_block, generate_response,
     validate_main_function, validate_python_code,
-    extract_json_block, parse_tests_from_text,
-    generate_tests
+    extract_json_block, parse_tests_from_text
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
@@ -21,6 +20,8 @@ from core.model_interface import (
 )
 from explain_user_code import explain_user_code
 from explain_error import explain_code_error
+from core.mutation_runner import MutationRunner
+from core.test_utils import generate_tests
 
 # ====== 判題核心（LeetCode / STDIN）======
 from core.judge_core import (
@@ -504,102 +505,103 @@ async def chat(request: Request):
         step = session.get("step") or "code"
         msg = last_user
 
-        # 狀態 1：等待程式碼
+        # [步驟 1] 等待程式碼
         if step == "code":
             if not msg or not msg.strip():
-                session["step"] = "code"
                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
-            
             ctx["code"] = msg
             session["ctx"] = ctx
             session["step"] = "need"
             return {"text": "已收到程式碼。\n請輸入這段程式碼的「需求說明」，AI 將以此生成測資來驗證。\n(若不提供，請直接輸入 'skip' 或 '無')"}
 
-        # 狀態 2：等待需求並執行驗證
+        # [步驟 2] 等待需求
         if step == "need":
-            need_text = msg.strip()
-            if need_text.lower() in ["skip", "no", "無", ""]:
-                need_text = ""
+            ctx["need"] = msg.strip()
+            session["ctx"] = ctx
+            session["step"] = "strategy"
+            return {
+                "text": (
+                    "請選擇測資生成策略：\n"
+                    "  [1] 標準模式 (Standard) - 平衡覆蓋率與速度\n"
+                    "  [2] 高準確度模式 (Accuracy) - 雙重驗證，寧缺勿濫 (推薦)\n"
+                    "  [3] 遺傳演算法 (GA) - 透過演化探索多樣化邊界\n"
+                    "  [4] 變異測試 (MuTAP) - 找出程式盲點 (較慢)\n\n"
+                    "請輸入選項數字 (1~4)，預設為 [1]："
+                )
+            }
+
+        # [步驟 3] 選擇策略並執行驗證
+        if step == "strategy":
+            strategy_map = {"1": "B", "2": "ACC", "3": "GA", "4": "MUTAP"}
+            selected_mode = strategy_map.get(msg.strip(), "B")
             
-            user_code = ctx["code"]
+            user_code = ctx.get("code", "")
+            user_need = ctx.get("need", "")
+            if user_need.lower() in ["skip", "no", "無", ""]:
+                user_need = ""
+
             report_lines = []
-
-            # 1. 嘗試生成測資 (Standard Prompt 模式)
-            json_tests = []
-            if need_text:
-                report_lines.append("[處理中] 正在生成驗證測資...\n")
-                try:
-                    test_prompt = build_test_prompt(need_text)
-                    test_resp = run_model(test_prompt)
-                    raw_tests = extract_json_block(test_resp)
-                    json_tests = normalize_tests(raw_tests)
-                    if not json_tests:
-                         json_tests = normalize_tests(parse_tests_from_text(need_text))
-                except Exception as e:
-                    report_lines.append(f"[警告] 測資生成失敗: {e}\n")
-                    json_tests = []
-
-            # 2. 執行驗證
-            if json_tests:
-                report_lines.append(f"✅ 已生成 {len(json_tests)} 筆測資，開始驗證...\n")
-                all_passed = True
-                failed = False
-                for i, t in enumerate(json_tests, 1):
-                    # [修改] 使用 _normalize_stdin 處理輸入
-                    inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                    exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                    
-                    inp_str = _normalize_stdin(inp_val)
-                    exp_str = _normalize_stdin(exp_val)
-
-                    ok, actual_out = validate_main_function(user_code, inp_str, exp_str)
-                    
-                    if ok:
-                        report_lines.append(f"✅ 測試 {i}: 通過")
-                    else:
-                        all_passed = False
-                        failed = True
-                        # [修改] 顯示時將換行替換為 \n 以便閱讀
-                        report_lines.append(f"❌ 測試 {i}: 失敗")
-                        report_lines.append(f"   輸入: {inp_str.replace('\n', '\\n')}")
-                        report_lines.append(f"   期望: {exp_str.strip()}")
-                        report_lines.append(f"   實際: {actual_out}\n")
-
-                report_lines.append("\n" + "="*20)
-                if all_passed:
-                    report_lines.append("總結: [成功] 通過所有 AI 生成的測資。")
-                else:
-                    report_lines.append("總結: [失敗] 未通過部分測資。")
-                    # 失敗時自動解釋
-                    try:
-                        report_lines.append("\n=== 錯誤分析 ===\n(正在分析錯誤原因...)\n")
-                        err_analysis = explain_code_error(user_code)
-                        if hasattr(err_analysis, "explanation"):
-                             report_lines.append(err_analysis.explanation)
-                        else:
-                             report_lines.append(str(err_analysis))
-                    except Exception as e:
-                        report_lines.append(f"[分析失敗] {e}")
-
+            if not user_need:
+                 report_lines.append("（未提供需求，僅執行程式一次）\n")
+                 ok, out_msg = validate_main_function(user_code, stdin_input=None, expected_output=None)
+                 if ok:
+                     report_lines.append("=== 執行成功 (Exit 0) ===\n輸出:\n" + out_msg)
+                 else:
+                     report_lines.append("=== 執行失敗 (Non-zero exit) ===\n錯誤訊息:\n" + out_msg)
             else:
-                # 無需求或生成失敗，僅執行一次
-                report_lines.append("（未提供需求或無法生成測資，僅執行程式一次）\n")
-                ok, out_msg = validate_main_function(user_code, stdin_input=None, expected_output=None)
-                if ok:
-                    report_lines.append("=== 執行成功 (Exit 0) ===\n輸出:\n" + out_msg)
-                else:
-                    report_lines.append("=== 執行失敗 (Non-zero exit) ===\n錯誤訊息:\n" + out_msg)
-                    try:
-                        report_lines.append("\n=== 錯誤分析 ===\n")
-                        err_analysis = explain_code_error(user_code)
-                        if hasattr(err_analysis, "explanation"):
-                             report_lines.append(err_analysis.explanation)
-                        else:
-                             report_lines.append(str(err_analysis))
-                    except Exception as e:
-                        report_lines.append(f"[分析失敗] {e}")
+                report_lines.append(f"[處理中] 正在以 '{selected_mode}' 模式生成測資，請稍候...\n")
+                
+                try:
+                    # 呼叫核心函式生成測資
+                    raw_tests = generate_tests(user_need, user_code, mode=selected_mode)
+                except Exception as e:
+                    raw_tests = []
+                    report_lines.append(f"[錯誤] 測資生成失敗: {e}")
 
-            # 結束 Mode 2 會話，重置狀態
+                if not raw_tests:
+                     report_lines.append("⚠️ 未能生成任何有效測資。")
+                else:
+                    report_lines.append(f"✅ 已生成 {len(raw_tests)} 筆測資，開始驗證...\n")
+                    all_passed = True
+                    pass_count = 0
+                    
+                    for i, test_tuple in enumerate(raw_tests, 1):
+                        # test_tuple 格式: (func_name, [input_args], expected_output)
+                        try:
+                            # 取出輸入與預期輸出
+                            inp_arg = test_tuple[1][0] if test_tuple[1] else ""
+                            expected = test_tuple[2]
+                            
+                            # 正規化為字串
+                            inp_str = _normalize_stdin(inp_arg)
+                            exp_str = _normalize_stdin(expected)
+
+                            # 執行驗證
+                            ok, actual_out = validate_main_function(user_code, inp_str, exp_str)
+
+                            report_lines.append(f"\n--- 測試 {i} ---")
+                            report_lines.append(f"輸入: {inp_str.replace('\n', '\\n')}")
+                            report_lines.append(f"預期: {exp_str.strip()}")
+                            
+                            if ok:
+                                report_lines.append("結果: [通過] ✅")
+                                pass_count += 1
+                            else:
+                                report_lines.append("結果: [失敗] ❌")
+                                report_lines.append(f"實際: {actual_out.strip()}")
+                                all_passed = False
+                        except Exception as e:
+                             report_lines.append(f"\n[跳過] 測試 {i} 格式異常: {e}")
+                             all_passed = False
+
+                    report_lines.append("\n" + "="*30)
+                    report_lines.append(f"驗證完成！ 通過率: {pass_count}/{len(raw_tests)}")
+                    if all_passed:
+                        report_lines.append("🎉 恭喜！您的程式碼通過了所有測試案例。")
+                    else:
+                        report_lines.append("⚠️ 存在失敗的測試案例，請參考上方資訊進行除錯。")
+
+            # 結束 Mode 2 會話
             session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
             return {"text": "\n".join(report_lines)}
 

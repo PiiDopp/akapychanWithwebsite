@@ -24,6 +24,19 @@ KEEP_ALIVE    = os.environ.get("OLLAMA_KEEP_ALIVE", "5m")        # 預熱時間
 FAST_NUM_PREDICT = int(os.getenv("LLM_FAST_NUM_PREDICT", "160")) # 典型錯誤解釋 2~4 句
 FAST_TIMEOUT_SEC = int(os.getenv("LLM_FAST_TIMEOUT", "12"))      # 逾時就放棄
 
+def call_ollama_cli(prompt: str, model: str = MODEL_NAME) -> str:
+    """
+    透過 Ollama CLI 呼叫模型
+    """
+    try:
+        proc = subprocess.run(
+            ["ollama", "run", model, prompt],
+            capture_output=True, text=True, timeout=300
+        )
+        return proc.stdout.strip() or proc.stderr.strip()
+    except Exception as e:
+        return f"[CLI 呼叫失敗] {e}"
+
 def _post_ollama(prompt: str, model: str, *, num_predict: int | None, timeout_sec: int | None):
     """
     低階呼叫：可指定 num_predict 與 timeout。
@@ -685,3 +698,110 @@ def normalize_tests(raw) -> list[dict]:
             norm.append({"input": inp, "output": out})
         # 其他型別略過
     return norm
+
+def build_cot_test_prompt(user_need: str) -> str:
+    """
+    [改進版] 測試案例生成 Prompt，引入思維鏈 (CoT) 以提高覆蓋率與準確性。
+    參考: arXiv:2504.20357 (強調系統化方法)
+    """
+    return (
+        "用繁體中文回答。\n"
+        "你是一位資深的軟體測試架構師。\n"
+        "任務：請為以下需求設計一套高覆蓋率的測試案例。請先進行分析，再輸出 JSON。\n\n"
+        f"需求描述:\n{user_need}\n\n"
+        "**分析步驟 (Thinking Process)**:\n"
+        "1. 識別核心功能與預期行為。\n"
+        "2. 列出 3 個關鍵的「邊界條件 (Edge Cases)」(例如: 空值、最大最小值、邊界索引)。\n"
+        "3. 列出 2 個可能的「異常輸入 (Invalid Inputs)」與預期錯誤處理（若適用）。\n\n"
+        "**最終輸出**:\n"
+        "請將上述分析轉化為一個 JSON 二維陣列，格式嚴格遵守 `[[輸入, 預期輸出], [輸入, 預期輸出], ...]`。\n"
+        "⚠️ JSON 區塊前後請勿包含任何其他文字。\n"
+        "```json\n"
+    )
+def build_mutation_killing_prompt(original_code: str, current_tests_str: str, mutant_info: str) -> str:
+    """
+    建立 MuTAP 提示詞：要求 AI 生成能殺死特定變異體的測資。
+    """
+    return f"""
+        你是一位軟體測試專家。請幫助我強化測試用例。
+        以下是原始程式碼，以及目前的測試輸入(JSON格式)。
+        我們發現目前的測試無法檢測出一個潛在的錯誤版本（存活的變異體）。
+
+        【原始程式碼 (Program Under Test)】
+        {original_code}
+
+        【目前已通過的測試輸入】
+        {current_tests_str}
+
+        【存活的變異體 (錯誤版本資訊)】
+        {mutant_info}
+
+        請分析變異體為何能存活，並提供一個**新的測試輸入與預期輸出**，它必須能區分原始代碼與變異體（即在原始代碼通過，但在變異體失敗）。
+        請只回傳一個 JSON 格式的列表，包含這個新的測試案例，格式為： `[[input_string, expected_output_string]]`
+        """
+def build_ga_crossover_prompt(user_need: str, parent1: list, parent2: list) -> str:
+    """
+    [GA] 交配 (Crossover) 提示詞：要求 AI 結合兩個父代測資的特徵。
+    """
+    return (
+        "用繁體中文回答。\n"
+        "你是一個測試演化演算法的操作員。\n"
+        f"任務：參考以下兩個父代測資，結合它們的特徵（例如：輸入的結構、邊界情況、資料類型），產生一個新的、合法的子代測資，以測試此需求：{user_need}。\n"
+        f"父代 1: {json.dumps(parent1, ensure_ascii=False)}\n"
+        f"父代 2: {json.dumps(parent2, ensure_ascii=False)}\n"
+        "⚠️ 僅輸出一個新的 JSON 測資 `[新輸入, 新預期輸出]`，不要有其他文字。"
+    )
+
+def build_ga_mutation_prompt(user_need: str, parent: list) -> str:
+    """
+    [GA] 突變 (Mutation) 提示詞：要求 AI 對單一測資進行微調以探索鄰近邊界。
+    """
+    return (
+        "用繁體中文回答。\n"
+        "你是一個測試演化演算法的操作員。\n"
+        f"任務：對以下測資進行「突變」（微調），例如改變數值大小、字串長度、特殊字元或邊界條件，使其能測試到不同的程式路徑，同時仍符合需求：{user_need}。\n"
+        f"原始測資: {json.dumps(parent, ensure_ascii=False)}\n"
+        "⚠️ 僅輸出突變後的 JSON 測資 `[新輸入, 新預期輸出]`，不要有其他文字。"
+    )
+
+def build_mutation_prompt(user_need: str, parent: list) -> str:
+    """
+    [GA] 突變 (Mutation)：對單一測資進行微小修改以探索新的邊界。
+    """
+    return (
+        "你是一個測試演化演算法的操作員。\n"
+        f"任務：對以下測資進行「突變」（微調），例如改變數值大小、字串長度、特殊字元或邊界條件，使其能測試到不同的程式路徑，同時仍符合需求：{user_need}。\n"
+        f"原始測資: {json.dumps(parent, ensure_ascii=False)}\n"
+        "⚠️ 僅輸出突變後的 JSON 測資 `[新輸入, 新預期輸出]`，不要有其他文字。"
+    )
+
+def build_high_confidence_test_prompt(user_need: str) -> str:
+    """
+    [準確度模式] 要求 AI 僅生成它最有信心的標準測試案例，避免模糊的邊界情況。
+    """
+    return (
+        "用繁體中文回答。\n"
+        "你是一位極度謹慎的測試工程師。\n"
+        "任務：請為以下需求設計 3~5 組「絕對正確」的標準測試案例 (Happy Path)。\n"
+        "**重要要求**：\n"
+        "1. **不追求**複雜或極端的邊界情況。\n"
+        "2. 只提供你 100% 確定輸入與輸出完全符合需求的例子。\n"
+        "3. 如果有任何不確定的地方，請不要包含該測試案例。\n\n"
+        f"需求描述:\n{user_need}\n\n"
+        "請直接輸出一個 JSON 格式的二維陣列 `[[輸入, 預期輸出], ...]`，不要有任何額外分析文字。"
+    )
+
+def build_test_verification_prompt(user_need: str, test_input: any, test_expected: any) -> str:
+    """
+    [準確度模式] 要求 AI 扮演審查員，驗證單一測資是否正確。
+    """
+    return (
+        "你是一位嚴格的程式需求審查員。\n"
+        f"需求原始描述:\n{user_need}\n\n"
+        "請審查以下這個測試案例是否「完全正確」符合上述需求：\n"
+        f"輸入 (Input): {test_input}\n"
+        f"預期輸出 (Expected Output): {test_expected}\n\n"
+        "請先進行一步步的推理分析，驗證這個輸入在需求下是否必然得到這個輸出。\n"
+        "最後，如果它絕對正確，請在最後一行輸出 'VERDICT: PASS'。\n"
+        "如果有任何疑慮或錯誤，請在最後一行輸出 'VERDICT: FAIL'。"
+    )
