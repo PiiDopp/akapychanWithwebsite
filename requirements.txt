@@ -5,3 +5,4 @@ requests
 langchain-community
 langchain-core
 langchain-ollama
+mutpy

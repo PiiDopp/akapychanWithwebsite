@@ -80,26 +80,34 @@ def run_mode_3(user_code: str) -> str:
         return "請貼上要解釋的 Python 程式碼。"
     return explain_user_code(user_code)
 
-# [輔助函數] 標準化 stdin 輸入
-def _normalize_stdin(val: Any) -> str:
-    if val is None:
-        return ""
-    if isinstance(val, list) or isinstance(val, tuple):
-        return "\n".join(str(v) for v in val)
+# [輔助函數] 專門用於「輸入」的標準化
+def _normalize_input_to_stdin(val: Any) -> str:
+    if val is None: return ""
+    if isinstance(val, (list, tuple)):
+        is_simple = all(not isinstance(x, (list, tuple, dict)) for x in val)
+        if is_simple:
+            return " ".join(str(x) for x in val)
+        else:
+            return "\n".join(_normalize_input_to_stdin(v) for v in val)
+    return str(val)
+
+# [輔助函數] 專門用於「預期輸出」的標準化
+def _normalize_expected_output(val: Any) -> str:
+    if val is None: return ""
+    if isinstance(val, (list, tuple, dict, set)):
+        return repr(val)
     return str(val)
 
 # [輔助函數] 轉換測資為 STDIN 格式
 def _prepare_stdin_tests(raw_tests: List[Any]) -> List[Dict[str, str]]:
     stdin_tests = []
     for t in raw_tests:
-        # 支援多種輸入格式
         inp_val = None
         exp_val = None
         if isinstance(t, dict):
             inp_val = t.get("input")
             exp_val = t.get("output", t.get("expected"))
         elif isinstance(t, (list, tuple)) and len(t) >= 2:
-            # 若是 tuple/list，假設格式為 (func_name, args, expected) 或 (input, expected)
             if len(t) == 3:
                  inp_val = t[1]
                  exp_val = t[2]
@@ -110,8 +118,8 @@ def _prepare_stdin_tests(raw_tests: List[Any]) -> List[Dict[str, str]]:
             continue
 
         stdin_tests.append({
-            "input": _normalize_stdin(inp_val),
-            "expected": _normalize_stdin(exp_val)
+            "input": _normalize_input_to_stdin(inp_val),
+            "expected": _normalize_expected_output(exp_val)
         })
     return stdin_tests
 
@@ -121,14 +129,9 @@ def _detect_judge_mode(code: str) -> str:
         return "leetcode"
     return "stdin"
 
-# [新增] 核心智慧驗證器：自動切換模式並執行
+# [核心] 智慧驗證器
 def _run_smart_verify(code: str, raw_tests: List[Any]) -> str:
-    """
-    統一的驗證入口。
-    raw_tests 可以是 [{'input':..., 'output':...}] 也可以是 [(fname, args, exp), ...]
-    """
     if not raw_tests:
-         # 無測資時，嘗試以空輸入執行一次
          _, log = validate_stdin_code(code, [{"input": "", "expected": ""}])
          return "(無有效測資，僅以空輸入執行)\n" + log
 
@@ -137,22 +140,19 @@ def _run_smart_verify(code: str, raw_tests: List[Any]) -> str:
         inferred_method = infer_method_name_from_code(code) or "solve"
         leetcode_tests = []
         for t in raw_tests:
-            # 嘗試從各種格式中提取 raw_args 和 expected
             raw_args = None
             expected = None
-            
             if isinstance(t, dict):
                 raw_args = t.get("input")
                 expected = t.get("output", t.get("expected"))
             elif isinstance(t, (list, tuple)):
-                if len(t) == 3: # (fname, args, expected)
+                if len(t) == 3:
                     raw_args = t[1]
                     expected = t[2]
-                elif len(t) >= 2: # (input, expected)
+                elif len(t) >= 2:
                     raw_args = t[0]
                     expected = t[1]
             
-            # 嘗試解析字串形式的複雜參數
             if isinstance(raw_args, str) and raw_args.strip().startswith(('[', '{', '(')):
                 try:
                     raw_args = json.loads(raw_args)
@@ -162,7 +162,6 @@ def _run_smart_verify(code: str, raw_tests: List[Any]) -> str:
                     except:
                         pass
 
-            # 確保參數是 tuple 形式傳入
             if isinstance(raw_args, (list, tuple)):
                 args_tuple = tuple(raw_args)
             else:
@@ -173,22 +172,32 @@ def _run_smart_verify(code: str, raw_tests: List[Any]) -> str:
         _, log = validate_leetcode_code(code, leetcode_tests)
         return log
     else:
-        # STDIN 模式
         stdin_tests = _prepare_stdin_tests(raw_tests)
         _, log = validate_stdin_code(code, stdin_tests)
         return log
 
-# [輔助函數] 模式一專用的測資生成
-def _mode1_generate_tests(need: str, code_context: str = "") -> List[Dict[str, Any]]:
+# [修改] 模式一專用的測資生成，同時參考需求、虛擬碼與實際程式碼
+def _mode1_generate_tests(need: str, virtual_code: str = "", actual_code: str = "") -> List[Dict[str, Any]]:
     print(f"[Mode 1] 正在使用 ACC 模式生成測資... (需求: {need[:20]}...)")
+    
+    # 組合豐富的上下文
+    context_parts = []
+    if virtual_code:
+        context_parts.append(f"--- 參考虛擬碼 ---\n{virtual_code}")
+    if actual_code:
+        context_parts.append(f"--- 當前程式碼 ---\n{actual_code}")
+    
+    full_context = "\n\n".join(context_parts)
+
     try:
-        raw_tuples = generate_tests(need, code_context, mode="ACC")
-        # 將 tuple 轉回 dict 以便統一儲存於 ctx["tests"]
+        # 將組合後的上下文傳給核心生成器
+        raw_tuples = generate_tests(need, full_context, mode="ACC")
         return [{"input": t[1], "output": t[2]} for t in raw_tuples]
     except Exception as e:
         print(f"[Mode 1] 測資生成失敗: {e}")
         return []
 
+# ====== 聊天入口（給前端）======
 # ====== 聊天入口（給前端）======
 @app.post("/chat")
 async def chat(request: Request):
@@ -204,8 +213,12 @@ async def chat(request: Request):
     session = SESSIONS.setdefault(chat_id, {"mode": None, "awaiting": False, "step": None, "ctx": {}})
     mode = session.get("mode")
 
+    # [新增] 重置會話的輔助函式，確保返回主選單時清除記憶
+    def _reset_session():
+        session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+
     MENU_TEXT = (
-        "已返回主選單。\n\n請選擇模式：\n"
+        "已返回主選單（當前會話記憶已清除）。\n\n請選擇模式：\n"
         "模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）\n"
         "模式 2｜程式驗證（貼程式碼 → 貼需求 → AI 自動生成測資並驗證）\n"
         "模式 3｜程式解釋（貼上要解釋的 Python 程式碼）\n\n"
@@ -213,15 +226,17 @@ async def chat(request: Request):
     )
 
     if last_user.lower() == "q":
-        session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+        _reset_session()
         return {"text": MENU_TEXT}
 
     if not mode:
         if last_user in {"1", "2", "3"}:
+            # 進入新模式前先確保狀態乾淨
+            _reset_session()
             session["mode"] = last_user
             session["awaiting"] = True
             session["step"] = None
-            session["ctx"] = {}
+            # ctx 已在 _reset_session 中清除
             if last_user == "1":
                 session["step"] = "need"
                 return {"text": "**模式 1｜互動開發**\n\n請描述你的功能需求（一句或一段話即可）。"}
@@ -278,7 +293,6 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("接受虛擬碼")
 
-                # [Mode 1] 使用與模式二相同的高品質測資生成
                 ctx["tests"] = _mode1_generate_tests(ctx["need"], ctx.get("virtual_code", ""))
 
                 code_prompt_string = build_stdin_code_prompt(
@@ -374,19 +388,17 @@ async def chat(request: Request):
         if step == "verify_prompt":
             choice = (msg or "").strip().upper()
             code = ctx.get("code") or ""
-            need_text = ctx.get("need_text", "")
             raw_tests = ctx.get("tests") or []
 
             if choice == "M":
                 session["step"] = "modify_gate"
-                # [修改] 使用智慧驗證器
                 log = _run_smart_verify(code, raw_tests)
                 return {"text": f"=== 程式執行/驗證結果 ===\n{log}\n\n"
                                 "是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
 
             elif choice == "N":
                 try:
-                    validate_python_code(code, [], need_text)
+                    validate_python_code(code, [], ctx.get("need_text", ""))
                 except Exception:
                     pass
                 session["step"] = "modify_gate"
@@ -411,7 +423,7 @@ async def chat(request: Request):
                                 "  - 完成 QUIT\n"}
             elif ans in ("n", "no"):
                 final_code = ctx.get("code") or ""
-                session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+                _reset_session() # [修改] 使用重置函式
                 return {"text": f"開發模式結束。最終程式如下：\n```python\n{final_code}\n```"}
             else:
                 return {"text": "請輸入 y 或 n。"}
@@ -444,13 +456,11 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
-                # [修改] 重新生成測資時也使用高品質模式
                 ctx["tests"] = _mode1_generate_tests(need_text, code)
                 history.append(f"重新生成測資 (共 {len(ctx['tests'])} 筆)")
                 ctx["history"] = history
                 session["ctx"] = ctx
 
-                # [修改] 使用智慧驗證器
                 log = _run_smart_verify(code, ctx["tests"])
                 return {"text": f"=== 程式執行/驗證結果 (依新測資) ===\n{log}\n\n"
                                 "請選擇您的下一步操作：\n"
@@ -465,7 +475,7 @@ async def chat(request: Request):
 
             if u in {"Q", "QUIT"}:
                 final_code = ctx.get("code") or ""
-                session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+                _reset_session() # [修改] 使用重置函式
                 return {"text": f"已結束互動式修改模式。最終程式如下：\n```python\n{final_code}\n```"}
 
             modification_request = choice
@@ -510,25 +520,9 @@ async def chat(request: Request):
 
         if step == "need":
             ctx["need"] = msg.strip()
-            session["ctx"] = ctx
-            session["step"] = "strategy"
-            return {
-                "text": (
-                    "請選擇測資生成策略：\n"
-                    "  [1] 標準模式 (Standard) - 平衡覆蓋率與速度\n"
-                    "  [2] 高準確度模式 (Accuracy) - 雙重驗證，寧缺勿濫 (推薦)\n"
-                    "  [3] 遺傳演算法 (GA) - 透過演化探索多樣化邊界\n"
-                    "  [4] 變異測試 (MuTAP) - 找出程式盲點 (較慢)\n\n"
-                    "請輸入選項數字 (1~4)，預設為 [1]："
-                )
-            }
-
-        if step == "strategy":
-            strategy_map = {"1": "B", "2": "ACC", "3": "GA", "4": "MUTAP"}
-            selected_mode = strategy_map.get(msg.strip(), "B")
-            
             user_code = ctx.get("code", "")
             user_need = ctx.get("need", "")
+
             if user_need.lower() in ["skip", "no", "無", ""]:
                 user_need = ""
 
@@ -537,9 +531,9 @@ async def chat(request: Request):
                  report_lines.append("（未提供需求，僅以空輸入執行一次程式）\n")
                  report_lines.append(_run_smart_verify(user_code, []))
             else:
-                report_lines.append(f"[處理中] 正在以 '{selected_mode}' 模式生成測資，請稍候...\n")
+                report_lines.append("[處理中] 正在使用高準確度模式 (ACC) 生成測資，請稍候...\n")
                 try:
-                    raw_tests_tuples = generate_tests(user_need, user_code, mode=selected_mode)
+                    raw_tests_tuples = generate_tests(user_need, user_code, mode="ACC")
                 except Exception as e:
                     raw_tests_tuples = []
                     report_lines.append(f"[錯誤] 測資生成失敗: {e}")
@@ -548,11 +542,10 @@ async def chat(request: Request):
                      report_lines.append("⚠️ 未能生成任何有效測資。")
                 else:
                     report_lines.append(f"✅ 已生成 {len(raw_tests_tuples)} 筆測資，開始驗證...\n")
-                    # [修改] 使用統一的智慧驗證器
                     log = _run_smart_verify(user_code, raw_tests_tuples)
                     report_lines.append(log)
 
-            session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+            _reset_session() # [修改] 使用重置函式
             return {"text": "\n".join(report_lines)}
 
     # === 模式 3：一次性回應 ===
@@ -564,10 +557,10 @@ async def chat(request: Request):
     except Exception as e:
         output = f"[例外錯誤] {e}"
 
-    session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+    _reset_session() # [修改] 使用重置函式
     return {"text": output}
 
-# ... (後續 API 保持不變)
+
 # ====== 判題 API（整合 judge_core）======
 _here = os.path.dirname(os.path.abspath(__file__))
 ALLOWED_BASES = [
