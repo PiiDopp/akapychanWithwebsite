@@ -18,8 +18,8 @@ from core.model_interface import (
     build_stdin_code_prompt, build_fix_code_prompt, build_hint_prompt, build_specific_explain_prompt,
     interactive_chat_api, normalize_tests
 )
-from explain_user_code import explain_user_code
-from explain_error import explain_code_error
+from backend.core.explain_user_code import explain_user_code
+from backend.core.explain_error import explain_code_error
 from core.mutation_runner import MutationRunner
 from core.test_utils import generate_tests
 
