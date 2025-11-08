@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 # ====== 標準庫 / 第三方 ======
-import os, sys, re, io, json, textwrap, tempfile, subprocess, contextlib
+import os, sys, re, io, json, ast, textwrap, tempfile, subprocess, contextlib
 from typing import Any, Dict, List, Optional, Tuple
 
 from fastapi import FastAPI, Request, HTTPException
@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # ====== 你既有的核心（互動開發 / 驗證 / 解釋 用）======
 from core import (
     extract_code_block, generate_response,
-    validate_main_function, validate_python_code,
+    validate_python_code,
     extract_json_block, parse_tests_from_text
 )
 from core.model_interface import (
@@ -91,14 +91,37 @@ def run_mode_3(user_code: str) -> str:
         return "請貼上要解釋的 Python 程式碼。"
     return explain_user_code(user_code)
 
-# [新增] 輔助函數：標準化 stdin 輸入，處理列表形式的測資
+# [輔助函數] 標準化 stdin 輸入
 def _normalize_stdin(val: Any) -> str:
     if val is None:
         return ""
-    if isinstance(val, list):
-        # 如果是列表，將其元素用換行符連接，確保傳入的是多行純文本
+    if isinstance(val, list) or isinstance(val, tuple):
         return "\n".join(str(v) for v in val)
     return str(val)
+
+# [輔助函數] 轉換測資為 STDIN 格式
+def _prepare_stdin_tests(raw_tests: List[Any]) -> List[Dict[str, str]]:
+    stdin_tests = []
+    for t in raw_tests:
+        if isinstance(t, dict):
+            inp_val = t.get("input")
+            exp_val = t.get("output", t.get("expected"))
+        elif isinstance(t, (list, tuple)) and len(t) >= 2:
+            inp_val = t[0]
+            exp_val = t[1]
+        else:
+            continue
+        stdin_tests.append({
+            "input": _normalize_stdin(inp_val),
+            "expected": _normalize_stdin(exp_val)
+        })
+    return stdin_tests
+
+# [輔助函數] 偵測程式碼類型以決定判題模式
+def _detect_judge_mode(code: str) -> str:
+    if re.search(r"class\s+Solution", code):
+        return "leetcode"
+    return "stdin"
 
 # ====== 聊天入口（給前端）======
 @app.post("/chat")
@@ -189,7 +212,6 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("接受虛擬碼")
 
-                # 1. 先產生測資 (使用 build_test_prompt)
                 test_prompt = build_test_prompt(ctx["need"])
                 test_resp = run_model(test_prompt)
                 raw_tests = extract_json_block(test_resp)
@@ -199,7 +221,6 @@ async def chat(request: Request):
 
                 ctx["tests"] = json_tests or []
 
-                # 2. 再產生程式碼
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
                     ctx.get("virtual_code", ""),
@@ -294,49 +315,21 @@ async def chat(request: Request):
             choice = (msg or "").strip().upper()
             code = ctx.get("code") or ""
             need_text = ctx.get("need_text", "")
-            tests = ctx.get("tests") or []
+            raw_tests = ctx.get("tests") or []
 
             if choice == "M":
-                report_lines = []
-                if tests:
-                    all_passed = True
-                    report_lines.append("=== 程式執行/驗證結果（依測資逐筆） ===")
-                    for i, t in enumerate(tests, 1):
-                        # [修改] 使用 _normalize_stdin 處理輸入
-                        inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                        exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                        
-                        stdin_str = _normalize_stdin(inp_val)
-                        expected_str = _normalize_stdin(exp_val) # 輸出通常也是字串，用同樣方式正規化較保險
-
-                        input_display = stdin_str.replace("\n", "\\n")
-                        output_display = expected_str.strip()
-                        report_lines.append(f"\n--- 測試案例 {i} ---")
-                        report_lines.append(f"輸入: {input_display}")
-                        report_lines.append(f"輸出: {output_display}")
-
-                        ok, detail = validate_main_function(
-                            code=code,
-                            stdin_input=stdin_str,
-                            expected_output=expected_str
-                        )
-                        report_lines.append("結果: [通過]" if ok else "結果: [失敗]")
-                        report_lines.append(f"你的輸出:\n{detail}")
-                        if not ok:
-                            all_passed = False
-
-                    report_lines.append("\n" + "="*20)
-                    report_lines.append("總結: [成功] 所有測資均已通過。" if all_passed else "總結: [失敗] 部分測資未通過。")
-                    session["step"] = "modify_gate"
-                    return {"text": "\n".join(report_lines) + "\n\n是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
-
+                session["step"] = "modify_gate"
+                if raw_tests:
+                    stdin_tests = _prepare_stdin_tests(raw_tests)
+                    ok, log = validate_stdin_code(code, stdin_tests)
+                    return {"text": f"=== 程式執行/驗證結果 ===\n{log}\n\n"
+                                    "是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
                 else:
-                    ok, detail = validate_main_function(code, stdin_input="", expected_output=None)
-                    session["step"] = "modify_gate"
+                    ok, log = validate_stdin_code(code, [{"input": "", "expected": ""}])
                     return {
                         "text": (
-                            "=== 程式執行/驗證結果（無測資，空輸入）===\n"
-                            f"{detail}\n\n"
+                            "=== 程式執行/驗證結果（無預設測資，以空輸入執行）===\n"
+                            f"{log}\n\n"
                             "是否進入互動式修改模式？\n"
                             "**點「輸入框上方的按鈕」即可選擇。**"
                         )
@@ -398,7 +391,6 @@ async def chat(request: Request):
             code = ctx.get("code") or ""
             need_text = ctx.get("need_text", ctx.get("need", ""))
             virtual_code = ctx.get("virtual_code", "")
-            json_tests = ctx.get("tests", [])
             history = ctx.get("history", [])
             u = choice.upper()
 
@@ -412,52 +404,19 @@ async def chat(request: Request):
                     json_tests = normalize_tests(parse_tests_from_text(need_text))
 
                 ctx["tests"] = json_tests or []
-                tests = ctx["tests"]
-                history.append(f"重新生成測資 (共 {len(tests)} 筆)")
-
+                history.append(f"重新生成測資 (共 {len(ctx['tests'])} 筆)")
                 ctx["history"] = history
                 session["ctx"] = ctx
 
-                if not tests:
-                    ok, detail = validate_main_function(code, stdin_input="", expected_output=None)
-                    return {
-                        "text": (
-                            "=== 程式執行/驗證結果 (無新測資，空輸入) ===\n"
-                            f"{detail}\n\n"
-                            "請選擇您的下一步操作：\n"
-                            "  - 修改：直接輸入您的修正需求\n"
-                            "  - 驗證 VERIFY\n"
-                            "  - 解釋 EXPLAIN\n"
-                            "  - 完成 QUIT\n"
-                        )
-                    }
-                
-                report_lines = []
-                all_passed = True
-                report_lines.append("=== 程式執行/驗證結果 (依*新*測資逐筆) ===")
-                for i, t in enumerate(tests, 1):
-                    # [修改] 使用 _normalize_stdin 處理輸入
-                    inp_val = t.get("input") if isinstance(t, dict) else (t[0] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                    exp_val = t.get("output") if isinstance(t, dict) else (t[1] if isinstance(t, (list, tuple)) and len(t) >= 2 else None)
-                    
-                    stdin_str = _normalize_stdin(inp_val)
-                    expected_str = _normalize_stdin(exp_val)
+                if ctx["tests"]:
+                    stdin_tests = _prepare_stdin_tests(ctx["tests"])
+                    ok, log = validate_stdin_code(code, stdin_tests)
+                    result_text = f"=== 程式執行/驗證結果 (依新測資) ===\n{log}"
+                else:
+                    ok, log = validate_stdin_code(code, [{"input": "", "expected": ""}])
+                    result_text = f"=== 程式執行/驗證結果 (無新測資，空輸入) ===\n{log}"
 
-                    input_display = stdin_str.replace("\n", "\\n")
-                    output_display = expected_str.strip()
-                    report_lines.append(f"\n--- 測試案例 {i} ---")
-                    report_lines.append(f"輸入: {input_display}")
-                    report_lines.append(f"輸出: {output_display}")
-
-                    ok, detail = validate_main_function(code=code, stdin_input=stdin_str, expected_output=expected_str)
-                    report_lines.append("結果: [通過]" if ok else "結果: [失敗]")
-                    report_lines.append(f"你的輸出:\n{detail}")
-                    if not ok: all_passed = False
-
-                report_lines.append("\n" + "="*20)
-                report_lines.append("總結: [成功] 所有新測資均已通過。" if all_passed else "總結: [失敗] 部分新測資未通過。")
-                
-                return {"text": "\n".join(report_lines) + "\n\n"
+                return {"text": result_text + "\n\n"
                                 "請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
@@ -477,7 +436,7 @@ async def chat(request: Request):
             fix_prompt_string = build_fix_code_prompt(
                 need_text,
                 virtual_code,
-                json_tests,
+                ctx.get("tests", []),
                 history,
                 code,
                 modification_request
@@ -505,7 +464,6 @@ async def chat(request: Request):
         step = session.get("step") or "code"
         msg = last_user
 
-        # [步驟 1] 等待程式碼
         if step == "code":
             if not msg or not msg.strip():
                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
@@ -514,7 +472,6 @@ async def chat(request: Request):
             session["step"] = "need"
             return {"text": "已收到程式碼。\n請輸入這段程式碼的「需求說明」，AI 將以此生成測資來驗證。\n(若不提供，請直接輸入 'skip' 或 '無')"}
 
-        # [步驟 2] 等待需求
         if step == "need":
             ctx["need"] = msg.strip()
             session["ctx"] = ctx
@@ -530,7 +487,6 @@ async def chat(request: Request):
                 )
             }
 
-        # [步驟 3] 選擇策略並執行驗證
         if step == "strategy":
             strategy_map = {"1": "B", "2": "ACC", "3": "GA", "4": "MUTAP"}
             selected_mode = strategy_map.get(msg.strip(), "B")
@@ -542,66 +498,69 @@ async def chat(request: Request):
 
             report_lines = []
             if not user_need:
-                 report_lines.append("（未提供需求，僅執行程式一次）\n")
-                 ok, out_msg = validate_main_function(user_code, stdin_input=None, expected_output=None)
-                 if ok:
-                     report_lines.append("=== 執行成功 (Exit 0) ===\n輸出:\n" + out_msg)
-                 else:
-                     report_lines.append("=== 執行失敗 (Non-zero exit) ===\n錯誤訊息:\n" + out_msg)
+                 report_lines.append("（未提供需求，僅以空輸入執行一次程式）\n")
+                 ok, log = validate_stdin_code(user_code, [{"input": "", "expected": ""}])
+                 report_lines.append(log)
             else:
                 report_lines.append(f"[處理中] 正在以 '{selected_mode}' 模式生成測資，請稍候...\n")
-                
                 try:
-                    # 呼叫核心函式生成測資
-                    raw_tests = generate_tests(user_need, user_code, mode=selected_mode)
+                    raw_tests_tuples = generate_tests(user_need, user_code, mode=selected_mode)
                 except Exception as e:
-                    raw_tests = []
+                    raw_tests_tuples = []
                     report_lines.append(f"[錯誤] 測資生成失敗: {e}")
 
-                if not raw_tests:
+                if not raw_tests_tuples:
                      report_lines.append("⚠️ 未能生成任何有效測資。")
                 else:
-                    report_lines.append(f"✅ 已生成 {len(raw_tests)} 筆測資，開始驗證...\n")
-                    all_passed = True
-                    pass_count = 0
+                    report_lines.append(f"✅ 已生成 {len(raw_tests_tuples)} 筆測資，開始驗證...\n")
                     
-                    for i, test_tuple in enumerate(raw_tests, 1):
-                        # test_tuple 格式: (func_name, [input_args], expected_output)
-                        try:
-                            # 取出輸入與預期輸出
-                            inp_arg = test_tuple[1][0] if test_tuple[1] else ""
-                            expected = test_tuple[2]
-                            
-                            # 正規化為字串
-                            inp_str = _normalize_stdin(inp_arg)
-                            exp_str = _normalize_stdin(expected)
+                    # [核心改動] 自動偵測並選擇驗證模式
+                    judge_mode = _detect_judge_mode(user_code)
 
-                            # 執行驗證
-                            ok, actual_out = validate_main_function(user_code, inp_str, exp_str)
+                    if judge_mode == "leetcode":
+                        # LeetCode 模式：
+                        inferred_method = infer_method_name_from_code(user_code)
+                        target_method = inferred_method or "solve"
 
-                            report_lines.append(f"\n--- 測試 {i} ---")
-                            report_lines.append(f"輸入: {inp_str.replace('\n', '\\n')}")
-                            report_lines.append(f"預期: {exp_str.strip()}")
-                            
-                            if ok:
-                                report_lines.append("結果: [通過] ✅")
-                                pass_count += 1
-                            else:
-                                report_lines.append("結果: [失敗] ❌")
-                                report_lines.append(f"實際: {actual_out.strip()}")
-                                all_passed = False
-                        except Exception as e:
-                             report_lines.append(f"\n[跳過] 測試 {i} 格式異常: {e}")
-                             all_passed = False
+                        leetcode_tests = []
+                        for t in raw_tests_tuples:
+                             # t 格式: (gen_func_name, raw_args, expected)
+                             raw_args = t[1]
+                             expected = t[2]
+                             
+                             # 嘗試解析字串形式的參數
+                             if isinstance(raw_args, str) and raw_args.strip().startswith(('[', '(')):
+                                 try:
+                                     raw_args = json.loads(raw_args)
+                                 except:
+                                     try:
+                                         raw_args = ast.literal_eval(raw_args)
+                                     except:
+                                         pass
 
-                    report_lines.append("\n" + "="*30)
-                    report_lines.append(f"驗證完成！ 通過率: {pass_count}/{len(raw_tests)}")
-                    if all_passed:
-                        report_lines.append("🎉 恭喜！您的程式碼通過了所有測試案例。")
+                             # 穩健地將 raw_args 轉換為 tuple
+                             if isinstance(raw_args, (list, tuple)):
+                                 args_tuple = tuple(raw_args)
+                             else:
+                                 args_tuple = (raw_args,)
+
+                             leetcode_tests.append((target_method, args_tuple, expected))
+                        
+                        ok, log = validate_leetcode_code(user_code, leetcode_tests)
+                        report_lines.append(log)
+
                     else:
-                        report_lines.append("⚠️ 存在失敗的測試案例，請參考上方資訊進行除錯。")
+                        # STDIN 模式：將 tuples 轉換為 stdin 字串
+                        stdin_tests = []
+                        for test_tuple in raw_tests_tuples:
+                             args_list = test_tuple[1] if isinstance(test_tuple[1], list) else [test_tuple[1]]
+                             inp_str = _normalize_stdin(args_list)
+                             expected_str = _normalize_stdin(test_tuple[2])
+                             stdin_tests.append({"input": inp_str, "expected": expected_str})
 
-            # 結束 Mode 2 會話
+                        ok, log = validate_stdin_code(user_code, stdin_tests)
+                        report_lines.append(log)
+
             session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
             return {"text": "\n".join(report_lines)}
 

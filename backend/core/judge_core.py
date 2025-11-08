@@ -8,37 +8,38 @@
 
 from __future__ import annotations
 
-import sys, os, json, ast, io, contextlib, tempfile, subprocess, importlib.util, time, inspect, textwrap
+import sys, os, json, ast, io, contextlib, tempfile, subprocess, importlib.util, time, inspect, textwrap, traceback
 from dataclasses import dataclass
 from typing import Any, Optional, Iterable, List, Dict, Tuple
 from collections import Counter
 from pathlib import Path
 
+# ========== 預匯入標頭 (注入到使用者程式碼前) ==========
+JUDGE_PRELUDE = """
+import sys, os, math, collections, itertools, functools, heapq, bisect, re, random
+from typing import *
+from collections import Counter, defaultdict, deque
+from functools import lru_cache, cache, reduce
+from heapq import heapify, heappush, heappop, heappushpop, heapreplace, nlargest, nsmallest
+from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
+from itertools import accumulate, permutations, combinations, combinations_with_replacement, product, groupby, cycle, repeat, count
+from math import gcd, ceil, floor, sqrt, pow, log, log2, log10, pi, e, inf, nan, factorial, comb, perm, prod
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+"""
+
 # ========== 通用工具 ==========
-
-def _display_width(s: str) -> int:
-    """估算顯示寬度（CJK 字視為 2，其他視為 1）"""
-    width = 0
-    for ch in s:
-        # Unicode 東亞寬度特性: 全形/寬字元為 2
-        if ord(ch) >= 0x1100 and (
-            0x1100 <= ord(ch) <= 0x115F or
-            0x2E80 <= ord(ch) <= 0xA4CF or
-            0xAC00 <= ord(ch) <= 0xD7A3 or
-            0xF900 <= ord(ch) <= 0xFAFF or
-            0xFE10 <= ord(ch) <= 0xFE6F or
-            0xFF00 <= ord(ch) <= 0xFF60 or
-            0xFFE0 <= ord(ch) <= 0xFFE6
-        ):
-            width += 2
-        else:
-            width += 1
-    return width
-
-def _pad_label(label: str, width: int = 8) -> str:
-    """補足顯示寬度，讓中英文欄位對齊"""
-    pad = max(0, width - _display_width(label))
-    return label + (" " * pad)
 
 def normalize(s: str) -> str:
     """逐行 trim、去尾端空行，統一換行符。"""
@@ -139,10 +140,6 @@ def kv_pairs_from_input(inp_text: str) -> dict[str, Any]:
 # ========== 從使用者程式碼推斷方法名稱 / 參數名稱 ==========
 
 def infer_method_name_from_code(user_code: str) -> Optional[str]:
-    """
-    從 class Solution 抓方法名；優先順序：solve > main > run > answer > 其他第一個非 dunder。
-    找不到 Solution / 方法則回傳 None（可由外部顯式指定 method）
-    """
     try:
         tree = ast.parse(user_code)
     except Exception:
@@ -161,11 +158,6 @@ def infer_method_name_from_code(user_code: str) -> Optional[str]:
     return None
 
 def infer_arg_names_from_examples(examples: List[Dict[str, str]]) -> List[str]:
-    """
-    嘗試從 examples[].input 推出參數名稱：
-    - 若是 key=value 形式，取共同 keys。
-    - 若是單一字串/數值/JSON 值，推為 ['s']。
-    """
     if not examples:
         return []
     parsed: List[Dict[str, Any]] = []
@@ -188,10 +180,9 @@ def infer_arg_names_from_examples(examples: List[Dict[str, str]]) -> List[str]:
     ordered = [k for k in parsed[0].keys() if k in common]
     return ordered
 
-# ========== 題目 JSON 載入（用絕對路徑） ==========
+# ========== 題目 JSON 載入 ==========
 
 def _safe_join(base_dir: str, rel_path: str) -> str:
-    """把 data_path（可相對或檔名）轉成 base_dir 內安全路徑。"""
     rel = str(rel_path).lstrip("/\\")
     path = Path(base_dir).resolve() / rel
     path = path.resolve()
@@ -205,24 +196,16 @@ def load_problem_cases(
     practice_idx: int = 0,
     *,
     data_path: Optional[str] = None,
-    allowed_bases: Optional[List[str]] = None,   # 保留參數相容性（未使用）
-    lessons_dir_env: Optional[str] = None        # 保留參數相容性（未使用）
+    allowed_bases: Optional[List[str]] = None,
+    lessons_dir_env: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    固定讀取以下兩個絕對路徑：
-    - 單元題目: ../frontend/data
-    - LeetCode 題目:../frontend/data/Leetcode
-    """
     UNIT_BASE = "../frontend/data"
     LEETCODE_BASE = "../frontend/data/Leetcode"
 
     candidates: List[str] = []
-
-    # 0) 若 data_path 已是絕對路徑且存在，直接用
     if data_path and os.path.isabs(data_path) and os.path.exists(data_path):
         candidates.append(data_path)
 
-    # 1) 若指定 data_path（相對路徑或檔名），優先從這兩個目錄找
     if data_path and not candidates:
         for base in [UNIT_BASE, LEETCODE_BASE]:
             try:
@@ -231,7 +214,6 @@ def load_problem_cases(
             except Exception:
                 pass
 
-    # 2) 若沒指定 data_path，就以 data_id 猜檔名
     if data_id:
         guesses = [
             os.path.join(UNIT_BASE, f"{data_id}.json"),
@@ -239,7 +221,6 @@ def load_problem_cases(
         ]
         candidates.extend(guesses)
 
-    # 搜尋
     path = None
     tried: List[str] = []
     for p in candidates:
@@ -252,7 +233,6 @@ def load_problem_cases(
     if path is None:
         raise FileNotFoundError(f"找不到題目檔案。嘗試過：{', '.join(tried)}")
 
-    # 讀 JSON
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -266,7 +246,6 @@ def load_problem_cases(
     title = item.get("title", f"題目 {practice_idx}")
     description = item.get("description", "")
 
-    # examples -> tests
     ex = item.get("examples")
     tests: List[Dict[str, str]] = []
     if isinstance(ex, list):
@@ -299,7 +278,7 @@ def load_problem_cases(
         "force_mode": data.get("force_mode"),
     }
 
-# ========== 資料結構：ListNode / TreeNode（LeetCode 常用） ==========
+# ========== 資料結構：ListNode / TreeNode (內部用) ==========
 
 class ListNode:
     def __init__(self, val: int = 0, next: 'Optional[ListNode]' = None):
@@ -323,12 +302,12 @@ def list_to_listnode(a: Iterable[int]) -> Optional[ListNode]:
             cur = node
     return head
 
-def listnode_to_list(head: Optional[ListNode]) -> list[int]:
+def listnode_to_list(head: Any) -> list[int]:
     out = []
     cur = head
-    while cur:
+    while cur is not None and hasattr(cur, 'val'):
         out.append(cur.val)
-        cur = cur.next
+        cur = getattr(cur, 'next', None)
     return out
 
 def list_to_btree(level: Iterable[Optional[int]]) -> Optional[TreeNode]:
@@ -344,7 +323,7 @@ def list_to_btree(level: Iterable[Optional[int]]) -> Optional[TreeNode]:
                 node.right = nodes[kid]; kid += 1
     return nodes[0]
 
-def btree_to_list(root: Optional[TreeNode]) -> list[Optional[int]]:
+def btree_to_list(root: Any) -> list[Optional[int]]:
     if not root: return []
     q = [root]
     out: list[Optional[int]] = []
@@ -353,29 +332,41 @@ def btree_to_list(root: Optional[TreeNode]) -> list[Optional[int]]:
         if node is None:
             out.append(None)
             continue
-        out.append(node.val)
-        q.append(node.left)
-        q.append(node.right)
+        if hasattr(node, 'val'):
+            out.append(node.val)
+            q.append(getattr(node, 'left', None))
+            q.append(getattr(node, 'right', None))
+        else:
+             out.append(None) 
     while out and out[-1] is None:
         out.pop()
     return out
 
-# ========== 泛用比較器（支援浮點誤差 / 無序 / 遞迴 / ListNode / TreeNode） ==========
+# ========== 寬鬆型別檢查 (Duck Typing Helpers) ==========
+
+def _is_listnode(obj: Any) -> bool:
+    return isinstance(obj, ListNode) or (hasattr(obj, '__class__') and obj.__class__.__name__ == 'ListNode' and hasattr(obj, 'val') and hasattr(obj, 'next'))
+
+def _is_treenode(obj: Any) -> bool:
+    return isinstance(obj, TreeNode) or (hasattr(obj, '__class__') and obj.__class__.__name__ == 'TreeNode' and hasattr(obj, 'val') and hasattr(obj, 'left') and hasattr(obj, 'right'))
+
+# ========== 泛用比較器 ==========
 
 def _almost_equal(a: float, b: float, tol: float = 1e-6) -> bool:
     return abs(a - b) <= tol
 
-def _eq_listnode(a: Optional[ListNode], b: Optional[ListNode]) -> bool:
+def _eq_listnode(a: Any, b: Any) -> bool:
     return listnode_to_list(a) == listnode_to_list(b)
 
-def _eq_btree(a: Optional[TreeNode], b: Optional[TreeNode]) -> bool:
+def _eq_btree(a: Any, b: Any) -> bool:
     return btree_to_list(a) == btree_to_list(b)
 
 def deep_compare(got: Any, exp: Any, *, float_tol: float = 1e-6, unordered: bool = False) -> bool:
-    if isinstance(got, ListNode) or isinstance(exp, ListNode):
-        return isinstance(got, ListNode) and isinstance(exp, ListNode) and _eq_listnode(got, exp)
-    if isinstance(got, TreeNode) or isinstance(exp, TreeNode):
-        return isinstance(got, TreeNode) and isinstance(exp, TreeNode) and _eq_btree(got, exp)
+    if _is_listnode(got) or _is_listnode(exp):
+        return _is_listnode(got) and _is_listnode(exp) and _eq_listnode(got, exp)
+    if _is_treenode(got) or _is_treenode(exp):
+        return _is_treenode(got) and _is_treenode(exp) and _eq_btree(got, exp)
+        
     if isinstance(got, float) or isinstance(exp, float):
         try:
             return _almost_equal(float(got), float(exp), float_tol)
@@ -404,11 +395,10 @@ def deep_compare(got: Any, exp: Any, *, float_tol: float = 1e-6, unordered: bool
         return got == exp
     return got == exp
 
-# ========== 參數轉換規格（LeetCode 模式） ==========
+# ========== 參數轉換規格 ==========
 
 @dataclass
 class BuildSpec:
-    """描述每個參數要如何建構：raw | listnode | btree"""
     kind: str = "raw"
 
 def _build_arg(arg: Any, spec: Optional[BuildSpec]) -> Any:
@@ -423,14 +413,10 @@ def _build_arg(arg: Any, spec: Optional[BuildSpec]) -> Any:
 # ========== 1) STDIN 模式 ==========
 
 def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5) -> tuple[bool, str]:
-    """
-    examples: [{ "input": str, "output": str } 或 { "input": str, "expected": str }, ...]
-    逐題把 input 餵給程式，用 stdout 與 expected 比對。
-    回傳 (ok, log)
-    """
     log = io.StringIO()
+    full_code = JUDGE_PRELUDE + "\n" + code
     with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as tmp:
-        tmp.write(code.encode("utf-8")); tmp.flush(); path = tmp.name
+        tmp.write(full_code.encode("utf-8")); tmp.flush(); path = tmp.name
     try:
         for idx, ex in enumerate(examples, 1):
             p = subprocess.run(
@@ -447,7 +433,6 @@ def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5
                     print(p.stderr[:400], file=log)
                 return False, log.getvalue()
             out = normalize(p.stdout)
-            # 允許 'output' 或 'expected'
             exp_raw = ex.get("output", ex.get("expected", ""))
             exp = normalize(exp_raw)
             if out != exp:
@@ -478,26 +463,22 @@ def validate_leetcode_code(
     unordered: bool = False,
     user_need: str = ""
 ) -> tuple[bool, str]:
-    """
-    逐筆列印測資結果，不提前中斷。
-    回傳 (全部通過與否, log)
-    """
     log = io.StringIO()
     tmp_path = None
 
     def _norm_out(g: Any) -> Any:
-        if expect_kind == "listnode" and isinstance(g, ListNode):
+        if expect_kind == "listnode" and _is_listnode(g):
             return listnode_to_list(g)
-        if expect_kind == "btree" and isinstance(g, TreeNode):
+        if expect_kind == "btree" and _is_treenode(g):
             return btree_to_list(g)
         return g
 
     passed_count = 0
 
     try:
-        # 寫入使用者程式碼到暫存檔
+        full_code = JUDGE_PRELUDE + "\n" + code
         with tempfile.NamedTemporaryFile(delete=False, suffix=".py") as tmp:
-            tmp.write(code.encode("utf-8"))
+            tmp.write(full_code.encode("utf-8"))
             tmp_path = tmp.name
 
         spec = importlib.util.spec_from_file_location("user_solution", tmp_path)
@@ -521,6 +502,26 @@ def validate_leetcode_code(
             if not isinstance(args, tuple):
                 args = (args,)
 
+            meth = getattr(ins, method_name, None) or getattr(Solution, method_name, None)
+            if meth is None:
+                print(f"[錯誤] 測試#{i}: 找不到方法 {method_name}", file=log)
+                continue
+
+            # [新增] 智慧參數解包：如果傳入的參數數量不符，但剛好被包在一個列表/元組中，嘗試解包
+            try:
+                sig = inspect.signature(meth)
+                # 計算實際需要的參數數量（排除有預設值的參數）
+                params = list(sig.parameters.values())
+                needed_count = len([p for p in params if p.default == inspect.Parameter.empty])
+
+                # 如果只傳入 1 個參數，但函式需要 >1 個，且這 1 個參數本身是列表/元組，且長度剛好符合需求
+                if len(args) == 1 and needed_count > 1 and isinstance(args[0], (list, tuple)):
+                     if len(args[0]) == needed_count:
+                          # print(f"DEBUG: Auto-unpacking arguments: {args[0]}", file=sys.stderr)
+                          args = tuple(args[0])
+            except Exception:
+                pass
+
             if per_arg_build:
                 built_args = tuple(
                     _build_arg(a, per_arg_build[j] if j < len(per_arg_build) else None)
@@ -529,28 +530,27 @@ def validate_leetcode_code(
             else:
                 built_args = args
 
-            meth = getattr(ins, method_name, None) or getattr(Solution, method_name, None)
-            if meth is None:
-                print(f"[錯誤] 測試#{i}: 找不到方法 {method_name}", file=log)
-                continue
+            # 在呼叫前先印出輸入，方便除錯
+            print(f"[測試#{i}]", file=log)
+            print(f"  輸入: {method_name}{built_args}", file=log)
 
             try:
                 got = meth(*built_args)
                 got_n = _norm_out(got)
             except Exception as e:
-                print(f"[測試#{i}] ❌ 執行例外: {e}", file=log)
+                print(f"  ❌ 執行例外: {e}", file=log)
+                print("", file=log)
                 continue
 
             ok = deep_compare(got_n, expected, float_tol=float_tol, unordered=unordered)
             if ok:
                 passed_count += 1
-                print(f"[測試#{i}] ✅ 通過", file=log)
+                print("  結果: ✅ 通過", file=log)
             else:
-                print(f"[測試#{i}] ❌ 失敗", file=log)
-
-            print(f"  標準輸入: {method_name}{built_args}", file=log)
-            print(f"  標準輸出: {expected!r}", file=log)
-            print(f"  你的輸出: {got_n!r}", file=log)
+                print("  結果: ❌ 失敗", file=log)
+            
+            print(f"  預期輸出: {expected!r}", file=log)
+            print(f"  實際輸出: {got_n!r}", file=log)
             print("", file=log)
 
         dt = time.perf_counter() - t0
@@ -565,7 +565,8 @@ def validate_leetcode_code(
         return passed_count == len(tests), log.getvalue()
 
     except Exception as e:
-        print(f"[驗證錯誤] {e}", file=log)
+        err_detail = "".join(traceback.format_exception(None, e, e.__traceback__))
+        print(f"[驗證錯誤] {e}\n詳細資訊:\n{err_detail}", file=log)
         return False, log.getvalue()
     finally:
         if tmp_path and os.path.exists(tmp_path):
@@ -584,7 +585,6 @@ def build_leetcode_tests_from_examples(
     for ex in examples:
         raw_inp = (ex.get("input") or "").strip()
 
-        # 參數解析：key=value / JSON array / 單值
         kv = kv_pairs_from_input(raw_inp)
         if kv:
             args = tuple(kv[name] for name in (arg_names or kv.keys()))
@@ -598,7 +598,6 @@ def build_leetcode_tests_from_examples(
             else:
                 args = (parse_expected(raw_inp),)
 
-        # ✅ 同時支援 output / expected
         expected_raw = ex.get("output", ex.get("expected", ""))
         expected = parse_expected(expected_raw)
 
