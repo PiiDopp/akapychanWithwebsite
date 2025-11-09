@@ -87,24 +87,6 @@ def _mode1_generate_virtual_code(ctx: Dict[str, Any]) -> str:
     prompt = build_virtual_code_prompt(need_text or (ctx.get("need") or ""))
     return run_model(prompt)
 
-def run_mode_2(user_code: str) -> str:
-    user_code = (user_code or "").strip()
-    if not user_code:
-        return "請貼上要驗證的 Python 程式碼。"
-
-    result = verify_and_explain_user_code(user_code)
-    if "錯誤" in result or "Traceback" in result or "失敗" in result:
-        try:
-            fallback_result = explain_code_error(user_code)
-            if hasattr(fallback_result, "explanation"):
-                result += f"\n\n[分析結果]\n{fallback_result.explanation}"
-            else:
-                result += f"\n\n[分析結果]\n{fallback_result}"
-        except Exception as e:
-            result += f"\n\n[分析失敗] {e}"
-
-    return result
-
 def run_mode_3(user_code: str) -> str:
     user_code = (user_code or "").strip()
     if not user_code:
@@ -452,12 +434,117 @@ async def chat(request: Request):
 
         session["step"] = "need"
         return {"text": "請描述你的需求："}
+    
+    # === 模式 2：程式驗證 (互動式) ===
+    if mode == "2":
+        ctx = session.get("ctx") or {}
+        step = session.get("step") or "awaiting_code"
+        msg = last_user
+
+        # 階段一：等待使用者貼上程式碼
+        if step == "awaiting_code":
+            if not msg.strip():
+                 return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
+            ctx["code"] = msg
+            session["ctx"] = ctx
+            session["step"] = "awaiting_need"
+            return {"text": "已收到程式碼。\n\n請輸入這段程式碼的「需求說明」，AI 將以此生成測資來驗證。\n(若不想使用測資驗證，請直接輸入 **SKIP** 或 **跳過**，將僅執行一次程式)"}
+
+        # 階段二：等待使用者輸入需求，或跳過
+        if step == "awaiting_need":
+            user_need = msg.strip()
+            user_code = ctx.get("code", "")
+            report = []
+
+            # 分支 A: 使用者提供了需求 -> 生成測資並驗證
+            if user_need and user_need.upper() not in ["SKIP", "跳過"]:
+                report.append(f"[提示] 正在根據需求說明生成測資...\n需求：{user_need}\n")
+                
+                try:
+                    # 生成並提取測資
+                    test_prompt = build_test_prompt(user_need)
+                    test_resp = run_model(test_prompt)
+                    raw_tests = extract_json_block(test_resp)
+                    json_tests = normalize_tests(raw_tests) or normalize_tests(parse_tests_from_text(user_need))
+
+                    if json_tests:
+                        report.append(f"[提示] 已成功提取 {len(json_tests)} 筆測資。開始驗證...\n")
+                        all_passed = True
+                        first_failure_msg = None
+
+                        for i, test in enumerate(json_tests, 1):
+                            # 確保測資格式為 [input, expected]
+                            t_input = test.get("input", "") if isinstance(test, dict) else (test[0] if isinstance(test, list) and len(test)>0 else "")
+                            t_output = test.get("output", "") if isinstance(test, dict) else (test[1] if isinstance(test, list) and len(test)>1 else None)
+                            
+                            stdin_str = str(t_input) if t_input is not None else ""
+                            expected_str = str(t_output) if t_output is not None else None
+
+                            report.append(f"--- 測試案例 {i} ---")
+                            report.append(f"輸入: {repr(stdin_str)}")
+                            report.append(f"預期: {repr(expected_str)}")
+
+                            # 呼叫驗證函式
+                            ok, detail = validate_main_function(user_code, stdin_input=stdin_str, expected_output=expected_str)
+                            
+                            if ok:
+                                report.append("結果: [通過] ✅\n")
+                            else:
+                                report.append("結果: [失敗] ❌")
+                                report.append(f"詳細資訊:\n{detail}\n")
+                                all_passed = False
+                                if first_failure_msg is None:
+                                    first_failure_msg = detail
+
+                        report.append("="*20)
+                        if all_passed:
+                             report.append("總結: [成功] 您的程式碼已通過所有 AI 生成的測資。")
+                        else:
+                             report.append("總結: [失敗] 您的程式碼未通過部分測資。")
+                             # 針對失敗進行分析
+                             report.append("\n[自動分析] 針對失敗案例進行分析...")
+                             try:
+                                 fallback = explain_code_error(user_code)
+                                 explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
+                                 report.append(f"\n=== 程式碼分析 ===\n{explanation}")
+                             except Exception as e:
+                                 report.append(f"\n[分析失敗] {e}")
+
+                    else:
+                        # 無法提取測資時的回退機制
+                        report.append("[警告] 未能提取有效測資，改為僅執行一次...\n")
+                        ok, detail = validate_main_function(user_code, stdin_input=None, expected_output=None)
+                        report.append("=== 執行結果 (無測資) ===")
+                        report.append(detail)
+
+                except Exception as e:
+                    report.append(f"[錯誤] 測資生成或驗證過程發生例外: {e}")
+
+            # 分支 B: 使用者選擇跳過測資生成 -> 僅執行一次
+            else:
+                report.append("[提示] 跳過測資生成，僅執行一次程式。\n")
+                ok, detail = validate_main_function(user_code, stdin_input=None, expected_output=None)
+                if ok:
+                    report.append("=== 程式執行成功 ===")
+                    report.append(detail)
+                else:
+                    report.append("=== 程式執行失敗 ===")
+                    report.append(detail)
+                    report.append("\n[自動分析] 執行失敗，開始分析...")
+                    try:
+                        fallback = explain_code_error(user_code)
+                        explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
+                        report.append(f"\n=== 程式碼分析 ===\n{explanation}")
+                    except Exception as e:
+                        report.append(f"\n[分析失敗] {e}")
+
+            # 完成後重置會話狀態
+            session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
+            return {"text": "\n".join(report)}
 
     # === 模式 2/3：一次性回應 ===
     try:
-        if mode == "2":
-            output = run_mode_2(last_user)
-        elif mode == "3":
+        if mode == "3":
             output = run_mode_3(last_user)
         else:
             output = "[錯誤] 未知模式"
