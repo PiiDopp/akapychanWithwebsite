@@ -131,16 +131,25 @@ def build_code_prompt(user_need: str) -> str:
 
 
 
-def build_test_prompt(user_need: str) -> str:
+def build_test_prompt(need: str) -> str:
     """
-    只產生測資
+    建立請求模型生成測試資料的 Prompt。
     """
     return (
-        "用繁體中文回答。\n"
-        "你是一個測資生成助理。\n"
-        "任務：根據使用者需求，產生 3~5 組測資，格式如下：\n"
-        "```json\n[[輸入, 輸出], [輸入, 輸出], ...]\n```\n"
-        f"\n使用者需求:\n{user_need}\n\n請產生測資："
+        "你是一個專業的軟體測試工程師。請根據以下需求，生成 5 到 10 筆具代表性的測試資料。\n"
+        "請以 JSON 格式陣列回傳，每筆資料包含 `input` 和 `output` 欄位。\n\n"
+        "**重要格式說明：**\n"
+        "1. 如果目標函式需要 **多個參數**（例如 `twoSum(nums, target)`），請將 `input` 寫成一個 **JSON 陣列**，按順序包含所有參數。\n"
+        "   - 正確範例: `{\"input\": [[2, 7, 11, 15], 9], \"output\": [0, 1]}`\n"
+        "   - 錯誤範例: `{\"input\": \"[2, 7, 11, 15]\\n9\", ...}` (請勿使用換行來分隔參數)\n"
+        "2. 如果目標函式只需 **一個參數**，則 `input` 直接為該值即可。\n"
+        "   - 範例: `{\"input\": \"hello\", \"output\": \"olleh\"}`\n\n"
+        f"需求說明:\n---\n{need}\n---\n\n"
+        "請僅回傳 JSON 格式的測資陣列，例如：\n"
+        "[\n"
+        "  {\"input\": [[2, 7, 11, 15], 9], \"output\": [0, 1]},\n"
+        "  {\"input\": [[3, 2, 4], 6], \"output\": [1, 2]}\n"
+        "]"
     )
 
 
@@ -509,28 +518,29 @@ def build_fix_code_prompt(user_need: str, virtual_code: str, json_tests: Optiona
 
 def build_hint_prompt(problem_description: str, user_code: str, error_message: Optional[str] = None) -> str:
     """
-    建立一個用於生成程式碼提示的提示。
+    建立請求模型提供解題提示的 Prompt。
     """
-    prompt_lines = [
-        "用繁體中文回答。\n"
-        "你是一位專業的程式解題助教。\n"
-        "任務：根據使用者提供的題目描述和他們不完整的/錯誤的程式碼，提供一個具體的、有建設性的「提示」，引導他們思考正確的方向。\n",
-        "**提示要求**：\n"
-        "1.  **不要** 直接給出完整解答或修正後的程式碼。\n"
-        "2.  針對程式碼中**最關鍵**的一個問題點提供指導。\n"
-        "3.  如果程式碼看起來完全離題，請提示他們重新閱讀題目描述的關鍵部分。\n"
-        "4.  如果提供了錯誤訊息，請優先針對錯誤訊息進行解釋和提示。\n"
-        "5.  提示應簡短、精確，控制在 2-3 句話內。\n",
-        f"--- 題目描述 ---\n{problem_description}\n",
-        f"--- 使用者的程式碼 (有問題) ---\n```python\n{user_code}```\n"
-    ]
-    
+    prompt = (
+        "你是一位經驗豐富的程式導師。學生正在嘗試解決一個 LeetCode 類型的程式題目，但遇到了困難。\n"
+        "請根據題目描述和學生目前的程式碼，提供 **漸進式的提示 (Hint)**，引導他們自己找出解決方案。\n"
+        "**不要直接給出完整答案或程式碼**。\n\n"
+        "題目描述：\n"
+        f"---\n{problem_description}\n---\n\n"
+        "學生的程式碼：\n"
+        f"```python\n{user_code}\n```\n"
+    )
+
     if error_message:
-        prompt_lines.append(f"--- 錯誤訊息/執行失敗日誌 ---\n{error_message}\n")
-    
-    prompt_lines.append("\n請根據上述資料，提供一個簡短的、引導性的提示：")
-    
-    return "".join(prompt_lines)
+         prompt += f"\n學生遇到的錯誤訊息：\n```\n{error_message}\n```\n\n"
+
+    prompt += (
+        "\n請提供 3 個層次的提示：\n"
+        "1. **思考方向**：點出題目關鍵或可能忽略的邊界條件。\n"
+        "2. **演算法建議**：建議適合的資料結構或演算法策略（如：Hash Map, Two Pointers, DP...），並簡述原因。\n"
+        "3. **程式碼除錯**（如果適用）：指出他們目前程式碼中潛在的邏輯錯誤或語法問題（如果有），但不直接幫他們改好。\n\n"
+        "請用繁體中文，以鼓勵和引導的語氣回答。"
+    )
+    return prompt
 
 # ===================== 正規化測資(omm) =====================
 def _ensure_str(x) -> str:
