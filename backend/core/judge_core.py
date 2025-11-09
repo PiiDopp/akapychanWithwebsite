@@ -1,9 +1,6 @@
 # ------------------------------------------------------------
 # judge_core.py
 # 多模式判題核心（可被 API / CLI 匯入使用）
-# - STDIN 模式：validate_stdin_code
-# - LeetCode 模式：validate_leetcode_code
-# - 小工具：載題、推參數、推方法、例子轉測資、資料結構轉換與深度比對
 # ------------------------------------------------------------
 
 from __future__ import annotations
@@ -59,6 +56,36 @@ def parse_expected(text: str):
             return ast.literal_eval(exp)
         except Exception:
             return exp
+
+def try_parse_stdin_output(text: str) -> Any:
+    """
+    嘗試將 STDIN 的純文字輸出解析為結構化資料，以便進行寬鬆比對。
+    能自動識別 [1,2] (JSON list) 或 "1 2" / "1\n2" (space separated) 為相同的 list 結構。
+    """
+    # 1. 嘗試標準 JSON / AST 解析 (處理 [1, 2]、{"a":1} 等複雜結構)
+    parsed = parse_expected(text)
+    if not isinstance(parsed, str):
+        return parsed
+    
+    # 2. 如果還是字串，嘗試解析為空白或換行分隔的數值序列 (處理 "1\n2" 或 "1 2")
+    try:
+        tokens = text.split()
+        if not tokens:
+            return text
+        # 嘗試將所有 token 轉為數字
+        nums = []
+        for token in tokens:
+             # 簡單判斷是否為浮點數
+             if '.' in token and token.replace('.', '', 1).isdigit():
+                 nums.append(float(token))
+             elif token.lstrip('-').isdigit():
+                 nums.append(int(token))
+             else:
+                 # 如果包含非數字，就放棄這種解析方式，回傳原字串
+                 return text
+        return nums
+    except Exception:
+        return text
 
 def kv_pairs_from_input(inp_text: str) -> dict[str, Any]:
     """
@@ -303,7 +330,6 @@ def list_to_listnode(a: Iterable[int]) -> Optional[ListNode]:
     return head
 
 def listnode_to_list(head: Any) -> list[int]:
-    """將 ListNode 轉回 list。支援 Duck Typing。"""
     out = []
     cur = head
     while cur is not None and hasattr(cur, 'val'):
@@ -325,7 +351,6 @@ def list_to_btree(level: Iterable[Optional[int]]) -> Optional[TreeNode]:
     return nodes[0]
 
 def btree_to_list(root: Any) -> list[Optional[int]]:
-    """將 TreeNode 轉回 list (BFS)。支援 Duck Typing。"""
     if not root: return []
     q = [root]
     out: list[Optional[int]] = []
@@ -429,8 +454,46 @@ def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5
             exp_raw = ex.get("output", ex.get("expected", ""))
             exp = normalize(exp_raw)
 
+            # --- 優化 STDIN 輸入格式 (保持之前加入的邏輯) ---
+            original_inp = inp
+            try:
+                inp_stripped = inp.strip()
+                parts = []
+                if inp_stripped.startswith("[") and inp_stripped.endswith("]"):
+                     try:
+                        maybe_json = json.loads(inp_stripped)
+                        if isinstance(maybe_json, list):
+                            parts = maybe_json
+                        else:
+                            parts = [maybe_json]
+                     except:
+                         parts = [inp_stripped]
+                elif "=" in inp_stripped and not inp_stripped.startswith("{"):
+                     kv = kv_pairs_from_input(inp)
+                     if kv:
+                         parts = list(kv.values())
+                     else:
+                         parts = [inp_stripped]
+                else:
+                     parts = [inp_stripped]
+
+                formatted_parts = []
+                for p in parts:
+                    if isinstance(p, list) and all(isinstance(x, (int, float, str, bool, type(None))) for x in p):
+                         formatted_parts.append(" ".join(str(x) for x in p))
+                    elif isinstance(p, (dict, list, bool, int, float)) or p is None:
+                         formatted_parts.append(json.dumps(p, ensure_ascii=False))
+                    else:
+                         formatted_parts.append(str(p))
+                
+                if formatted_parts:
+                    inp = "\n".join(formatted_parts)
+
+            except Exception:
+                inp = original_inp
+            # ------------------------------------
+
             print(f"[測試#{idx}]", file=log)
-            # 使用 textwrap.indent 讓多行輸入/輸出更易讀
             print(f"  輸入內容:\n{textwrap.indent(inp, '    ')}", file=log)
 
             try:
@@ -450,9 +513,29 @@ def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5
                     continue
                 
                 out = normalize(p.stdout)
+
+                # --- [修改重點] STDIN 智慧寬鬆比對 ---
+                matched = False
                 if out == exp:
+                    matched = True
+                else:
+                    # 如果字串不完全相同，嘗試解析為結構化資料後再比對
+                    try:
+                        out_val = try_parse_stdin_output(out)
+                        exp_val = try_parse_stdin_output(exp)
+                        if deep_compare(out_val, exp_val):
+                            matched = True
+                    except Exception:
+                        pass
+                # ----------------------------------
+
+                if matched:
                     passed_count += 1
-                    print("  結果: ✅ 通過", file=log)
+                    # 提示使用者通過的方式 (如果是因為寬鬆比對才通過的)
+                    if out == exp:
+                        print("  結果: ✅ 通過", file=log)
+                    else:
+                        print("  結果: ✅ 通過 (格式寬鬆比對)", file=log)
                 else:
                     print("  結果: ❌ 失敗 (輸出不符)", file=log)
                 
@@ -539,7 +622,6 @@ def validate_leetcode_code(
                 sig = inspect.signature(meth)
                 params = list(sig.parameters.values())
                 needed_count = len([p for p in params if p.default == inspect.Parameter.empty])
-                # 如果只傳入 1 個參數，但函式需要 >1 個，且這 1 個參數本身是列表/元組，且長度剛好符合需求
                 if len(args) == 1 and needed_count > 1 and isinstance(args[0], (list, tuple)):
                      if len(args[0]) == needed_count:
                           args = tuple(args[0])
@@ -555,7 +637,6 @@ def validate_leetcode_code(
                 built_args = args
 
             print(f"[測試#{i}]", file=log)
-            # 格式化輸入參數顯示
             args_str = ", ".join(repr(a) for a in built_args)
             print(f"  輸入: {method_name}({args_str})", file=log)
 
