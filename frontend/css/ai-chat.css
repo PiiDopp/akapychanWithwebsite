@@ -25,10 +25,10 @@ html.is-leaving body {
 
 /* ========= RWD 高度參數 ========= */
 :root {
-  --header-h: 90px;     /* header 高度 */
-  --toolbars-h: 52px;   /* 工具列高度（顯示時才占位；隱藏時用 JS 改成 0px） */
-  --input-h: 80px;      /* 輸入欄最小高度 */
-  --container-pad: 10px;/* 下方 buffer（含安全區） */
+  --header-h: 90px; /* header 高度 */
+  --toolbars-h: 52px; /* 工具列高度（顯示時才占位；隱藏時用 JS 改成 0px） */
+  --input-h: 80px; /* 輸入欄最小高度 */
+  --container-pad: 10px; /* 下方 buffer（含安全區） */
 }
 
 .chatbot {
@@ -133,7 +133,6 @@ html.is-leaving body {
   overflow: auto;
   padding: 12px 16px;
   border-radius: 0.5rem;
-  border: dashed 2px #777;
   margin: 10px;
 }
 .ai-rich-content code {
@@ -145,6 +144,42 @@ html.is-leaving body {
 strong {
   color: #000;
 }
+
+.code-block {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+  border: dashed 2px #777;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  color: #555;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  margin: 0; /* 緊貼上方 */
+}
+.lang-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  opacity: 0.8;
+}
+
+/* 複製鍵 */
+.copy-btn {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.copy-btn:hover {
+  color: #777;
+}
+
 .chat-outgoing {
   display: flex;
   justify-content: flex-end;
@@ -160,7 +195,7 @@ strong {
   word-break: break-word;
   overflow-wrap: break-word;
 }
-.toolbar-group{
+.toolbar-group {
   position: absolute;
   left: 10px;
   right: 10px;
@@ -182,17 +217,20 @@ strong {
   border: solid clamp(2px, 1vw, 3px) #777;
   border-radius: 8px;
   padding: 8px 12px;
-  margin-left: 12px; 
+  margin-left: 12px;
   cursor: pointer;
   font-size: clamp(18px, 0.8vw, 20px);
   transition: all 0.2s;
 }
-.toolbar .btn:hover { background: #ddd; }
-.tag { 
-  margin-left: 20px; 
-  font-size: clamp(18px, 0.8vw, 20px); 
-  color: #90a0b5; 
-  align-self: center; }
+.toolbar .btn:hover {
+  background: #ddd;
+}
+.tag {
+  margin-left: 20px;
+  font-size: clamp(18px, 0.8vw, 20px);
+  color: #90a0b5;
+  align-self: center;
+}
 
 /* ========= 輸入區固定在底部，含安全區 ========= */
 .chatinput {
@@ -210,7 +248,7 @@ strong {
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 .chatinput textarea {
-  max-height: 80px;
+  max-height: 70px;
   width: 100%;
   border: none;
   outline: none;

@@ -4,7 +4,7 @@
   --text: #e6e8f2;
   --muted: #9aa0b8;
   --accent: #6ea8fe;
-  --border: #2a2e45;
+  --border: rgb(58, 62, 102);
 }
 * {
   margin: 0;
@@ -72,7 +72,8 @@ body.sidebar-collapsed .changeBtn {
   max-width: 400px;
   height: calc(100vh - 6vh - 20px);
   border-radius: 20px;
-  border: 2px solid #2a2e45;
+  background-color: var(--panel);
+  border: 2px solid var(--border);
   overflow: hidden auto;
   scrollbar-width: none;
 }
@@ -85,7 +86,7 @@ body.sidebar-collapsed .changeBtn {
   margin-left: 8px;
   padding: 6px 12px;
   cursor: pointer;
-  border: solid 2px #2a2e45;
+  border: solid 2px var(--border);
   border-radius: 10px;
 }
 .backBtn:hover {
@@ -128,6 +129,40 @@ body.sidebar-collapsed .changeBtn {
   list-style: none;
   padding-left: 0;
 }
+.random{
+  padding: 12px;
+  margin-top: 8px;
+  margin-right: 8px;
+  background-color: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+.random p{
+  margin-bottom: 8px;
+}
+select{
+  color: var(--text);
+  background-color: var(--bg);
+  font-size: 16px;
+  padding: 4px 0;
+  margin-bottom: 8px;
+}
+option{
+  color: var(--text);
+}
+input{
+  width: 100%;
+  font-size: 14px;
+  padding: 4px;
+  border: 2px solid var(--text);
+  border-radius: 12px;
+  color: var(--text);
+  background-color: var(--bg);
+  cursor: pointer;
+}
+input:hover{
+  background-color: #404668;
+}
 .UnitBlock {
   margin: 0.25rem 0 0.5rem;
 }
@@ -160,6 +195,7 @@ body.sidebar-collapsed .changeBtn {
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: all 0.2s ease;
 }
 
 /* 圓點標籤基底 */
@@ -169,35 +205,59 @@ body.sidebar-collapsed .changeBtn {
 }
 
 .UnitSubheader.diff-easy {
-  color: #36c26c; /* 明亮綠 */
+  color: #36c26c;
 }
-.UnitSubheader.diff-easy::before {
-  color: #4aff8f;
+.UnitSubheader.diff-easy:hover {
+  border-left: 6px solid;
+  padding-left: 12px;
 }
-
 .UnitSubheader.diff-medium {
-  color: #ffd95b; /* 明亮黃 */
-}
-.UnitSubheader.diff-medium::before {
   color: #ffd95b;
 }
-
-.UnitSubheader.diff-hard {
-  color: #ff6b6b; /* 明亮紅 */
+.UnitSubheader.diff-medium:hover {
+  border-left: 6px solid;
+  padding-left: 12px;
 }
-.UnitSubheader.diff-hard::before {
+.UnitSubheader.diff-hard {
   color: #ff6b6b;
+}
+.UnitSubheader.diff-hard:hover {
+  border-left: 6px solid;
+  padding-left: 12px;
+}
+.UnitSubheader {
+  cursor: pointer;
+  user-select: none;
+  padding: 6px 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 收合時隱藏清單 */
+.DiffInner.is-collapsed {
+  display: none;
+}
+
+/* 視覺提示（可自行微調） */
+.UnitSubheader[aria-expanded="true"]::after {
+  content: "▾";
+  float: right;
+}
+.UnitSubheader[aria-expanded="false"]::after {
+  content: "▸";
+  float: right;
 }
 
 .leftsideBtn {
   position: absolute;
-  top: 45%;
+  top: 50%;
+  transform: translateY(-50%);
   right: -12px;
   width: 42px;
   height: 42px;
   border-radius: 50%;
   border: none;
-  background-color: #354a6b;
+  background-color: var(--border);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -207,7 +267,7 @@ body.sidebar-collapsed .changeBtn {
 }
 
 .leftsideBtn:hover {
-  background-color: #9aa0b8;
+  background-color: #404668;
 }
 .leftsideBtn img {
   width: 42px;
@@ -228,7 +288,8 @@ body.sidebar-collapsed .leftsideBtn img {
   line-height: 6vh;
   font-size: 20px;
   color: #fff;
-  border: solid 2px #2a2e45;
+  background-color: var(--panel);
+  border: solid 2px var(--border);
   border-radius: 20px;
   margin-top: 8px;
   justify-content: center;
@@ -238,28 +299,40 @@ body.sidebar-collapsed .leftsideBtn img {
 .changeBtn:hover {
   background-color: #404668;
 }
-.editor {
+.chat-editor{
   flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.editor {
+  width: 100%;
+  height: 100%;
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 12px;
   padding: 12px 12px 12px 0;
   background-color: #000;
   display: flex;
-  grid-template-columns: auto 1fr;
-  overflow: auto;
+  overflow: hidden;
+
+  transform-origin: top;
+  transition: all 0.3s ease;
+}
+.chat-editor .editor.shrink {
+  height: calc(50% - 6px);
 }
 .editorContainer {
-  flex: 1 1 auto;
   position: relative;
-  width: 100%;
-  height: 80vh;
+  min-width: 100%;
+  height: 100%;
+  scrollbar-width: none;
 }
 
 .runBtn {
-  position: fixed;
-  right: 38%;
-  bottom: 4%;
+  position: absolute;
+  height: 68px;
+  right: 38vw;
+  top: 90vh;
   font-size: 24px;
   padding: 18px 48px;
   border-radius: 18px;
@@ -267,6 +340,7 @@ body.sidebar-collapsed .leftsideBtn img {
   background-color: #058f3a83;
   text-align: center;
   text-decoration: none;
+  transition: all 0.2s ease;
 }
 .runBtn:hover {
   background-color: #058f3a;
@@ -281,8 +355,8 @@ body.sidebar-collapsed .leftsideBtn img {
 .textContent {
   flex: 0 0 auto;
   min-width: 280px;
-  max-height: 50%;
-  border: 1px solid var(--border);
+  max-height: calc(50% - 6px);
+  border: 2px solid var(--border);
   border-radius: 12px;
   background: var(--panel);
   padding: 20px;
@@ -350,7 +424,7 @@ body.sidebar-collapsed .leftsideBtn img {
   flex: 1 1 auto;
   min-height: 220px;
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -386,15 +460,10 @@ body.sidebar-collapsed .leftsideBtn img {
 .hintbtn:hover{
   background-color: var(--panel);
 }
-.outputContent {
-  height: 100%;
-  padding: 12px;
-  overflow: auto;
-  scrollbar-width: none;
-}
 #output {
   flex: 1;
   max-height: 55vh;
+  padding: 12px;
   font-family: monospace;
   color: var(--text);
   white-space: pre-wrap;
@@ -402,7 +471,42 @@ body.sidebar-collapsed .leftsideBtn img {
   overflow-y: auto;
   scrollbar-width: thin;
 }
+.code-block {
+  background: #0d1117;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0;
+}
 
+/* 上方標題列緊貼 code 區塊 */
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0d1117;
+  color: #ccc;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  margin: 0;
+  top: 0;
+}
+
+/* 調整複製按鈕位置 */
+.copy-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.copy-btn:hover {
+  color: #fff;
+}
+.lang-label {
+  font-family: monospace;
+  opacity: 0.8;
+}
 .status {
   font-size: 0.85rem;
   color: var(--muted);
@@ -410,13 +514,14 @@ body.sidebar-collapsed .leftsideBtn img {
 }
 
 .scroll-area {
+  position: relative;
   overflow-y: auto;
   scrollbar-width: none;
+  background: #0f1221;          /* 你的背景色 */
 }
-.scroll-area::-webkit-scrollbar {
-  display: none;
-}
+.scroll-area::-webkit-scrollbar { display: none; }
 
+/* 讓最後一點空間給 sticky 元素用 */
 .scroll-area::after {
   content: "";
   position: sticky;
@@ -425,7 +530,11 @@ body.sidebar-collapsed .leftsideBtn img {
   display: block;
   background: linear-gradient(to top, #0f1221, transparent);
   pointer-events: none;
+  flex-shrink: 0;
 }
+
+.scroll-area::after { opacity: 0; transition: opacity .3s ease; }
+.scroll-area.has-overflow::after { opacity: 1; }
 
 .q-chooser {
   display: flex;
@@ -483,4 +592,261 @@ body.sidebar-collapsed .leftsideBtn img {
 /* 通用隱藏（用在輸出區） */
 .is-hidden {
   display: none !important;
+}
+
+.hljs {
+  background: #0d1117 !important;
+  color: #c9d1d9 !important;
+}
+.hljs-keyword, .hljs-selector-tag, .hljs-title {
+  color: #ff7b72 !important;
+}
+.hljs-string, .hljs-number {
+  color: #a5d6ff !important;
+}
+
+.openChat b{
+  display: inline-block;
+  cursor: pointer;
+  color: var(--text);
+  border: 3px dashed var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 16px;
+  user-select: none;
+}
+
+.openChat b:hover{
+  background-color: #354a6b;
+}
+
+/* ========= RWD 高度參數 ========= */
+:root {
+  --header-h: 50px; /* header 高度 */
+  --toolbars-h: 42px; /* 工具列高度（顯示時才占位；隱藏時用 JS 改成 0px） */
+  --input-h: 60px; /* 輸入欄最小高度 */
+  --container-pad: 10px; /* 下方 buffer（含安全區） */
+}
+
+.chatbot {
+  display: flex;
+  width: 100%;
+  height: 0;
+  position: relative;
+  visibility: hidden;
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chat-editor .chatbot.open {
+  height: calc(50% - 6px);
+  visibility: visible;
+  border: solid 2px var(--border);
+  margin-bottom: 12px;
+}
+
+.chatbot header {
+  height: var(--header-h);
+  width: 100%;
+  left: 50%;
+  transform: translate(-50%);
+  background-color: var(--panel);
+  border-bottom: solid 1px var(--border);
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  user-select: none;
+}
+.chatbot header h2 {
+  color: var(--text);
+  font-size: 30px;
+}
+.hiddenBtn{
+  position: absolute;
+  right: 18px;
+  background-color: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.hiddenBtn:hover{
+  background-color: #404668;
+}
+/* ========= 聊天訊息區：自動填滿剩餘高度 ========= */
+.chatbox {
+  position: absolute;
+  width: 100%;
+  top: var(--header-h);
+  bottom: calc(var(--input-h) + var(--toolbars-h) + 48px);
+  flex: 1;
+  padding: 0 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-incoming {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+.chat-incoming p {
+  max-width: min(75vw, 920px);
+  white-space: pre-line;
+  color: #fff;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.chat-incoming i {
+  height: 33px;
+  width: 33px;
+  color: #fff;
+  background: var(--border);
+  text-align: center;
+  font-size: 20px;
+  line-height: 33px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.ai-rich-content {
+  max-width: min(75vw, 920px);
+  margin: 10px;
+  padding: 12px 16px;
+  border: solid 2px var(--border);
+  background: var(--bg);
+  border-radius: 0px 10px 10px 10px;
+}
+.ai-rich-content pre {
+  max-width: min(75vw, 920px);
+  overflow: auto;
+  padding: 12px 16px;
+  border-radius: 0.5rem;
+  margin: 10px;
+}
+.ai-rich-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 18px;
+  line-height: 1.5;
+}
+strong {
+  color: #fff;
+}
+
+.code-block {
+  background: var(--bg);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+  border: dashed 2px #777;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  color: #555;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  margin: 0; /* 緊貼上方 */
+}
+.lang-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  opacity: 0.8;
+}
+
+.chat-outgoing {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0;
+}
+.chat-outgoing p {
+  margin-left: auto;
+  max-width: 75%;
+  background: var(--border);
+  padding: 12px 16px;
+  border-radius: 10px 0px 10px 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.toolbar-group {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: calc(var(--input-h) + 40px);
+  z-index: 999;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  margin: 0;
+  width: auto;
+  background: transparent;
+  user-select: none;
+}
+
+.toolbar .btn {
+  background: var(--panel);
+  color: var(--text);
+  border: solid 2px var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-left: 12px;
+  cursor: pointer;
+  font-size: clamp(14px, 0.8vw, 18px);
+  transition: all 0.2s;
+}
+.toolbar .btn:hover {
+  background: #404668;
+}
+.tag {
+  margin-left: 20px;
+  font-size: clamp(18px, 0.8vw, 20px);
+  color: #90a0b5;
+  align-self: center;
+}
+
+/* ========= 輸入區固定在底部，含安全區 ========= */
+.chatinput {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  bottom: 0;
+  padding: 10px 10px;
+  border-radius: 30px;
+  background: var(--panel);
+  border: solid 2px var(--border);
+  min-height: var(--input-h);
+  inset: auto 10px 10px 10px;
+  z-index: 998;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+.chatinput textarea {
+  background: var(--panel);
+  max-height: 70px;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding-top: 25px;
+  margin-left: 10px;
+  font-size: 18px;
+  align-self: center;
+}
+.chatinput i {
+  height: 40px;
+  font-size: 20px;
+  padding-top: 10px;
+  cursor: pointer;
+  align-self: center;
+  visibility: hidden;
+}
+.chatinput textarea:valid ~ i {
+  visibility: visible;
 }

@@ -36,7 +36,7 @@ export async function handleHint(e) {
       "";
 
     if (!problemId || !code) {
-      show("請先輸入題目 ID 與程式碼");
+      show("# 請先輸入您的程式碼，會針對你的程式碼，給予相對應的提示。");
       return;
     }
 

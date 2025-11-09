@@ -845,7 +845,7 @@
     "title": "ZigZag Conversion",
     "tag": 611,
     "unit": 6,
-    "difficulty": "unknown"
+    "difficulty": "easy"
   },
   {
     "file": "Leetcode/leetcode26.json",

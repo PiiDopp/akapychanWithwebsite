@@ -1,6 +1,7 @@
 import { ensureHLJSAssets } from "./assets.js";
 import { SELECTORS } from "./constants.js";
 import { scrollToBottom } from "./dom-utils.js";
+import { installCopyDelegation } from "./dom-utils.js";
 import { typeParagraph, insertCodeBlock } from "./typewriter.js";
 import { createChatLi } from "./render.js";
 import { bindEnterToSend } from "./events.js";
@@ -22,6 +23,8 @@ if (!window.__chat_inited) {
 
   window.addEventListener("DOMContentLoaded", () => {
     ensureHLJSAssets();
+
+    installCopyDelegation(document);
 
     const chatRoot = document.querySelector(SELECTORS.chatRoot);
     const chatInput = chatRoot?.querySelector("textarea");

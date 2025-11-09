@@ -5,14 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AkaPyChan</title>
     <link rel="stylesheet" href="../css/python.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script type="module" src="../js/python-practice/main.js"></script>
+    <script type="module" src="../js/ai-chat/main.js"></script>
     <script src="../js/viewTransitions.js" defer></script>
   </head>
   <body>
     <main class="workspace">
       <div class="leftSideBar">
-        <button class="leftsideBtn"><img src="../img/leftsideBtn.png" alt=""></button>
+        <button class="leftsideBtn">
+          <img src="../img/leftsideBtn.png" alt="" />
+        </button>
         <div class="menuSelectionMeun scroll-area">
           <h1 style="margin: 10px">題型選擇</h1>
           <hr style="margin: 10px" />
@@ -34,16 +46,62 @@
             </ul>
             <ul class="L-Unit" id="leetcode-list">
               <div class="menuTitle">Leetcode</div>
+              <div class="random">
+                <p>隨機出題:</p>
+                <select name="data-id" size="1">
+                  <option value="500">五、重複結構（迴圈）</option>
+                  <option value="600">六、複合式資料型態</option>
+                  <option value="700">七、函數</option>
+                  <option value="800">八、模組與套件</option>
+                  <option value="900">九、例外處理與檔案操作</option>
+                  <option value="1000">十、進階資料處理</option>
+                  <option value="1100">十一、物件導向程式設計</option>
+                  <option value="1200">十二、應用實作與延伸</option>
+                </select>
+                <select name="difficult" size="1">
+                  <option value="none">隨機難度</option>
+                  <option value="Easy">簡單(Easy)</option>
+                  <option value="Medium">中等(Medium)</option>
+                  <option value="Hard">困難(Hard)</option>
+                </select>
+                <input type="submit" value="出題" />
+              </div>
             </ul>
           </ul>
         </div>
         <a href="/html/main.html" class="changeBtn"><b>課程模式</b></a>
       </div>
-      <section class="editor">
-        <div id="editorContainer" class="editorContainer"></div>
-        <button type="button" class="runBtn">Run</button>
-      </section>
-
+      <div class="chat-editor">
+        <div class="chatbot">
+          <header>
+            <h2>AkaPyChan</h2>
+            <button class="hiddenBtn">隱藏</button>
+          </header>
+          <ul class="chatbox">
+            <li class="chat-incoming" data-typewriter>
+              <i class="fas fa-robot"></i>
+              <div class="ai-rich-content">
+                <p>
+                  您好，我是 AkaPyChan 的專屬助教，很高興為您解答任何與 Python相關的問題。 請選擇以下模式： 
+                  模式 1｜互動開發（貼需求 → 產生程式碼 → 可使用 驗證 / 解釋 / 修改）
+                  模式 2｜程式驗證（貼上你的 Python 程式碼） 
+                  模式 3｜程式解釋（貼上要解釋的 Python 程式碼）
+                  **點「輸入框上方的按鈕」即可選擇模式。**或直接輸入文字開始一般聊天。
+                </p>
+              </div>
+            </li>
+          </ul>
+          <div class="toolbar"></div>
+          <div class="chatinput">
+            <textarea placeholder="Enter a message..." required></textarea>
+            <i class="fas fa-paper-plane"></i>
+          </div>
+        </div>
+        <section class="editor">
+          <div id="editorContainer" class="editorContainer"></div>
+          <button type="button" class="runBtn">Run</button>
+        </section>
+      </div>
       <aside class="codePane">
         <div class="textContent" id="practiceArea">
           <div class="titleRow">
@@ -59,13 +117,11 @@
           <header class="outputHeader">
             <h1>輸出結果</h1>
             <div class="btnContent">
-              <button type="button" class="hintbtn">提示</button>
-              <button type="button" class="answerbtn">解答</button>
+              <button type="button" class="hintbtn">AI 提示</button>
+              <button type="button" class="answerbtn">範例解答</button>
             </div>
           </header>
-          <div class="outputContent">
-            <pre id="output"></pre>
-          </div>
+          <div id="output"></div>
         </section>
       </aside>
     </main>
