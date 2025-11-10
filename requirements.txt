@@ -5,3 +5,5 @@ requests
 langchain-community
 langchain-core
 langchain-ollama
+pynguin
+pytest 
