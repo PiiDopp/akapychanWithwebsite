@@ -1235,68 +1235,55 @@ async def get_hint(request: Request):
     """
     try:
         data = await request.json()
-        problem_id = data.get("problem_id") or data.get("data_id") 
-        user_code = data.get("code") or data.get("user_code")
+        problem_id = data.get("problem_id") or data.get("data_id")  # 相容舊版欄位
+        user_code = data.get("code") or data.get("user_code")       # 改用 code
         practice_idx = int(data.get("practice_idx") or 0)
         data_path = data.get("data_path")
+        # 'mode' and 'source' are not used by the hint logic, but are part of the request
 
         if not problem_id or not user_code:
             raise HTTPException(status_code=400, detail="缺少 problem_id 或 code")
 
-        # 🔹 先直接嘗試讀題目 JSON（依你要求的方式）
-        possible_paths = [
-            f"../frontend/data/{problem_id}.json",
-            f"../frontend/data/Leetcode/{problem_id}.json",
-        ]
-        filepath = next((p for p in possible_paths if os.path.exists(p)), None)
-        if not filepath:
-            raise HTTPException(status_code=404, detail=f"找不到 {problem_id}.json")
+        # 1. 載入題目描述
+        problem_description = "（無法載入題目描述）"
+        try:
+            prob = load_problem_cases(
+                data_id=problem_id or "",
+                practice_idx=practice_idx,
+                data_path=data_path,
+                allowed_bases=ALLOWED_BASES,
+                lessons_dir_env=os.getenv("LESSONS_DIR"),
+            )
+            problem_description = prob.get("description", "無題目描述")
+            
+            # 嘗試獲取更詳細的描述或標題
+            if problem_description == "無題目描述":
+                problem_description = prob.get("title", "無題目描述")
+            
+            # 獲取範例測資作為額外上下文
+            tests = prob.get("tests", [])
+            if tests:
+                examples = "\n".join([
+                    f"範例 {i+1}:\n  輸入: {t.get('input')}\n  輸出: {t.get('expected')}" 
+                    for i, t in enumerate(tests[:2]) # 最多取 2 個範例
+                ])
+                problem_description += f"\n\n--- 範例 ---\n{examples}"
 
-        # 讀取 JSON
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = json.load(f)
+        except Exception as e:
+            print(f"[警告] /hint 路由無法載入題目 ({problem_id}): {e}")
+            # 即使載入失敗，還是繼續，只是描述會比較少
+            pass
 
-        # 嘗試取得題目內容（支援 LeetCode 結構）
-        if "coding_practice" in content:
-            items = content.get("coding_practice", [])
-            if items:
-                item = items[practice_idx] if 0 <= practice_idx < len(items) else items[0]
-                problem_description = item.get("description", "無題目描述")
-                examples = item.get("examples", [])
-                if examples:
-                    example_text = "\n".join([
-                        f"範例 {i+1}:\n  輸入: {ex.get('input')}\n  輸出: {ex.get('output')}"
-                        for i, ex in enumerate(examples[:2])
-                    ])
-                    problem_description += f"\n\n--- 範例 ---\n{example_text}"
-            else:
-                problem_description = "（無法載入題目描述）"
-        else:
-            # 備援一般題型
-            problem_description = content.get("description") or content.get("title") or "（無法載入題目描述）"
-
-        # 🔹 額外：若 JSON 含有 explanation、follow up 也一起加進提示上下文
-        explanation = None
-        follow_up = None
-        if "coding_practice" in content:
-            item = content["coding_practice"][practice_idx]
-            explanation = item.get("explanation")
-            follow_up = item.get("follow up")
-
-        if explanation:
-            problem_description += f"\n\n--- 題目說明 ---\n{explanation}"
-        if follow_up:
-            problem_description += f"\n\n--- 進階提示 ---\n{follow_up}"
-
-        # 2️⃣ 組合提示 prompt
+        # 2. 建立提示 Prompt (目前不執行程式碼，未來可擴充)
         error_message = None 
+        
         hint_prompt = build_hint_prompt(
             problem_description=problem_description,
             user_code=user_code,
             error_message=error_message
         )
 
-        # 3️⃣ 呼叫模型（run_model）
+        # 3. 呼叫模型 (run_model 已在 main.py 中定義)
         hint_text = run_model(hint_prompt)
 
         print(f"[INFO] /hint 路由被呼叫, problem_id: {problem_id}")
