@@ -4,27 +4,34 @@ import { setBackBtnVisible, setPreviewVisible, setOutput } from "./dom.js";
 import { saveCur } from "./state.js";
 
 export function installRandomPicker() {
-  // 僅在頁面包含 .random 區塊時啟用
-  const randomBox = document.querySelector(".random");
-  if (!randomBox) return;
+  // ---------- 快取 ----------
+  const setCache = new Map(); // setId -> Promise<{ setId, url, data }>
+  let leetSetsMemo = null; // 記住最近掃到的 [{ setId, url }]
 
-  const selectCategory   = randomBox.querySelector('select[name="data-id"]');
-  const selectDifficulty = randomBox.querySelector('select[name="difficult"]');
-  const submitBtn        = randomBox.querySelector('input[type="submit"]');
+  // ---------- 現抓 UI ----------
+  function getUI() {
+    const box = document.querySelector(".randomPicker");
+    const selectCategory = box?.querySelector('select[name="data-id"]') || null;
+    const selectDifficulty =
+      box?.querySelector('select[name="difficult"]') || null;
+    const submitBtn =
+      box?.querySelector(
+        'input[type="submit"], button[type="submit"], button.random-submit'
+      ) || null;
+    // 保險：避免 form submit 導致跳頁
+    if (submitBtn) submitBtn.setAttribute("type", "button");
+    return { box, selectCategory, selectDifficulty, submitBtn };
+  }
 
-  // ---- 快取（避免重複抓同一題組）----
-  // key: setId (e.g., 'leetcode1') → Promise<{ setId, url, data }>
-  const setCache = new Map();
-
-  // ---- 工具：DOM option ----
+  // ---------- 小工具 ----------
   function makeOption(value, label) {
     const opt = document.createElement("option");
-    opt.value = value;
+    opt.value = value; // 保留你的大小寫（Easy/Medium/Hard/none）
     opt.textContent = label;
     return opt;
   }
 
-  // ---- 收集頁面上所有可載入的 Leetcode 題組（支援 data-path 覆寫）----
+  // 掃 DOM 抓題組；若這次有掃到就更新 memo
   function collectAllLeetSets() {
     const nodes = document.querySelectorAll('[data-id^="leetcode"]');
     const list = [];
@@ -32,20 +39,25 @@ export function installRandomPicker() {
       const setId = el.dataset?.id;
       if (!/^leetcode\d+$/i.test(setId)) return;
       const preferPath = el.dataset?.path;
-      const url = preferPath || `${PATHS.leetRoot}/${encodeURIComponent(setId)}.json`;
+      const url =
+        preferPath || `${PATHS.leetRoot}/${encodeURIComponent(setId)}.json`;
       list.push({ setId, url });
     });
+    if (list.length) leetSetsMemo = list;
     return list;
   }
 
-  // ---- 載入單一題組 JSON ----
   function loadSetJSON(setId, url) {
     if (!setCache.has(setId)) {
       const p = (async () => {
         const resp = await fetch(url, { cache: "no-store" });
-        if (!resp.ok) throw new Error(`題組 ${setId} 載入失敗（HTTP ${resp.status}）`);
+        if (!resp.ok)
+          throw new Error(`題組 ${setId} 載入失敗（HTTP ${resp.status}）`);
         const data = await resp.json();
-        if (!Array.isArray(data?.coding_practice) || data.coding_practice.length === 0) {
+        if (
+          !Array.isArray(data?.coding_practice) ||
+          data.coding_practice.length === 0
+        ) {
           throw new Error(`題組 ${setId} 內容為空或格式不正確`);
         }
         return { setId, url, data };
@@ -55,21 +67,25 @@ export function installRandomPicker() {
     return setCache.get(setId);
   }
 
-  // ---- 載入所有題組 ----
   async function loadAllSets() {
-    const sets = collectAllLeetSets();
+    // 先試著從 DOM 掃；掃不到就用上次 memo
+    let sets = collectAllLeetSets();
+    if (!sets.length && Array.isArray(leetSetsMemo) && leetSetsMemo.length) {
+      sets = leetSetsMemo;
+    }
     if (!sets.length) {
-      throw new Error('找不到任何可載入的 Leetcode 題組（請確認主選單的 data-id="leetcodeX" 項目）');
+      // 不要 throw，避免把流程卡死；給清楚訊息
+      throw new Error(
+        '目前沒有題組清單（請回含 data-id="leetcodeX" 的主頁初始化一次）。'
+      );
     }
     return Promise.all(sets.map((s) => loadSetJSON(s.setId, s.url)));
   }
 
-  // ---- 依單元(百位數)取得該單元實際擁有的難度（lowercase: easy/medium/hard）----
   async function getAvailableDiffsForUnit(categoryId) {
     const loaded = await loadAllSets();
     const diffs = new Set();
     const wantHundreds = Number(categoryId);
-
     for (const { data } of loaded) {
       (data.coding_practice || []).forEach((q) => {
         const tagNum = Math.floor(Number(q.tag) / 100) * 100;
@@ -78,102 +94,95 @@ export function installRandomPicker() {
         }
       });
     }
-    return Array.from(diffs); // 例：['medium'] 或 ['medium','hard']
+    return Array.from(diffs);
   }
 
-  // ---- 重建難度下拉（規則：僅 1 種難度 → 只顯示該難度；≥2 種 → 顯示「隨機難度」+ 這些難度）----
   async function rebuildDifficultySelect(categoryId, selectEl) {
-  const labelMap = {
-    easy:   "簡單(Easy)",
-    medium: "中等(Medium)",
-    hard:   "困難(Hard)",
-  };
-  const order = ["easy", "medium", "hard"]; // 固定順序
+    if (!selectEl) return;
+    const labelMap = {
+      easy: "簡單(Easy)",
+      medium: "中等(Medium)",
+      hard: "困難(Hard)",
+    };
+    const order = ["easy", "medium", "hard"];
+    const prevValueRaw = selectEl.value || "none";
+    const prevValueLc = prevValueRaw.toLowerCase();
 
-  // 先記住目前使用者選的值（可能是 Easy/Medium/Hard/none）
-  const prevValueRaw = selectEl.value || "none";
-  const prevValueLc  = prevValueRaw.toLowerCase(); // 'easy' | 'medium' | 'hard' | 'none'
+    const diffs = await getAvailableDiffsForUnit(categoryId).catch(() => []);
+    selectEl.innerHTML = "";
 
-  // 取得該單元實際存在的難度（小寫陣列）
-  const diffs = await getAvailableDiffsForUnit(categoryId);
-
-  // 重建選單
-  selectEl.innerHTML = "";
-
-  if (diffs.length === 0) {
-    // 這個單元沒有任何題 → 顯示預設四項，維持使用者原本值（若不存在就設 'none'）
-    selectEl.append(
-      makeOption("none", "隨機難度"),
-      makeOption("Easy",   labelMap.easy),
-      makeOption("Medium", labelMap.medium),
-      makeOption("Hard",   labelMap.hard),
-    );
-    selectEl.value = ["none","easy","medium","hard"].includes(prevValueLc)
-      ? prevValueRaw
-      : "none";
-    return;
-  }
-
-  // 依固定順序放入當前單元真的有的難度
-  const present = order.filter(d => diffs.includes(d)); // e.g. ['medium'] 或 ['medium','hard']
-  present.forEach(d => {
-    selectEl.append(makeOption(d[0].toUpperCase()+d.slice(1), labelMap[d]));
-  });
-
-  if (present.length >= 2) {
-    // 有 2+ 種難度 → 顯示「隨機難度」，但 **不主動選取 'none'**
-    selectEl.prepend(makeOption("none", "隨機難度"));
-
-    // 選擇策略：
-    // 1) 若先前選的是某個難度且仍存在 → 保留
-    // 2) 若先前選的是 'none' → 保留 'none'
-    // 3) 其餘（先前選的難度不在 present）→ 選 present[0]（Easy→Medium→Hard）
-    if (present.includes(prevValueLc)) {
-      selectEl.value = prevValueLc[0].toUpperCase()+prevValueLc.slice(1);
-    } else if (prevValueLc === "none") {
-      selectEl.value = "none";
-    } else {
-      const pick = present[0];
-      selectEl.value = pick[0].toUpperCase()+pick.slice(1);
+    if (!diffs.length) {
+      selectEl.append(
+        makeOption("none", "隨機難度"),
+        makeOption("Easy", labelMap.easy),
+        makeOption("Medium", labelMap.medium),
+        makeOption("Hard", labelMap.hard)
+      );
+      selectEl.value = ["none", "easy", "medium", "hard"].includes(prevValueLc)
+        ? prevValueRaw
+        : "none";
+      return;
     }
-  } else {
-    // 只有 1 種難度 → 不顯示「隨機」
-    const only = present[0]; // 'easy' | 'medium' | 'hard'
-    selectEl.value = only[0].toUpperCase()+only.slice(1);
-  }
-}
 
-  // ---- 過濾器（依單元百位數 + 難度；difficulty === 'none' 代表不限難度）----
+    const present = order.filter((d) => diffs.includes(d));
+    present.forEach((d) =>
+      selectEl.append(makeOption(d[0].toUpperCase() + d.slice(1), labelMap[d]))
+    );
+
+    if (present.length >= 2) {
+      selectEl.prepend(makeOption("none", "隨機難度"));
+      if (present.includes(prevValueLc)) {
+        selectEl.value = prevValueLc[0].toUpperCase() + prevValueLc.slice(1);
+      } else if (prevValueLc === "none") {
+        selectEl.value = "none";
+      } else {
+        const pick = present[0];
+        selectEl.value = pick[0].toUpperCase() + pick.slice(1);
+      }
+    } else {
+      const only = present[0];
+      selectEl.value = only[0].toUpperCase() + only.slice(1);
+    }
+  }
+
   function makeFilter(categoryId, difficulty) {
     const wantHundreds = Number(categoryId);
-    const wantAnyDiff = difficulty === "none";
-    const wantDiff = wantAnyDiff ? null : String(difficulty).toLowerCase();
-
+    const diffLc = String(difficulty).toLowerCase();
+    const any = diffLc === "none";
     return (q) => {
       const tagNum = Math.floor(Number(q.tag) / 100) * 100;
-      const okCat  = tagNum === wantHundreds;
-      const okDiff = wantAnyDiff ? true : String(q.difficult).toLowerCase() === wantDiff;
-      return okCat && okDiff;
+      if (tagNum !== wantHundreds) return false;
+      if (any) return true;
+      return String(q.difficult).toLowerCase() === diffLc;
     };
   }
 
-  // ---- 抽題主流程 ----
+  // ---------- 核心流程：每次點擊都現抓元素 ----------
   async function pickAndRender() {
-    const categoryId = selectCategory?.value;   // "500" | "600" | ...
-    const difficulty = selectDifficulty?.value; // "none" | "Easy" | "Medium" | "Hard"
+    const { box, selectCategory, selectDifficulty } = getUI();
+    if (!box || !selectCategory || !selectDifficulty) {
+      setOutput("找不到隨機出題區塊或選單元素");
+      return;
+    }
+
+    const categoryId = selectCategory.value;
+    const difficulty = selectDifficulty.value;
 
     setOutput("隨機出題中…");
 
-    // 先保險：依單元重建難度下拉，確保使用者看到與資料一致
-    await rebuildDifficultySelect(categoryId, selectDifficulty);
-
-    // 重新取 difficulty（避免剛剛重建時預設值有變）
+    // 重建難度下拉（UI同步）；失敗不阻擋
+    await rebuildDifficultySelect(categoryId, selectDifficulty).catch(() => {});
     const finalDifficulty = selectDifficulty.value;
 
-    // 載入所有題組後合併候選池
-    const loaded = await loadAllSets();
-    const filterFn = makeFilter(categoryId, finalDifficulty);
+    let loaded;
+    try {
+      loaded = await loadAllSets();
+    } catch (err) {
+      setOutput(err?.message || "目前沒有題組清單。");
+      return;
+    }
 
+    const filterFn = makeFilter(categoryId, finalDifficulty);
     const pool = [];
     for (const { setId, data } of loaded) {
       (data.coding_practice || []).forEach((q, idx) => {
@@ -181,24 +190,22 @@ export function installRandomPicker() {
       });
     }
 
-    // 若「隨機難度」仍沒命中，保險再放寬到該單元所有難度
-    let candidate = pool;
-    if (!candidate.length && finalDifficulty === "none") {
+    // 放寬：finalDifficulty = none 時，改抓該單元任意難度
+    if (!pool.length && String(finalDifficulty).toLowerCase() === "none") {
       for (const { setId, data } of loaded) {
         (data.coding_practice || []).forEach((q, idx) => {
           const tagNum = Math.floor(Number(q.tag) / 100) * 100;
-          if (tagNum === Number(categoryId)) candidate.push({ setId, data, idx, q });
+          if (tagNum === Number(categoryId)) pool.push({ setId, data, idx, q });
         });
       }
     }
 
-    // 若依舊沒有，丟出提示
-    if (!candidate.length) {
-      throw new Error("找不到符合「單元／難度」的題目。請換個條件再試試！");
+    if (!pool.length) {
+      setOutput("找不到符合「單元／難度」的題目。請換個條件再試試！");
+      return;
     }
 
-    // 隨機挑一題並渲染
-    const picked = candidate[Math.floor(Math.random() * candidate.length)];
+    const picked = pool[Math.floor(Math.random() * pool.length)];
     await renderOneQuestion(document, picked.data, picked.idx, picked.setId);
     saveCur(picked.setId, picked.idx);
 
@@ -209,26 +216,42 @@ export function installRandomPicker() {
     setOutput("");
   }
 
-  // ---- 事件：出題 ----
-  submitBtn?.addEventListener("click", async (e) => {
-    e.preventDefault?.();
-    try {
-      await pickAndRender();
-    } catch (err) {
-      setOutput(`出題失敗：${err.message}`);
+  // ---------- 單次初始化（若目前就有 .random，先重建難度） ----------
+  {
+    const { selectCategory, selectDifficulty } = getUI();
+    if (selectCategory && selectDifficulty) {
+      rebuildDifficultySelect(selectCategory.value, selectDifficulty).catch(
+        () => {}
+      );
     }
-  });
+  }
 
-  // ---- 事件：切換單元 → 依單元重建難度下拉 ----
-  selectCategory?.addEventListener("change", () => {
-    rebuildDifficultySelect(selectCategory.value, selectDifficulty)
-      .catch((err) => setOutput(`更新難度選單失敗：${err.message}`));
-  });
+  // ---------- 事件委派 ----------
+  if (!window.__randomDelegatedOnce__) {
+    document.addEventListener("click", async (e) => {
+      const btn =
+        e.target &&
+        e.target.closest?.(
+          ".random .random-submit, .randomPicker .random-submit"
+        );
+      if (!btn) return;
+      e.preventDefault?.();
+      await pickAndRender();
+    });
 
-  // ---- 初始：進頁時就依當前單元重建一次難度下拉 ----
-  // 若你的專案已經在 main.js 裡有 DOMContentLoaded 時機，也可改成在那邊呼叫。
-  if (selectCategory && selectDifficulty) {
-    rebuildDifficultySelect(selectCategory.value, selectDifficulty)
-      .catch(() => {/* 初載失敗不擋流程 */});
+    document.addEventListener("change", (e) => {
+      const isUnitSelect =
+        e.target && e.target.matches?.('select[name="data-id"]');
+      if (!isUnitSelect) return;
+      if (!e.target.closest(".random, .randomPicker")) return;
+
+      const { selectDifficulty } = getUI();
+      if (!selectDifficulty) return;
+      rebuildDifficultySelect(e.target.value, selectDifficulty).catch((err) =>
+        setOutput(`更新難度選單失敗：${err.message}`)
+      );
+    });
+
+    window.__randomDelegatedOnce__ = true;
   }
 }

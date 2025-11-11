@@ -1,5 +1,5 @@
 // 子選單載入與返回主選單 / URL 與瀏覽器行為
-import { SELECTORS, PATHS } from "./constants.js";
+import { SELECTORS } from "./constants.js";
 import {
   setBackBtnVisible,
   setPreviewVisible,
@@ -86,6 +86,19 @@ export async function loadSet(setId, pushUrl = false) {
 }
 
 export function backToMainMenu(evt) {
+  const isProgrammatic = !evt;
+  const isFromAnchor = !!(
+    evt?.type === "click" &&
+    evt.target?.closest &&
+    evt.target.closest("#backToMenuBtn")
+  );
+  if (!isProgrammatic && !isFromAnchor) {
+    console.warn(
+      "backToMainMenu ignored (not from #backToMenuBtn):",
+      evt?.target
+    );
+    return;
+  }
   const menuEl = document.querySelector(SELECTORS.mainMenu);
   const area = document.querySelector(SELECTORS.practiceArea);
 

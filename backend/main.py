@@ -813,10 +813,18 @@ async def chat(request: Request):
                 ctx["history"] = history
                 session["ctx"] = ctx
                 return {"text": f"=== 程式碼（新版本） ===\n```python\n{new_code}\n```\n"
-                                "請輸入下一步（修改 / VERIFY / EXPLAIN / QUIT）"}
+                                "請選擇您的下一步操作：\n"
+                                "  - 修改：直接輸入您的修正需求\n"
+                                "  - 驗證 VERIFY\n"
+                                "  - 解釋 EXPLAIN\n"
+                                "  - 完成 QUIT\n"}
             else:
                 return {"text": "模型無法生成修正後的程式碼，請輸入更明確的修改需求。\n"
-                                "或輸入 VERIFY / EXPLAIN / QUIT"}
+                                "請選擇您的下一步操作：\n"
+                                "  - 修改：直接輸入您的修正需求\n"
+                                "  - 驗證 VERIFY\n"
+                                "  - 解釋 EXPLAIN\n"
+                                "  - 完成 QUIT\n"}
 
         session["step"] = "need"
         return {"text": "請描述你的需求："}

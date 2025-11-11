@@ -76,7 +76,7 @@ export async function handleRun(e) {
       dots = (dots + 1) % 4; // 0,1,2,3循環
       const dotText = ".".repeat(dots);
       const sec = Math.floor((Date.now() - t0) / 1000);
-      setStatus(`判題中${dotText}（${sec}s）`);
+      setStatus(`判題中${dotText}`);
     }, 400);
 
     const body = {
