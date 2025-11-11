@@ -81,7 +81,7 @@ export function mountToolbars(chatRoot, _chatbox, sendViaUI) {
     ]
   );
 
-  const backToMenuBtn = mkGroup("backToMenuBtn", "", [
+  const backToMenuButtons = mkGroup("backToMenuButtons", "", [
     { text: "回到主選單", display: "回到主選單", payload: "q" },
   ]);
 
@@ -115,7 +115,7 @@ export function mountToolbars(chatRoot, _chatbox, sendViaUI) {
       vc_confirmButtons,
       verifyButtons,
       enterLoopButtons,
-      backToMenuBtn,
+      backToMenuButtons,
     ].forEach((el) => show(el, false));
   };
 
@@ -141,10 +141,10 @@ export function mountToolbars(chatRoot, _chatbox, sendViaUI) {
     if (vc_confirmPrompt) return show(vc_confirmButtons, true);
     if (inMode1Loop) return show(loopButtons, true);
     if (needMode) return show(modeButtons, true);
-    if (inMode1Need || inMode2 || inMode3) return show(backToMenuBtn, true);
+    if (inMode1Need || inMode2 || inMode3) return show(backToMenuButtons, true);
 
     // 預設顯示回主選單
-    show(backToMenuBtn, true);
+    show(backToMenuButtons, true);
   }
 
   // 6) 初始顯示

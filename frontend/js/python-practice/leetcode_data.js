@@ -6,9 +6,7 @@ import {
   groupByUnitAndDifficulty,
 } from "./helpers.js";
 
-//
-// ====== 這段是 discoverLeetEntries()，原本應該在 leetcode_discover.js ======
-//
+
 export async function discoverLeetEntries() {
   // 1) 嘗試讀取 /data/leetcode_index.json
   try {

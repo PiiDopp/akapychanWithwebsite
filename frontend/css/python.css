@@ -129,7 +129,7 @@ body.sidebar-collapsed .changeBtn {
   list-style: none;
   padding-left: 0;
 }
-.random{
+.randomPicker{
   padding: 12px;
   margin-top: 8px;
   margin-right: 8px;
@@ -137,7 +137,7 @@ body.sidebar-collapsed .changeBtn {
   border: 2px solid var(--border);
   border-radius: 10px;
 }
-.random p{
+.randomPicker p{
   margin-bottom: 8px;
 }
 select{
@@ -150,7 +150,7 @@ select{
 option{
   color: var(--text);
 }
-input{
+.random-submit{
   width: 100%;
   font-size: 14px;
   padding: 4px;
@@ -159,8 +159,9 @@ input{
   color: var(--text);
   background-color: var(--bg);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
-input:hover{
+.random-submit:hover{
   background-color: #404668;
 }
 .UnitBlock {
@@ -262,7 +263,7 @@ input:hover{
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
   z-index: 100;
 }
 
@@ -295,6 +296,7 @@ body.sidebar-collapsed .leftsideBtn img {
   justify-content: center;
   align-items: center;
   text-decoration: none;
+  transition: all 0.3s ease;
 }
 .changeBtn:hover {
   background-color: #404668;
@@ -340,7 +342,7 @@ body.sidebar-collapsed .leftsideBtn img {
   background-color: #058f3a83;
   text-align: center;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 .runBtn:hover {
   background-color: #058f3a;
@@ -394,10 +396,12 @@ body.sidebar-collapsed .leftsideBtn img {
   background: #0f1221;
   padding: 8px 12px;
   border-radius: 6px;
-  white-space: pre-wrap;
   font-family: monospace;
   font-size: 16px;
   line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .examples {
@@ -453,6 +457,7 @@ body.sidebar-collapsed .leftsideBtn img {
   background-color: var(--border);
   border: solid 1px var(--muted);
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 .answerbtn:hover{
   background-color: var(--panel);
@@ -682,7 +687,7 @@ body.sidebar-collapsed .leftsideBtn img {
   position: absolute;
   width: 100%;
   top: var(--header-h);
-  bottom: calc(var(--input-h) + var(--toolbars-h) + 48px);
+  bottom: calc(var(--input-h) + var(--toolbars-h) + 52px);
   flex: 1;
   padding: 0 20px;
   overflow-y: auto;

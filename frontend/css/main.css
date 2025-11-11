@@ -90,6 +90,7 @@ body.sidebar-collapsed .mainBtn{
   cursor: pointer;
   transition: background-color 0.2s ease, padding-left 0.2s ease;
   font-size: clamp(14px, 1.6vw, 16px);
+  transition: all 0.3s ease;
 }
 .M-Unit:hover {
   background-color: #ddd;
@@ -108,6 +109,7 @@ body.sidebar-collapsed .mainBtn{
   border-radius: 5px;
   transition: background-color 0.2s ease, padding-left 0.2s ease;
   font-size: clamp(13px, 1.4vw, 15px);
+  transition: all 0.3s ease;
 }
 .S-Unit:hover {
   background-color: #ccc;
@@ -126,7 +128,7 @@ body.sidebar-collapsed .mainBtn{
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .leftsideBtn:hover {
@@ -402,6 +404,40 @@ body.sidebar-collapsed .chatbot {
   border-radius: 8px;
   margin-top: 10px;
 }
+.code-block {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+  border: dashed 2px #777;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  color: #555;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  margin: 0; /* 緊貼上方 */
+}
+.lang-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  opacity: 0.8;
+}
+
+/* 複製鍵 */
+.copy-btn {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+.copy-btn:hover {
+  color: #777;
+}
 
 .ai-rich-content {
   max-width: 100%;
@@ -416,7 +452,6 @@ body.sidebar-collapsed .chatbot {
   overflow: auto;
   padding: 12px 16px;
   border-radius: 0.5rem;
-  border: dashed 2px #888;
   margin: 10px;
 }
 .ai-rich-content code {
