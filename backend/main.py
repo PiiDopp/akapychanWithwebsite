@@ -22,6 +22,7 @@ from core.model_interface import (
 
 from core.explain_user_code import explain_user_code
 from core.explain_error import explain_code_error
+from core.pynguin_runne import run_pynguin_on_code
 
 # ====== 判題核心（LeetCode / STDIN）(omm)======
 from core.judge_core import (
@@ -336,16 +337,22 @@ async def chat(request: Request):
                     "code": code_block,
                     "need_text": ctx["need"],
                 })
-                if "history" not in ctx:
-                    ctx["history"] = []
-                _append_history(f"測資筆數: {len(ctx['tests'])}")
-                _append_history("初始程式產生完成（stdin 版本）")
+                # === 新增：在顯示給使用者前，先用 Pynguin 跑一次 ===
+                # 這可以幫助發現 LLM 生成的程式碼是否有明顯的語法錯誤或無法執行的問題
+                # 因為 Pynguin 需要可執行的程式碼才能生成測試
+                py_res = run_pynguin_on_code(PYTHON_PRELUDE + "\n" + code_block, timeout=10)
+                pynguin_note = ""
+                if py_res["success"] and py_res["has_tests"]:
+                    pynguin_note = "\n(✅ 系統已通過自動化工具初步驗證此程式碼的可測試性)"
+                # =================================================
+
                 session["ctx"] = ctx
                 session["step"] = "verify_prompt"
 
                 body = (
                     "=== 程式碼（初始版，stdin/stdout） ===\n"
-                    f"```python\n{code_block}\n```\n\n"
+                    f"```python\n{code_block}\n```\n"
+                    f"{pynguin_note}\n" # 加在這裡
                     "=== 程式碼解釋 ===\n"
                     f"{explain_resp}\n\n"
                     "要執行程式（main 測試）嗎？\n"
@@ -841,6 +848,21 @@ async def chat(request: Request):
             # 分支 A: 使用者提供了需求 -> 生成測資並驗證
             if user_need and user_need.upper() not in ["SKIP", "跳過"]:
                 report.append(f"[提示] 正在根據需求說明生成測資...\n需求：{user_need[:100]}...\n")
+
+                # === 新增：Pynguin 自動強健性測試 ===
+                # 這裡選擇同步呼叫作為示範，實際生產環境建議用背景任務 (BackgroundTasks)
+                report.append("[系統] 同時啟動 Pynguin 進行自動化邊界測試...\n")
+                pynguin_result = run_pynguin_on_code(user_code_to_run, timeout=15) # 設定短一點的 timeout
+
+                if pynguin_result["success"] and pynguin_result["has_tests"]:
+                     report.append(f"[Pynguin] ✅ 已自動生成額外的單元測試來檢查程式強健性。\n")
+                     # 進階：您可以嘗試解析 pynguin_result["test_code"] 來看看有無失敗的斷言
+                     # 或是直接把生成的測試程式碼提供給使用者參考
+                     # report.append(f"--- Pynguin Generated Tests ---\n```python\n{pynguin_result['test_code']}\n```\n")
+                elif not pynguin_result["success"]:
+                     # Pynguin 執行失敗 (可能是程式碼本身無法解析或 timeout)
+                     print(f"[Pynguin Error] {pynguin_result.get('error')}")
+                # =================================
                 
                 try:
                     # 在生成測資的 Prompt 中加入使用者程式碼作為參考，提高測資格式的準確度
