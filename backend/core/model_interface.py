@@ -41,31 +41,31 @@ few_shot_examples = [
     {
         "user_need": "寫一個函式 twoSum(nums, target)，回傳陣列中兩個數字相加等於 target 的索引。",
         "output": """
-{
+{{
     "reasoning": "此題需要測試基本功能，並考慮邊界情況：1. 答案在陣列開頭或結尾。 2. 陣列中包含負數或零。 3. 確保不會重複使用同一個元素(例如 [3,3] target 6 應回傳 [0,1] 而非 [0,0])。",
     "cases": [
-        {"input": [[2, 7, 11, 15], 9], "output": [0, 1]},
-        {"input": [[3, 2, 4], 6], "output": [1, 2]},
-        {"input": [[3, 3], 6], "output": [0, 1]},
-        {"input": [[-1, -2, -3, -4, -5], -8], "output": [2, 4]},
-        {"input": [[0, 4, 3, 0], 0], "output": [0, 3]}
+        {{"input": [[2, 7, 11, 15], 9], "output": [0, 1]}},
+        {{"input": [[3, 2, 4], 6], "output": [1, 2]}},
+        {{"input": [[3, 3], 6], "output": [0, 1]}},
+        {{"input": [[-1, -2, -3, -4, -5], -8], "output": [2, 4]}},
+        {{"input": [[0, 4, 3, 0], 0], "output": [0, 3]}}
     ]
-}
+}}
 """
     },
     {
         "user_need": "反轉一個字串。",
         "output": """
-{
+{{
     "reasoning": "基本字串操作。測試策略應包含：1. 一般英文字串。 2. 空字串(Empty String)的邊界測試。 3. 只有一個字元的字串。 4. 包含空白、特殊符號或中文的字串，確保編碼處理正確。",
     "cases": [
-        {"input": "hello", "output": "olleh"},
-        {"input": "", "output": ""},
-        {"input": "a", "output": "a"},
-        {"input": "race car", "output": "rac ecar"},
-        {"input": "你好世界", "output": "界世好你"}
+        {{"input": "hello", "output": "olleh"}},
+        {{"input": "", "output": ""}},
+        {{"input": "a", "output": "a"}},
+        {{"input": "race car", "output": "rac ecar"}},
+        {{"input": "你好世界", "output": "界世好你"}}
     ]
-}
+}}
 """
     }
 ]

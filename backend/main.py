@@ -167,31 +167,61 @@ def _robust_extract_tests(model_response: str, user_need: str = "") -> List[Dict
     # 1. 標準提取 (尋找 ```json 區塊)
     raw_tests = extract_json_block(model_response)
 
-    # 2. 回退機制 A: 如果沒找到區塊，嘗試直接解析整個回覆 (有時模型只回傳純 JSON)
+    # 2. 回退機制 A: 如果沒找到區塊，嘗試直接解析整個回覆
     if not raw_tests:
         trimmed = model_response.strip()
         if (trimmed.startswith('[') and trimmed.endswith(']')):
             try:
-                json.loads(trimmed) # 測試是否為有效 JSON
-                raw_tests = trimmed
+                raw_tests = json.loads(trimmed)
             except:
                 pass
 
-    # 3. 正規化
-    json_tests = normalize_tests(raw_tests)
-
-    # 4. 回退機制 B: 如果正規化失敗但我們有原始 JSON，嘗試直接使用
-    if not json_tests and raw_tests:
+    # 3. 回退機制 B (強力模式): 在整篇回覆中尋找最大的 [...] 區塊
+    # 這能解決模型在 ```json 區塊外還有其他文字，或是區塊標記錯誤的問題
+    if not raw_tests:
         try:
-            parsed = json.loads(raw_tests)
-            if isinstance(parsed, list):
-                json_tests = parsed
+            start_idx = model_response.find('[')
+            end_idx = model_response.rfind(']')
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                potential_json = model_response[start_idx : end_idx + 1]
+                raw_tests = json.loads(potential_json)
         except:
             pass
 
-    # 5. 回退機制 C: 從文字描述中解析
+    # 4. 正規化 (如果抓到的是 dict，嘗試轉成 list)
+    if isinstance(raw_tests, dict):
+        # 有時模型會回傳 {"tests": [...]} 或 {"reasoning": "...", "data": [...]}
+        for key in ["tests", "data", "examples", "cases"]:
+            if key in raw_tests and isinstance(raw_tests[key], list):
+                raw_tests = raw_tests[key]
+                break
+        else:
+            # 如果還是 dict 且沒找到已知 key，嘗試把它當成單一測試案例包成 list
+            raw_tests = [raw_tests]
+
+    # 確保 raw_tests 是列表，否則正規化可能會失敗
+    if not isinstance(raw_tests, list):
+        raw_tests = []
+
+    # 5. 呼叫核心的 normalize_tests
+    # 注意：需要確保 core.model_interface 有匯出這個函式
+    try:
+        json_tests = normalize_tests(raw_tests)
+    except Exception as e:
+        print(f"[警告] normalize_tests 失敗: {e}")
+        json_tests = []
+
+    # 6. 回退機制 C: 從文字描述中解析 (最後手段)
     if not json_tests and user_need:
-         json_tests = normalize_tests(parse_tests_from_text(user_need))
+         # 這裡使用既有的 parse_tests_from_text，但它可能需要特定格式
+         try:
+            text_parsed = parse_tests_from_text(user_need)
+            if text_parsed:
+                # 這裡可能需要根據 parse_tests_from_text 的回傳格式做調整
+                # 假設它回傳的是可以直接用的格式
+                pass 
+         except:
+             pass
          
     return json_tests or []
 
@@ -288,11 +318,9 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("接受虛擬碼")
 
-                test_prompt = generate_structured_tests(ctx["need"])
-                test_resp = run_model(test_prompt)
-                
-                # 使用更強健的提取方式
-                json_tests = _robust_extract_tests(test_resp, ctx["need"])
+                raw_tests = generate_structured_tests(ctx["need"])
+                # 透過 normalize_tests 確保格式統一 (例如將 list 轉為 stdin 字串)
+                json_tests = normalize_tests(raw_tests)
 
                 # 存回 ctx，後面 verify 會用
                 ctx["tests"] = json_tests or []
@@ -303,7 +331,7 @@ async def chat(request: Request):
                     #    print(f"  {i}. 輸入: {repr(t.get('input'))} → 預期輸出: {repr(t.get('output'))}")
                 else:
                     print("[警告] ⚠️ 未能從模型回覆中提取/正規化測資。以下是模型原文：")
-                    print(test_resp)
+                    # print(test_resp)
 
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
@@ -513,8 +541,8 @@ async def chat(request: Request):
                         output_display = (str(expected_str) or "").strip()
                         report_lines.append(f"\n--- 測試案例 {i} ---")
                         report_lines.append(f"輸入: {input_display}")
-                        if stdin_to_use != str(stdin_str):
-                             report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
+                        # if stdin_to_use != str(stdin_str):
+                        #      report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
                         report_lines.append(f"預期輸出: {output_display}")
 
                         # 第一次驗證：使用標準（或已攤平的）輸入與原始預期輸出
@@ -621,9 +649,9 @@ async def chat(request: Request):
                 # === 步驟 A: 重新生成測資 (與模式 1 首次驗證相同) ===
                 try:
                     # print(f"[DEBUG] Regenerating tests for need: {need_text[:50]}...")
-                    test_prompt = generate_structured_tests(need_text)
-                    test_resp = run_model(test_prompt)
-                    new_tests = _robust_extract_tests(test_resp, need_text)
+                    raw_tests = generate_structured_tests(ctx["need"])
+                    # 透過 normalize_tests 確保格式統一 (例如將 list 轉為 stdin 字串)
+                    new_tests = normalize_tests(raw_tests)
                     
                     if new_tests:
                         ctx["tests"] = new_tests
@@ -732,8 +760,8 @@ async def chat(request: Request):
                             input_display = " ".join((str(stdin_str) or "").split())
                             report_lines.append(f"\n--- 測試案例 {i} ---")
                             report_lines.append(f"輸入: {input_display}")
-                            if stdin_to_use != str(stdin_str):
-                                report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
+                            # if stdin_to_use != str(stdin_str):
+                            #     report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
                             report_lines.append(f"預期輸出: {(str(expected_str) or '').strip()}")
 
                             ok, detail = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=expected_str)
@@ -875,11 +903,11 @@ async def chat(request: Request):
                 try:
                     # 在生成測資的 Prompt 中加入使用者程式碼作為參考，提高測資格式的準確度
                     need_with_code_context = f"需求說明:\n{user_need}\n\n參考程式碼(請確保測資能作為此程式的合法輸入):\n```python\n{raw_user_code}\n```"
-                    test_prompt = generate_structured_tests(need_with_code_context)
-                    test_resp = run_model(test_prompt)
+                    raw_tests = generate_structured_tests(need_with_code_context)
+                    json_tests = normalize_tests(raw_tests)
                     
                     # 使用更強健的提取方式
-                    json_tests = _robust_extract_tests(test_resp, user_need)
+                    # json_tests = _robust_extract_tests(test_resp, user_need)
 
                     if json_tests:
                         report.append(f"[提示] 已成功提取 {len(json_tests)} 筆測資。開始驗證...\n")
@@ -998,8 +1026,8 @@ async def chat(request: Request):
 
                             report.append(f"--- 測試案例 {i+1} ---")
                             report.append(f"輸入: {repr(stdin_str)}")
-                            if stdin_to_use != stdin_str:
-                                 report.append(f"(輸入已自動調整為: {repr(stdin_to_use)})")
+                            # if stdin_to_use != stdin_str:
+                            #     #  report.append(f"(輸入已自動調整為: {repr(stdin_to_use)})")
                             report.append(f"預期輸出: {repr(expected_str)}")
 
                             # 第一次驗證

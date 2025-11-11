@@ -1,6 +1,7 @@
 import re
 import json
 from typing import Optional
+from typing import Union, List, Dict
 
 
 def extract_code_block(model_output: str) -> Optional[str]:
@@ -8,15 +9,37 @@ def extract_code_block(model_output: str) -> Optional[str]:
     return m.group(1).strip() if m else None
 
 
-def extract_json_block(model_output: str) -> list:
-    m = re.search(r"```json\n(.*?)```", model_output, re.DOTALL)
+def extract_json_block(model_output: str) -> Union[List, Dict]:
+    # 增強版正則：
+    # 1. (?:json)? -> 允許 ``` 後面不一定要有 json
+    # 2. \s* -> 允許任意空白字元（包含換行）
+    # 3. re.IGNORECASE -> 忽略大小寫
+    m = re.search(r"```(?:json)?\s*(.*?)```", model_output, re.DOTALL | re.IGNORECASE)
     if not m:
         return []
     try:
         content = m.group(1).strip()
         return json.loads(content)
-    except Exception:
+    except json.JSONDecodeError:
+        # 如果標準解析失敗，嘗試尋找最外層的 [] 或 {}
+        try:
+            content = m.group(1).strip()
+            # 嘗試抓取列表
+            if '[' in content and ']' in content:
+                start = content.find('[')
+                end = content.rfind(']') + 1
+                return json.loads(content[start:end])
+            # 嘗試抓取物件
+            elif '{' in content and '}' in content:
+                start = content.find('{')
+                end = content.rfind('}') + 1
+                return json.loads(content[start:end])
+        except:
+            pass
         print("[警告] JSON 解析失敗，請檢查模型輸出格式。")
+        return []
+    except Exception as e:
+        print(f"[警告] JSON 提取發生未預期錯誤: {e}")
         return []
 
 
