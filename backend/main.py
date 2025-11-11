@@ -15,7 +15,7 @@ from core import (
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
-    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt,
+    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt, generate_structured_tests,
     #omm
     interactive_chat_api, normalize_tests
 )
@@ -288,7 +288,7 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("接受虛擬碼")
 
-                test_prompt = build_test_prompt(ctx["need"])
+                test_prompt = generate_structured_tests(ctx["need"])
                 test_resp = run_model(test_prompt)
                 
                 # 使用更強健的提取方式
@@ -621,7 +621,7 @@ async def chat(request: Request):
                 # === 步驟 A: 重新生成測資 (與模式 1 首次驗證相同) ===
                 try:
                     # print(f"[DEBUG] Regenerating tests for need: {need_text[:50]}...")
-                    test_prompt = build_test_prompt(need_text)
+                    test_prompt = generate_structured_tests(need_text)
                     test_resp = run_model(test_prompt)
                     new_tests = _robust_extract_tests(test_resp, need_text)
                     
@@ -875,7 +875,7 @@ async def chat(request: Request):
                 try:
                     # 在生成測資的 Prompt 中加入使用者程式碼作為參考，提高測資格式的準確度
                     need_with_code_context = f"需求說明:\n{user_need}\n\n參考程式碼(請確保測資能作為此程式的合法輸入):\n```python\n{raw_user_code}\n```"
-                    test_prompt = build_test_prompt(need_with_code_context)
+                    test_prompt = generate_structured_tests(need_with_code_context)
                     test_resp = run_model(test_prompt)
                     
                     # 使用更強健的提取方式
