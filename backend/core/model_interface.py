@@ -5,14 +5,17 @@ import time
 import requests
 import subprocess
 from core.io_utils import ThinkingDots
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 from core.code_extract import extract_code_block
 from core.validators import validate_main_function
+import json
 
+from langchain_ollama import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, FewShotPromptTemplate
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_ollama import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser
+from pydantic import BaseModel, Field
 
 # ===== 基本設定 =====
 OLLAMA_HOST   = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
@@ -23,60 +26,168 @@ KEEP_ALIVE    = os.environ.get("OLLAMA_KEEP_ALIVE", "5m")        # 預熱時間
 FAST_NUM_PREDICT = int(os.getenv("LLM_FAST_NUM_PREDICT", "160")) # 典型錯誤解釋 2~4 句
 FAST_TIMEOUT_SEC = int(os.getenv("LLM_FAST_TIMEOUT", "12"))      # 逾時就放棄
 
-def _post_ollama(prompt: str, model: str, *, num_predict: int | None, timeout_sec: int | None):
-    """
-    低階呼叫：可指定 num_predict 與 timeout。
-    """
-    url = f"{OLLAMA_HOST}/api/generate"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "stream": False,
-        "keep_alive": KEEP_ALIVE,
-    }
-    # 精簡生成
-    options = {
-        # 控制生成長度與速度
-        **({"num_predict": num_predict} if num_predict is not None else {}),
-        "temperature": 0.2,
-        "top_k": 30,
-        "top_p": 0.9,
-        "repeat_penalty": 1.05,
-    }
-    payload["options"] = options
-    # 有逾時則套用（connect/read 分開避免掛住）
-    kwargs = {}
-    if timeout_sec is not None and timeout_sec > 0:
-        kwargs["timeout"] = (5, max(5, timeout_sec - 5))
+# ===================== 1. 定義測資的預期結構 (Pydantic) =====================
+class TestCase(BaseModel):
+    input: Any = Field(description="輸入參數。若是多參數函式，請使用陣列 [arg1, arg2]。單一參數則直接給值。")
+    output: Any = Field(description="預期的正確輸出結果。")
 
-    res = requests.post(url, json=payload, **kwargs)
-    res.raise_for_status()
-    data = res.json()
-    return (data.get("response") or "").strip()
+class TestSuite(BaseModel):
+    # Chain of Thought 核心：強制模型在生成 cases 前先輸出 reasoning
+    reasoning: str = Field(description="請先在此欄位描述你的測試策略：你考慮了哪些邊界情況(Edge Cases)？為什麼選擇這些範例？")
+    cases: List[TestCase] = Field(description="包含 5 到 10 筆具代表性的測試資料列表。")
+
+# ===================== 2. 定義 Few-Shot 範例 =====================
+few_shot_examples = [
+    {
+        "user_need": "寫一個函式 twoSum(nums, target)，回傳陣列中兩個數字相加等於 target 的索引。",
+        "output": """
+{{
+    "reasoning": "此題需要測試基本功能，並考慮邊界情況：1. 答案在陣列開頭或結尾。 2. 陣列中包含負數或零。 3. 確保不會重複使用同一個元素(例如 [3,3] target 6 應回傳 [0,1] 而非 [0,0])。",
+    "cases": [
+        {{"input": [[2, 7, 11, 15], 9], "output": [0, 1]}},
+        {{"input": [[3, 2, 4], 6], "output": [1, 2]}},
+        {{"input": [[3, 3], 6], "output": [0, 1]}},
+        {{"input": [[-1, -2, -3, -4, -5], -8], "output": [2, 4]}},
+        {{"input": [[0, 4, 3, 0], 0], "output": [0, 3]}}
+    ]
+}}
+"""
+    },
+    {
+        "user_need": "反轉一個字串。",
+        "output": """
+{{
+    "reasoning": "基本字串操作。測試策略應包含：1. 一般英文字串。 2. 空字串(Empty String)的邊界測試。 3. 只有一個字元的字串。 4. 包含空白、特殊符號或中文的字串，確保編碼處理正確。",
+    "cases": [
+        {{"input": "hello", "output": "olleh"}},
+        {{"input": "", "output": ""}},
+        {{"input": "a", "output": "a"}},
+        {{"input": "race car", "output": "rac ecar"}},
+        {{"input": "你好世界", "output": "界世好你"}}
+    ]
+}}
+"""
+    }
+]
+
+# ===================== LangChain Helper =====================
+def get_ollama_llm(
+    model: str = MODEL_NAME,
+    temperature: float = 0.2,
+    num_predict: Optional[int] = None,
+    timeout_sec: Optional[int] = None
+) -> OllamaLLM:
+    return OllamaLLM(
+        base_url=OLLAMA_HOST,
+        model=model,
+        temperature=temperature,
+        top_k=30,
+        top_p=0.9,
+        repeat_penalty=1.05,
+        num_predict=num_predict,
+        keep_alive=KEEP_ALIVE,
+        request_timeout=timeout_sec if timeout_sec and timeout_sec > 0 else None,
+    )
 
 # ===================== 高階介面 =====================
-def generate_response(prompt: str, model: str = MODEL_NAME) -> str:
-    """
-    正常/完整輸出（保留原本行為；不強制設定逾時與 num_predict）。
-    """
+def generate_response(prompt: str, model: str = MODEL_NAME, num_predict: Optional[int] = None, timeout: Optional[int] = None) -> str:
+    """通用文字生成 (保持不變以相容舊程式碼)"""
     spinner = ThinkingDots("模型思考中")
-    start_time = time.perf_counter()
     spinner.start()
     try:
-        resp = _post_ollama(prompt, model, num_predict=None, timeout_sec=None)
-        if not resp:
-            return (
-                "❌ 無法連線到本機模型（Ollama HTTP）。\n"
-                f"1) 服務：{OLLAMA_HOST}\n"
-                f"2) 模型：{model}\n"
-                "3) Windows/WSL2/Docker 埠號是否正確。"
-            )
-        return resp
+        llm = get_ollama_llm(model=model, num_predict=num_predict, timeout_sec=timeout)
+        resp = llm.invoke(prompt)
+        return resp.strip() if resp else "[警告] 模型回傳空值"
     except Exception as e:
-        return f"[HTTP 呼叫失敗] {e}"
+        return f"[模型錯誤] {e}"
     finally:
         spinner.stop()
-        print(f"[資訊] 模型思考時間: {time.perf_counter() - start_time:.3f} 秒")
+
+# ===================== 核心：強健的 JSON 解析器 =====================
+def try_parse_json(text: str) -> Optional[Dict[str, Any]]:
+    """
+    嘗試多層次策略從混雜文字中提取並解析 JSON 物件。
+    """
+    if not text: return None
+    text = text.strip()
+
+    # 策略 1: 假設整段就是合法的 JSON
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # 策略 2: 嘗試提取 Markdown code block 中的內容
+    # 使用非貪婪匹配抓取第一個可能的 JSON 區塊
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    # 策略 3: 暴力法 - 尋找最外層的 {}
+    # 這能處理模型在 JSON 前後加上大量廢話的情況
+    start_idx = text.find('{')
+    end_idx = text.rfind('}')
+    if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+        potential_json = text[start_idx : end_idx + 1]
+        try:
+            return json.loads(potential_json)
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
+# ===================== 新版：結構化測資生成 (最終修復版) =====================
+def generate_structured_tests(user_need: str, model_name: str = MODEL_NAME) -> List[Dict[str, Any]]:
+    spinner = ThinkingDots("設計測試案例中 (CoT)")
+    spinner.start()
+    try:
+        # 定義 Prompt，明確要求 JSON 格式
+        example_prompt = PromptTemplate(
+            input_variables=["user_need", "output"],
+            template="需求: {user_need}\n回應: {output}"
+        )
+
+        prompt = FewShotPromptTemplate(
+            examples=few_shot_examples,
+            example_prompt=example_prompt,
+            prefix=(
+                "你是一位專業 QA。請根據需求設計具代表性且包含邊界情況的測試案例。\n"
+                "請先在 'reasoning' 欄位寫下你的測試策略思考過程，然後在 'cases' 欄位列出測試資料。\n"
+                "務必直接回傳合法的 JSON 物件格式，不要加任何 Markdown 標記或其他解釋文字。\n"
+            ),
+            suffix="需求: {user_need}\n回應:",
+            input_variables=["user_need"]
+        )
+
+        # 執行模型
+        llm = get_ollama_llm(model=model_name, temperature=0.1) # 低溫以提高格式穩定性
+        chain = prompt | llm
+        raw_output = chain.invoke({"user_need": user_need})
+        
+        # 使用強健解析器處理結果
+        parsed_data = try_parse_json(raw_output)
+
+        if parsed_data and isinstance(parsed_data, dict):
+            # 成功解析，顯示思考過程 (CoT)
+            if "reasoning" in parsed_data:
+                print(f"\n[測試策略思考]\n{parsed_data['reasoning']}\n")
+            
+            # 回傳測資列表，若無則回傳空列表
+            return parsed_data.get("cases", [])
+        else:
+            # 解析失敗，印出部分原始輸出以供除錯
+            print(f"\n[警告] 無法從模型輸出中解析出 JSON 測資。")
+            # print(f"[除錯原始輸出] {raw_output[:500]}...") # 需要時可取消註解
+            return []
+
+    except Exception as e:
+        print(f"\n[測資生成程序錯誤] {e}")
+        return []
+    finally:
+        spinner.stop()
 
 # ===================== Prompt Builders =====================
 
