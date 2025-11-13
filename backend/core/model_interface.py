@@ -5,7 +5,7 @@ import time
 import requests
 import subprocess
 from core.io_utils import ThinkingDots
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict, Any, Callable
 from core.code_extract import extract_code_block
 from core.validators import validate_main_function
 import json
@@ -14,7 +14,7 @@ from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, FewShotPromptTemplate
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser
+from langchain_core.output_parsers import PydanticOutputParser, JsonOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
 
 # ===== 基本設定 =====
@@ -28,8 +28,10 @@ FAST_TIMEOUT_SEC = int(os.getenv("LLM_FAST_TIMEOUT", "12"))      # 逾時就放�
 
 # ===================== 1. 定義測資的預期結構 (Pydantic) =====================
 class TestCase(BaseModel):
-    input: Any = Field(description="輸入參數。若是多參數函式，請使用陣列 [arg1, arg2]。單一參數則直接給值。")
+    input: Any = Field(description="輸入參數。多參數請用陣列 [arg1, arg2]。")
     output: Any = Field(description="預期的正確輸出結果。")
+    type: str = Field(description="測資分類：Normal, Edge, Exception, MutationKiller", default="Normal")
+    note: str = Field(description="測試目的說明", default="")
 
 class TestSuite(BaseModel):
     # Chain of Thought 核心：強制模型在生成 cases 前先輸出 reasoning
@@ -139,59 +141,273 @@ def try_parse_json(text: str) -> Optional[Dict[str, Any]]:
 
     return None
 
-# ===================== 新版：結構化測資生成 (最終修復版) =====================
-def generate_structured_tests(user_need: str, model_name: str = MODEL_NAME) -> List[Dict[str, Any]]:
-    spinner = ThinkingDots("設計測試案例中 (CoT)")
-    spinner.start()
-    try:
-        # 定義 Prompt，明確要求 JSON 格式
-        example_prompt = PromptTemplate(
-            input_variables=["user_need", "output"],
-            template="需求: {user_need}\n回應: {output}"
-        )
+class ChainOfThoughtTestAgent:
+    """
+    整合 LangChain 的五階段測資生成與驗證代理人。
+    - Module A: CoT 需求分析
+    - Module B: 結構化測資生成
+    - Module C: 執行介面 (透過 callback)
+    - Module D: 結果反饋與修正
+    - Module E: 變異測試 (Mutation Testing)
+    """
+    def __init__(self, model_name=MODEL_NAME):
+        self.llm = get_ollama_llm(model=model_name, temperature=0.2)
+        self.memory = ChatMessageHistory()
 
-        prompt = FewShotPromptTemplate(
-            examples=few_shot_examples,
-            example_prompt=example_prompt,
-            prefix=(
-                "你扮演 **Agent 2：程式碼轉換與測資生成模組** 的角色。\n"
-                "任務：根據使用者需求，設計 5 到 10 筆具代表性且包含邊界情況（Edge Cases）的測試資料。\n"
-                "請先在 'reasoning' 欄位寫下你的測試策略思考過程，然後在 'cases' 欄位列出測試資料。\n"
-                "務必直接回傳合法的 JSON 物件格式，不要加任何 Markdown 標記或其他解釋文字。\n"
-            ),
-            suffix="需求: {user_need}\n回應:",
+    def _get_analysis_chain(self):
+        """Agent A: 需求分析與邏輯拆解"""
+        prompt = PromptTemplate(
+            template="""
+            你扮演 **Agent A：程式碼測試架構師**。
+            
+            使用者需求：
+            {user_need}
+            
+            請進行 Chain of Thought 邏輯分析：
+            1. **I/O 規格**：輸入參數個數、型態；輸出型態。
+            2. **邏輯路徑**：正常情況 (Happy Path)。
+            3. **邊界與例外**：列出至少 3 種邊界情況 (Edge Cases，如空值、極值、負數)。
+            
+            請輸出你的分析報告：
+            """,
             input_variables=["user_need"]
         )
+        return prompt | self.llm | StrOutputParser()
 
-        # 執行模型
-        llm = get_ollama_llm(model=model_name, temperature=0.1) # 低溫以提高格式穩定性
-        chain = prompt | llm
-        raw_output = chain.invoke({"user_need": user_need})
-        
-        # 使用強健解析器處理結果
-        parsed_data = try_parse_json(raw_output)
-
-        if parsed_data and isinstance(parsed_data, dict):
-            # 成功解析，顯示思考過程 (CoT)
-            if "reasoning" in parsed_data:
-                print(f"\n[測試策略思考]\n{parsed_data['reasoning']}\n")
+    def _get_generation_chain(self):
+        """Agent B: 結構化測資生成"""
+        prompt = PromptTemplate(
+            template="""
+            你扮演 **Agent B：測資工程師**。
             
-            # 回傳測資列表，若無則回傳空列表
-            return parsed_data.get("cases", [])
+            參考分析報告：{analysis_result}
+            原始需求：{user_need}
+            
+            任務：生成 5-8 筆 JSON 格式的測試案例。
+            
+            格式要求 (JSON Array of Objects):
+            [
+              {{ "input": [參數1, 參數2], "output": 預期結果, "type": "Normal", "note": "基本測試" }},
+              {{ "input": [邊界參數], "output": 預期結果, "type": "Edge", "note": "邊界測試" }}
+            ]
+            
+            **注意**：若函式有多個參數，input 必須是包含所有參數的陣列，例如 `[nums, target]`。
+            
+            請直接回傳 JSON，不要包含 Markdown 標記：
+            """,
+            input_variables=["user_need", "analysis_result"]
+        )
+        return prompt | self.llm | StrOutputParser()
+
+    def _get_feedback_chain(self):
+        """Agent D: 錯誤分析與反饋"""
+        prompt = PromptTemplate(
+            template="""
+            你扮演 **Agent D：除錯專家**。
+            測試執行失敗，請分析原因。
+            
+            錯誤報告：
+            {execution_report}
+            
+            需求：{user_need}
+            
+            請分析：
+            1. 是程式邏輯錯誤？還是測資預期輸出有誤？
+            2. 給出具體的修正建議 (Actionable Advice)。
+            """,
+            input_variables=["user_need", "execution_report"]
+        )
+        return prompt | self.llm | StrOutputParser()
+
+    def _get_mutant_generation_chain(self):
+        """Agent E: 生成變異體 (Mutants)"""
+        prompt = PromptTemplate(
+            template="""
+            你扮演 **Agent E：變異測試專家**。
+            
+            請將以下正確的 Python 程式碼修改出 {num_mutants} 個「變異體 (Mutants)」。
+            每個變異體包含一個微小的邏輯錯誤 (如 > 改 >=, + 改 -, 忽略邊界等)，用以測試測資的品質。
+            
+            目標程式碼：
+            ```python
+            {target_code}
+            ```
+            
+            請回傳 JSON 列表：
+            [ {{ "description": "將迴圈範圍減一", "code": "def..." }} ]
+            
+            只回傳 JSON。
+            """,
+            input_variables=["target_code", "num_mutants"]
+        )
+        return prompt | self.llm | StrOutputParser()
+
+    def _get_mutant_killer_chain(self):
+        """Agent E: 生成殺手測資"""
+        prompt = PromptTemplate(
+            template="""
+            你扮演 **Agent B+：高階測資工程師**。
+            變異測試中，目前的測資無法區分「正確程式碼」與「變異體」。
+            
+            變異體描述：{mutant_desc}
+            
+            請設計一個新的測試案例 (JSON)，讓正確程式碼通過，但變異體失敗 (Output 不同)。
+            
+            格式：[ {{ "input": ..., "output": ..., "type": "MutationKiller", "note": "殺死變異體: {mutant_desc}" }} ]
+            """,
+            input_variables=["mutant_desc"]
+        )
+        return prompt | self.llm | StrOutputParser()
+
+    def run_pipeline(self, user_need: str, target_code: Optional[str] = None, execution_callback: Optional[Callable] = None) -> Dict[str, Any]:
+        """
+        執行完整閉環：分析 -> 生成 -> (執行) -> (反饋/變異測試)
+        """
+        # 1. Module A: Analysis
+        print(f"\n[Agent A] 分析需求中...")
+        analysis_res = self._get_analysis_chain().invoke({"user_need": user_need})
+        print(f"[Agent A 分析]\n{analysis_res[:200]}...\n")
+
+        # 2. Module B: Generation
+        print(f"\n[Agent B] 生成測資中...")
+        raw_tests = self._get_generation_chain().invoke({"user_need": user_need, "analysis_result": analysis_res})
+        test_cases = try_parse_json(raw_tests) or []
+        
+        # 確保格式是 List
+        if isinstance(test_cases, dict): test_cases = test_cases.get("cases", [])
+        if not isinstance(test_cases, list): test_cases = []
+        
+        # 補全欄位預設值
+        for tc in test_cases:
+            if "type" not in tc: tc["type"] = "Normal"
+            if "note" not in tc: tc["note"] = "Generated case"
+
+        result = {
+            "analysis": analysis_res,
+            "test_cases": test_cases,
+            "feedback": None,
+            "mutation_report": None
+        }
+
+        # 3. Module C: Execution (若有提供 Callback)
+        if execution_callback and target_code and test_cases:
+            print(f"\n[Agent C] 執行驗證中...")
+            success, report = execution_callback(target_code, test_cases)
+            
+            if not success:
+                # 4. Module D: Feedback
+                print(f"\n[Agent D] 測試失敗，偵測到錯誤...")
+                feedback = self._get_feedback_chain().invoke({"user_need": user_need, "execution_report": report})
+                result["feedback"] = feedback
+                print(f"[Agent D 建議]\n{feedback}")
+            else:
+                # 5. Module E: Mutation Testing
+                print(f"[Agent C] 基礎驗證通過！啟動變異測試 (Mutation Testing)...")
+                mutation_stats = self._run_mutation(target_code, test_cases, execution_callback)
+                result["mutation_report"] = mutation_stats
+                
+                if mutation_stats.get("new_cases"):
+                    print(f"[Agent E] 自動補充了 {len(mutation_stats['new_cases'])} 筆殺手測資。")
+                    # 將新測資合併回結果
+                    result["test_cases"].extend(mutation_stats["new_cases"])
+
+        return result
+
+    def _run_mutation(self, target_code, current_tests, runner):
+        """執行變異測試迴圈"""
+        chain = self._get_mutant_generation_chain()
+        raw = chain.invoke({"target_code": target_code, "num_mutants": 3})
+        mutants = try_parse_json(raw) or []
+        
+        killed = 0
+        new_cases = []
+        survivors = []
+
+        for m in mutants:
+            # 執行變異體
+            # Pass (True) = 變異體存活 (Bad) -> 測資不足
+            # Fail (False) = 變異體被殺死 (Good) -> 測資有效
+            is_passed, _ = runner(m.get("code", ""), current_tests)
+            if not is_passed:
+                killed += 1
+            else:
+                survivors.append(m)
+        
+        score = (killed / len(mutants)) * 100 if mutants else 0
+        print(f"[Agent E] 變異得分: {score:.1f}% ({killed}/{len(mutants)})")
+
+        # 對存活者生成新測資
+        if survivors:
+            print(f"[Agent E] 針對 {len(survivors)} 個存活變異體生成新測資...")
+            killer_chain = self._get_mutant_killer_chain()
+            for sm in survivors:
+                raw_k = killer_chain.invoke({"mutant_desc": sm.get("description", "unknown mutant")})
+                k_cases = try_parse_json(raw_k)
+                if isinstance(k_cases, list):
+                    for k in k_cases: k["type"] = "MutationKiller"
+                    new_cases.extend(k_cases)
+        
+        return {"score": score, "killed": killed, "total": len(mutants), "new_cases": new_cases}
+
+# ===================== 4. 執行適配器 (關鍵修正) =====================
+
+def leetcode_execution_adapter(code: str, test_cases: List[Dict]) -> Tuple[bool, str]:
+    """
+    Agent C (實作): 將 JSON 測資轉為 judge_core 可執行的格式。
+    ★ 解決 'missing 1 required positional argument' 錯誤的關鍵。
+    """
+    # 確保引用
+    try:
+        from core.judge_core import infer_method_name_from_code, validate_leetcode_code
+    except ImportError:
+        return False, "[系統錯誤] 無法匯入 judge_core 模組。"
+
+    method_name = infer_method_name_from_code(code)
+    if not method_name:
+        return False, "無法從程式碼中推斷方法名稱 (請定義 class Solution)。"
+
+    formatted_tests = []
+    for tc in test_cases:
+        inp = tc.get("input")
+        exp = tc.get("output")
+        
+        # [關鍵修正]: 
+        # 如果輸入是 List (例如 [nums, target])，必須轉為 Tuple (nums, target)
+        # 這樣 judge_core 內部的 func(*args) 才能正確解包為多個參數。
+        if isinstance(inp, list):
+            args = tuple(inp)
         else:
-            # 解析失敗，印出部分原始輸出以供除錯
-            print(f"\n[警告] 無法從模型輸出中解析出 JSON 測資。")
-            # print(f"[除錯原始輸出] {raw_output[:500]}...") # 需要時可取消註解
-            return []
+            # 單一參數的情況
+            args = (inp,)
+            
+        formatted_tests.append((method_name, args, exp))
 
-    except Exception as e:
-        print(f"\n[測資生成程序錯誤] {e}")
-        return []
-    finally:
-        spinner.stop()
+    # 呼叫 judge_core
+    success, log = validate_leetcode_code(
+        code=code,
+        tests=formatted_tests,
+        class_name="Solution"
+    )
+    
+    return success, log
 
-# ===================== Prompt Builders =====================
 
+# ===================== 5. 對外介面 =====================
+
+def generate_and_run_tests(user_need: str, code: str) -> Dict[str, Any]:
+    """
+    供 API 或主程式呼叫的入口函式。
+    """
+    agent = ChainOfThoughtTestAgent()
+    # 傳入 adapter 作為 callback
+    result = agent.run_pipeline(user_need, target_code=code, execution_callback=leetcode_execution_adapter)
+    return result
+
+def generate_structured_tests(user_need: str, model_name: str = MODEL_NAME) -> List[Dict[str, Any]]:
+    """舊介面相容 (只生成不執行)"""
+    agent = ChainOfThoughtTestAgent(model_name)
+    res = agent.run_pipeline(user_need)
+    return res["test_cases"]
 def build_virtual_code_prompt(user_need: str) -> str:
     """
     產生結構化虛擬碼 (Virtual Code)。
@@ -234,7 +450,6 @@ def build_virtual_code_prompt(user_need: str) -> str:
     )
     
     return prompt.format(user_need=user_need)
-
 def build_code_prompt(user_need: str, virtual_code: Optional[str] = None) -> str:
     """
     Agent 2: 程式碼轉換模組

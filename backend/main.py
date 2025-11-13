@@ -304,7 +304,6 @@ async def chat(request: Request):
             session["step"] = "need"
             return {"text": "**模式 1｜互動開發**\n\n請描述你的功能需求（一句或一段話即可）。"}
 
-        # Agent 1: 虛擬碼生成
         if step == "need":
             ctx["need"] = msg.strip()
             vc_preview = _mode1_generate_virtual_code(ctx)
@@ -312,8 +311,6 @@ async def chat(request: Request):
             session["ctx"] = ctx
             session["step"] = "vc_confirm"
             _append_history("Agent 1: 虛擬碼產生完成")
-            
-            # [FIX] 回復原始觸發字串
             return {
                 "text": (
                     "=== 虛擬碼 (預覽) ===\n"
@@ -323,19 +320,16 @@ async def chat(request: Request):
                 )
             }
 
-        # 確認虛擬碼 -> Agent 2 生成測資與程式碼
         if step == "vc_confirm":
             choice = (msg or "").strip().lower()
             if choice in ("", "y", "yes"):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("確認虛擬碼")
 
-                # Agent 2 Sub-task: 生成結構化測資
                 raw_tests = generate_structured_tests(ctx["need"])
                 json_tests = normalize_tests(raw_tests)
                 ctx["tests"] = json_tests or []
 
-                # Agent 2 Sub-task: 生成程式碼 (基於需求 + 虛擬碼 + 測資範例)
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
                     ctx.get("virtual_code", ""),
@@ -359,7 +353,6 @@ async def chat(request: Request):
                     session["step"] = "need"
                     return {"text": "Agent 2 無法產生有效程式碼，請嘗試補充需求細節。"}
 
-                # Agent 4: 初步解釋
                 explain_prompt = build_explain_prompt(ctx["need"], code_block)
                 explain_resp = run_model(explain_prompt)
 
@@ -368,7 +361,6 @@ async def chat(request: Request):
                     "need_text": ctx["need"],
                 })
 
-                # Pynguin 初步檢查
                 py_res = run_pynguin_on_code(PYTHON_PRELUDE + "\n" + code_block, timeout=10)
                 pynguin_note = ""
                 if py_res["success"] and py_res["has_tests"]:
@@ -377,7 +369,6 @@ async def chat(request: Request):
                 session["ctx"] = ctx
                 session["step"] = "verify_prompt"
 
-                # [FIX] 回復原始觸發字串，確保按鈕出現
                 body = (
                     "=== 程式碼（初始版，stdin/stdout） ===\n"
                     f"```python\n{code_block}\n```\n"
@@ -448,7 +439,6 @@ async def chat(request: Request):
                             inp = t.get("input")
                             out = t.get("output")
                             args = None
-                            # (簡化版參數解析)
                             if isinstance(inp, list) and expected_arg_count > 1 and len(inp) == expected_arg_count:
                                 args = tuple(inp)
                             else:
@@ -470,15 +460,29 @@ async def chat(request: Request):
                         stdin_str = str(t.get("input", ""))
                         expected_str = str(t.get("output", ""))
                         stdin_to_use = _try_flatten_input(stdin_str, code)
+                        
                         ok, detail = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=expected_str)
                         
                         if not ok:
                             flat_exp = _try_flatten_output_str(expected_str)
                             if flat_exp and flat_exp != expected_str:
-                                ok2, _ = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=flat_exp)
-                                if ok2: ok = True
+                                ok2, detail2 = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=flat_exp)
+                                if ok2: 
+                                    ok = True
+                                    detail = detail2 # 成功時更新為 Output
 
-                        report_lines.append(f"Case {i}: {'[通過]✅' if ok else '[失敗]❌'}\n{detail}")
+                        # [修改] 顯示 Input, Output, Expected
+                        status_icon = '[通過]✅' if ok else '[失敗]❌'
+                        sb = [f"Case {i}: {status_icon}"]
+                        sb.append(f"  Input: {stdin_str.strip()}")
+                        sb.append(f"  Output: {detail.strip()}")
+                        
+                        if not ok:
+                            sb.append(f"  Expected: {expected_str.strip()}")
+
+                        report_lines.append("\n".join(sb))
+                        report_lines.append("") # 分隔線
+
                         if not ok: 
                             all_passed = False
                             if not error_for_agent3: error_for_agent3 = detail
@@ -489,7 +493,7 @@ async def chat(request: Request):
 
             return "\n".join(report_lines), error_for_agent3
 
-        # 初次驗證 (Agent 3)
+        # 初次驗證
         if step == "verify_prompt":
             choice = (msg or "").strip().upper()
             code = ctx.get("code") or ""
@@ -507,12 +511,10 @@ async def chat(request: Request):
                     except Exception as e:
                         report_text += f"[Agent 3 分析失敗] {e}"
 
-                # [FIX] 回復原始觸發字串
                 return {"text": report_text + "\n\n是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
 
             elif choice == "N":
                 session["step"] = "modify_gate"
-                # [FIX] 回復原始觸發字串
                 return {
                         "text": (
                             "已略過執行驗證。\n\n是否進入互動式修改模式？\n"
@@ -526,7 +528,6 @@ async def chat(request: Request):
             ans = (msg or "").strip().lower()
             if ans in ("y", "yes"):
                 session["step"] = "modify_loop"
-                # [FIX] 回復原始觸發字串
                 return {"text": "\n=== 進入互動式修改模式 ===\n"
                                 "請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
@@ -540,7 +541,6 @@ async def chat(request: Request):
             else:
                 return {"text": "請輸入 y 或 n。"}
 
-        # 迭代修改迴圈 (Agents 3 & 4)
         if step == "modify_loop":
             choice = (msg or "").strip()
             code = ctx.get("code") or ""
@@ -550,7 +550,6 @@ async def chat(request: Request):
             history = ctx.get("history", [])
             u = choice.upper()
 
-            # Agent 3: 驗證與分析
             if u in {"V", "VERIFY"}:
                 report_text, error_msg = _perform_verification(code, json_tests)
                 if error_msg:
@@ -561,18 +560,15 @@ async def chat(request: Request):
                     except Exception as e:
                         report_text += f"[Agent 3 分析失敗] {e}"
                 
-                # [FIX] 保持原始格式
                 return {"text": f"{report_text}\n\n請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
                                 "  - 解釋 EXPLAIN\n"
                                 "  - 完成 QUIT\n"}
 
-            # Agent 4: 解釋
             if u in {"E", "EXPLAIN"}:
                 explain_prompt = build_explain_prompt(need_text, code)
                 text = f"=== Agent 4: 程式碼解釋 ===\n{run_model(explain_prompt)}"
-                # [FIX] 保持原始格式
                 return {"text": f"{text}\n\n請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
@@ -584,7 +580,6 @@ async def chat(request: Request):
                 session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
                 return {"text": f"已結束互動式修改模式。最終程式如下：\n```python\n{final_code}\n```"}
 
-            # Agent 4: 修正/重構
             modification_request = choice
             fix_prompt_string = build_fix_code_prompt(
                 need_text,
@@ -606,7 +601,6 @@ async def chat(request: Request):
             else:
                 text = "Agent 4 無法生成修正後的程式碼，請輸入更明確的需求。"
 
-            # [FIX] 保持原始格式
             return {"text": f"{text}\n\n請選擇您的下一步操作：\n"
                             "  - 修改：直接輸入您的修正需求\n"
                             "  - 驗證 VERIFY\n"
@@ -639,7 +633,6 @@ async def chat(request: Request):
             if user_need and user_need.upper() not in ["SKIP", "跳過"]:
                 report.append(f"[提示] 正在根據需求說明生成測資...\n需求：{user_need[:100]}...\n")
                 
-                # Pynguin 自動強健性測試
                 py_res = run_pynguin_on_code(user_code_to_run, timeout=15)
                 if py_res["success"] and py_res["has_tests"]:
                      report.append(f"[Pynguin] ✅ 已自動生成額外的單元測試。\n")
@@ -651,7 +644,6 @@ async def chat(request: Request):
 
                     if json_tests:
                         report.append(f"[提示] 已提取 {len(json_tests)} 筆測資。開始驗證...\n")
-                        # 使用與 Mode 1 相同的驗證邏輯 (這裡簡化重複代碼，實務上可封裝成共用函式)
                         is_leetcode = "class Solution" in raw_user_code
                         if is_leetcode:
                             try:
@@ -666,18 +658,26 @@ async def chat(request: Request):
                                     ok, log = validate_leetcode_code(user_code_to_run, core, class_name="Solution")
                                     report.append(log)
                                     if not ok:
-                                        # 呼叫 Agent 3 分析
                                         report.append("\n[Agent 3] 分析失敗原因...\n")
                                         report.append(_run_agent3_analysis(user_need, raw_user_code, log))
                             except Exception as e:
                                 report.append(f"[LeetCode 驗證錯誤] {e}")
                         else:
-                            for i, t in enumerate(json_tests):
+                            # [修改] 模式 2 的 STDIN 驗證報告也同步更新
+                            for i, t in enumerate(json_tests, 1):
                                 inp = str(t.get("input",""))
                                 out = str(t.get("output",""))
                                 inp_flat = _try_flatten_input(inp, user_code_to_run)
                                 ok, det = validate_main_function(user_code_to_run, stdin_input=inp_flat, expected_output=out)
-                                report.append(f"Case {i+1}: {'[通過]' if ok else '[失敗]'}\n{det}")
+                                
+                                status_icon = '[通過]✅' if ok else '[失敗]❌'
+                                sb = [f"Case {i}: {status_icon}"]
+                                sb.append(f"  Input: {inp.strip()}")
+                                sb.append(f"  Output: {det.strip()}")
+                                if not ok:
+                                    sb.append(f"  Expected: {out.strip()}")
+                                report.append("\n".join(sb))
+                                
                                 if not ok:
                                      report.append("\n[Agent 3] 分析失敗原因...\n")
                                      report.append(_run_agent3_analysis(user_need, raw_user_code, det))
