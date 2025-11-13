@@ -154,7 +154,8 @@ def generate_structured_tests(user_need: str, model_name: str = MODEL_NAME) -> L
             examples=few_shot_examples,
             example_prompt=example_prompt,
             prefix=(
-                "你是一位專業 QA。請根據需求設計具代表性且包含邊界情況的測試案例。\n"
+                "你扮演 **Agent 2：程式碼轉換與測資生成模組** 的角色。\n"
+                "任務：根據使用者需求，設計 5 到 10 筆具代表性且包含邊界情況（Edge Cases）的測試資料。\n"
                 "請先在 'reasoning' 欄位寫下你的測試策略思考過程，然後在 'cases' 欄位列出測試資料。\n"
                 "務必直接回傳合法的 JSON 物件格式，不要加任何 Markdown 標記或其他解釋文字。\n"
             ),
@@ -193,52 +194,70 @@ def generate_structured_tests(user_need: str, model_name: str = MODEL_NAME) -> L
 
 def build_virtual_code_prompt(user_need: str) -> str:
     """
-    產生虛擬碼 (Virtual Code)，類似流程圖的描述方式
+    產生結構化虛擬碼 (Virtual Code)。
+    採用結構化模板：(1)問題分析 (2)演算法邏輯 (3)邊界條件。
+    此 Prompt 引導模型先進行 CoT 推理（分析與邊界考慮），再生成虛擬碼。
     """
-    return (
+    template = (
         "用繁體中文回答。\n"
-        "你是一個虛擬碼生成助理。\n"
-        "任務：根據使用者的自然語言需求，**逐行地**產生對應的虛擬碼 (Virtual Code)，並在每行虛擬碼之後**立即**提供該行的**簡短、直觀的解釋**。\n"
-        "⚠️ 請勿輸出實際程式碼，只輸出結構化的步驟。\n\n"
-        "**輸出格式要求**：\n"
-        "1.  **逐行**輸出。\n"
-        "2.  **每行**必須包含：`虛擬碼步驟` + `[空格]` + `// 解釋/說明`。\n"
-        "3.  使用虛擬碼的箭頭 (`→`, `Yes →`, `No →`) 和結構 (`Start`, `End`, `Decision:`)。\n\n"
-        "**格式範例**：\n"
-        "```\n"
-        "Start // 程式開始執行\n"
-        "→ Step 1: 輸入使用者數字 // 從使用者處取得一個數值\n"
-        "→ Decision: 如果數字大於 0? // 檢查數值是否為正\n"
-        "    Yes → Step 2: 輸出 '正數' // 如果是正數，顯示該訊息\n"
-        "    No  → Decision: 如果數字等於 0? // 如果不是正數，檢查是否為零\n"
-        "        Yes → Step 3: 輸出 '零' // 數字是零，顯示該訊息\n"
-        "        No  → Step 4: 輸出 '負數' // 否則數值是負數\n"
-        "End // 程式執行結束\n"
+        "你是一個專業的演算法設計助理。\n"
+        "任務：根據使用者的需求，產生一份**結構化**的虛擬碼設計文件。\n"
+        "為了確保後續程式碼轉換的精準度，請務必嚴格遵守以下三個固定區段的輸出格式：\n\n"
+        "### (1) 問題分析與輸入／輸出定義\n"
+        "- **分析**：簡述題目目標，將需求拆解為思考步驟。\n"
+        "- **Input**：說明輸入資料的型態與結構。\n"
+        "- **Output**：說明預期輸出的結果。\n\n"
+        "### (2) 演算法邏輯步驟 (Virtual Code)\n"
+        "請使用結構化的虛擬碼描述流程 (包含箭頭 `→` 與縮排)，範例如下：\n"
+        "```text\n"
+        "Start // 程式開始\n"
+        "→ Step 1: 初始化變數... // 說明\n"
+        "→ Loop: 針對每一個元素... // 迴圈說明\n"
+        "    → Decision: 若符合條件? // 判斷說明\n"
+        "        Yes → 執行動作 A\n"
+        "        No  → 執行動作 B\n"
+        "End // 程式結束\n"
         "```\n\n"
-        f"使用者需求:\n{user_need}\n\n請根據**輸出格式要求**產生虛擬碼和逐行解釋："
+        "### (3) 邊界條件與例外情況處理\n"
+        "- 列出潛在的邊界情況 (Edge Cases) (如：空陣列、負數、資料型態錯誤...等)。\n"
+        "- 說明針對這些情況的處理邏輯或防禦性程式設計策略。\n\n"
+        "---\n"
+        "使用者需求：\n{user_need}\n"
+        "---\n"
+        "請依照上述結構產生完整回應："
     )
 
-def build_code_prompt(user_need: str) -> str:
+    # 使用 LangChain 的 PromptTemplate 實作，確保變數正確注入
+    prompt = PromptTemplate(
+        input_variables=["user_need"],
+        template=template
+    )
+    
+    return prompt.format(user_need=user_need)
+
+def build_code_prompt(user_need: str, virtual_code: Optional[str] = None) -> str:
     """
-    只產生 Python 程式碼，且程式碼必須包含 main() 函式。
+    Agent 2: 程式碼轉換模組
+    將使用者需求 (與 Agent 1 的虛擬碼) 轉換為可執行的 Python 程式碼。
     """
-    return (
+    prompt = (
         "用繁體中文回答。\n"
-        "你是程式碼生成助理。\n"
-        "任務：依據使用者需求產生正確可執行的 Python 程式碼，並加上白話註解。\n\n"
+        "你扮演 **Agent 2：程式碼轉換模組** 的角色。\n"
+        "任務：依據使用者需求" + ("與結構化虛擬碼 (Virtual Code)" if virtual_code else "") + "，產生正確可執行的 Python 程式碼。\n\n"
         "⚠️ **重要**：請僅輸出一個 Python 程式碼區塊，絕對不要輸出任何額外文字或解釋。\n"
         "程式碼必須：\n"
         "  1) 定義一個 `def main():` 函式作為程式進入點，\n"
         "  2) 在 `main()` 函式內，**必須包含具體的測試案例程式碼**，展示如何呼叫你定義的函式，並用 `print()` 輸出結果。\n"
         "  3) 在檔案尾端包含 `if __name__ == \"__main__\":\\n    main()` 以便直接執行，\n"
         "  4) 包含必要的白話註解以說明主要步驟。\n\n"
-        "輸出格式範例（務必遵守）：\n"
-        "```python\n"
-        "# 你的程式碼（包含 def main(): 與 if __name__ == \"__main__\": main() ）\n"
-        "```\n\n"
         f"使用者需求:\n{user_need}\n\n"
-        "請產生符合上述要求的 Python 程式碼："
     )
+    
+    if virtual_code:
+        prompt += f"參考虛擬碼設計:\n{virtual_code}\n\n"
+
+    prompt += "請產生符合上述要求的 Python 程式碼："
+    return prompt
 
 
 
@@ -435,7 +454,7 @@ def interactive_chat_api(user_input: str) -> str:
         return f"[錯誤] 模型回覆失敗：{e}"
 
 def interactive_code_modification_loop():
-    print("=== 互動式程式碼開發與修正模式 (生成/修正/解釋) ===")
+    print("=== 互動式程式碼開發與修正模式 (Agent 迴圈) ===")
 
     # 1. 取得初始需求
     print("請輸入您的程式碼需求，多行輸入，結束請輸入單獨一行 'END'。")
@@ -455,19 +474,20 @@ def interactive_code_modification_loop():
         return
 
     current_code = ""
+    virtual_code_content = "" # 用於儲存 Agent 1 的產出
     history = [f"初始需求: {user_need}"]
 
-    # 2. 初始生成
-    print("\n[第一步] 產生初始程式碼...")
-
-    # --- (可選) 略過虛擬碼步驟，直接生成程式碼 ---
-    # 如果需要虛擬碼步驟，可以取消註解以下程式碼並修改邏輯
-    # vc_prompt = build_virtual_code_prompt(user_need)
-    # vc_resp = generate_response(vc_prompt)
-    # print("\n=== 模型回覆 (虛擬碼) ===\n", vc_resp)
-    # ---------------------------------------------
-
-    code_prompt = build_code_prompt(user_need)
+    # 2. Agent 1: 虛擬碼生成
+    print("\n[Agent 1] 啟動虛擬碼生成模組...")
+    vc_prompt = build_virtual_code_prompt(user_need)
+    virtual_code_content = generate_response(vc_prompt)
+    print("\n=== Agent 1 產出 (虛擬碼設計) ===\n")
+    print(virtual_code_content)
+    
+    # 3. Agent 2: 程式碼生成
+    print("\n[Agent 2] 啟動程式碼轉換模組...")
+    # 將 Agent 1 的產出傳給 Agent 2
+    code_prompt = build_code_prompt(user_need, virtual_code=virtual_code_content) 
     code_resp = generate_response(code_prompt)
     current_code = extract_code_block(code_resp)
 
@@ -475,72 +495,50 @@ def interactive_code_modification_loop():
         print("[錯誤] 模型無法生成程式碼，請重試。")
         return
 
-    print("\n=== 程式碼 (初始版本) ===\n")
+    print("\n=== Agent 2 產出 (Python 程式碼) ===\n")
     print(f"```python\n{current_code}\n```")
 
-    # 3. 進入修正迴圈
+    # 4. 進入修正迴圈 (Agent 3 & 4 互動)
     while True:
         print("\n" + "="*40)
         print("請輸入您的下一步操作：")
-        print("  - [修改/優化/重構]：輸入您的需求說明 (例如: '請將迴圈改為列表推導式')")
-        print("  - [驗證]：輸入 'VERIFY' 或 'V' (執行程式並檢查錯誤/邏輯)") # 修改說明
-        print("  - [解釋]：輸入 'EXPLAIN' 或 'E' (取得當前程式碼的白話解釋)") # 修改說明
-        print("  - [完成]：輸入 'QUIT' (結束開發，儲存最終程式碼)")
+        print("  - [修改/優化]：輸入需求說明 (Agent 4 介入)")
+        print("  - [驗證]：輸入 'VERIFY' (Agent 3 進行測試與分析)")
+        print("  - [解釋]：輸入 'EXPLAIN' (Agent 4 進行解釋)")
+        print("  - [完成]：輸入 'QUIT'")
         print("="*40)
 
-        user_input = input("您的操作 (或修改需求): ").strip()
+        user_input = input("您的操作: ").strip()
 
         if user_input.upper() == "QUIT":
-            print("\n開發模式結束。最終程式碼如下：")
-            print(f"```python\n{current_code}\n```")
             break
 
-        if user_input.upper() in ("VERIFY", "V"): # 修改判斷
-            print("\n[驗證中] 執行程式碼並檢查錯誤...")
-            # 假設 validate_main_function 返回 (bool, str) 分別表示成功與否和輸出/錯誤訊息
-            success, validation_result = validate_main_function(current_code) # 修改接收方式
-            print("\n=== 程式執行/錯誤報告 ===\n")
+        if user_input.upper() in ("VERIFY", "V"):
+            print("\n[Agent 3] 啟動測試驗證模組...")
+            success, validation_result = validate_main_function(current_code)
+            print("\n=== Agent 3 分析報告 ===\n")
             print(validation_result)
+            
+            # 若有錯誤，這裡未來可自動呼叫 build_hint_prompt 進行分析
 
-            # 如果執行失敗，且 validation_result 包含錯誤訊息 (可以進一步判斷)
-            # 這裡簡化，直接假設模型可能提供修正建議
-            # 注意：原始程式碼中 validate_main_function 不直接調用模型解釋錯誤並提供修正版
-            # 這部分邏輯需要依賴 validate_main_function 的實際行為或外部錯誤處理
-            # 以下為示意性代碼，假設 validation_result 可能包含修正建議的標記
-            if not success and "修正版程式" in validation_result: # 示意性判斷
-                 temp_code = extract_code_block(validation_result)
-                 if temp_code:
-                     print("\n[提示] 模型提供了修正建議。是否要將當前程式碼替換為修正版？(y/n): ", end="")
-                     choice = input().strip().lower()
-                     if choice in ["y", "yes", "是", "好"]:
-                         current_code = temp_code
-                         history.append("自動採納模型修正版。")
-                         print("\n[成功] 已採納修正版程式碼。")
-                         print(f"```python\n{current_code}\n```")
-                     else:
-                         print("\n[提示] 已忽略修正建議，您可手動提供修改需求。")
-
-        elif user_input.upper() in ("EXPLAIN", "E"): # 修改判斷
-            print("\n[解釋中] 產生程式碼解釋...")
+        elif user_input.upper() in ("EXPLAIN", "E"):
+            print("\n[Agent 4] 啟動程式碼解釋模組...")
             explain_prompt = build_explain_prompt(user_need, current_code)
             explain_resp = generate_response(explain_prompt)
-            print("\n=== 程式碼解釋 ===\n")
+            print("\n=== Agent 4 解釋 ===\n")
             print(explain_resp)
 
-        else: # 修正需求
+        else:
             modification_request = user_input
-            print(f"\n[修正中] 正在根據您的要求 '{modification_request}' 修正程式碼...")
-
-            # 構建修正提示
+            print(f"\n[Agent 4] 啟動迭代修正模組...")
+            
+            # 這裡簡化呼叫，若要完整 CoT 流程應使用 build_fix_code_prompt 並傳入 history
             fix_prompt = build_code_prompt(
-                f"請根據以下歷史需求與當前程式碼，進行修正和重構：\n"
-                f"--- 初始需求 ---\n"
-                f"{user_need}\n"
-                f"--- 當前程式碼 ---\n"
-                f"```python\n{current_code}\n```\n"
-                f"--- 新增修改需求 ---\n"
-                f"{modification_request}\n"
-                f"請確保輸出只有一個完整的 Python 程式碼區塊。"
+                f"請根據以下歷史需求與當前程式碼，進行修正：\n"
+                f"--- 初始需求 ---\n{user_need}\n"
+                f"--- Agent 1 虛擬碼 ---\n{virtual_code_content}\n"
+                f"--- 當前程式碼 ---\n```python\n{current_code}\n```\n"
+                f"--- 新增修改需求 (Agent 4 Context) ---\n{modification_request}\n"
             )
 
             fix_resp = generate_response(fix_prompt)
@@ -548,13 +546,13 @@ def interactive_code_modification_loop():
 
             if new_code:
                 current_code = new_code
-                history.append(f"上次修改: {modification_request}")
-                print("\n=== 程式碼 (新版本) ===\n")
+                history.append(f"修改: {modification_request}")
+                print("\n=== Agent 4 修正後程式碼 ===\n")
                 print(f"```python\n{current_code}\n```")
             else:
-                print("[警告] 模型無法生成修正後的程式碼。請重試或輸入更明確的指令。")
+                print("[警告] 模型無法生成修正後的程式碼。")
 
-    return current_code # 函數應回傳最終代碼
+    return current_code
 
 def build_stdin_code_prompt(user_need: str, virtual_code: str, json_tests: Optional[List[Tuple[str, str]]]) -> str:
     """
@@ -590,26 +588,26 @@ def build_stdin_code_prompt(user_need: str, virtual_code: str, json_tests: Optio
 
 def build_fix_code_prompt(user_need: str, virtual_code: str, json_tests: Optional[List[Tuple[str, str]]], history: List[str], current_code: str, modification_request: str) -> str:
     """
-    (MODIFIED) 建立一個用於「互動式修改」的提示。
-    這會包含歷史紀錄、當前程式碼和修改需求。
+    Agent 4: 程式碼解釋與迭代建議模組 (修正模式)
+    利用共享記憶 (Memory) 與歷史紀錄，進行程式碼的迭代修正。
     """
     code_prompt_lines = [
-        "用繁體中文回答。\n你是程式碼生成助理。\n任務：依據使用者需求、虛擬碼、範例，產生正確可執行的 Python 程式碼，並加上白話註解。\n",
+        "用繁體中文回答。\n",
+        "你扮演 **Agent 4：程式碼解釋與迭代建議模組** 的角色。\n",
+        "任務：依據歷史互動紀錄、原始需求與新的修改請求，對程式碼進行重構或修正。\n",
         f"原始需求：\n{user_need}\n",
-        f"虛擬碼：\n{virtual_code}\n",
-        f"歷史紀錄：\n{' -> '.join(history)}\n",
-        f"--- 當前程式碼 (有問題或待修改) ---\n"
-        f"```python\n{current_code}```\n"
-        f"--- !! 新增修改需求 !! ---\n"
+        f"參考虛擬碼：\n{virtual_code}\n",
+        f"Context Memory (歷史紀錄)：\n{' -> '.join(history)}\n",
+        f"--- 當前程式碼 (待修正) ---\n"
+        f"```python\n{current_code}```\n",
+        f"--- !! 新增修改請求 (User Input) !! ---\n",
         f"{modification_request}\n\n",
-        "--- 程式碼要求 (務必遵守) ---\n",
-        "生成的程式碼必須包含一個 `if __name__ == \"__main__\":` 區塊。\n",
-        "這個 `main` 區塊必須：\n"
-        "1. 從標準輸入 (stdin) 讀取解決問題所需的所有數據。\n"
-        "2. 處理這些數據。\n"
-        "3. 將最終答案打印 (print) 到標準輸出 (stdout)。\n"
-        "4. **不要** 在 `main` 區塊中硬編碼 (hard-code) 任何範例輸入或輸出。\n"
+        "--- 程式碼要求 ---\n",
+        "生成的程式碼必須包含一個 `if __name__ == \"__main__\":` 區塊，並能從標準輸入 (stdin) 讀取資料（若適用）。\n",
+        "⚠️ **重要**：請僅輸出一個 Python 程式碼區塊 ```python ... ```，絕對不要輸出任何額外文字或解釋。"
     ]
+    # ... (後續處理 json_tests 的邏輯保持不變)
+    
 
     if json_tests: # 重新使用先前生成的測資
         code_prompt_lines.append("\n以下是幾個範例，展示了程式執行時**應該**如何處理輸入和輸出（你的程式碼將透過 `stdin` 接收這些輸入）：\n")
@@ -629,12 +627,14 @@ def build_fix_code_prompt(user_need: str, virtual_code: str, json_tests: Optiona
 
 def build_hint_prompt(problem_description: str, user_code: str, error_message: Optional[str] = None) -> str:
     """
-    建立請求模型提供解題提示的 Prompt。
+    Agent 3: 測試驗證與結果分析模組
+    當測試失敗或程式出錯時，提供分析與漸進式提示。
     """
     prompt = (
-        "你是一位經驗豐富的程式導師。學生正在嘗試解決一個 LeetCode 類型的程式題目，但遇到了困難。\n"
-        "請根據題目描述和學生目前的程式碼，提供 **漸進式的提示 (Hint)**，引導他們自己找出解決方案。\n"
-        "**不要直接給出完整答案或程式碼**。\n\n"
+        "你扮演 **Agent 3：測試驗證與結果分析模組** 的角色。\n"
+        "學生正在嘗試解決一個程式題目，但遇到了困難或錯誤。\n"
+        "請根據題目描述、學生的程式碼以及（如果有）錯誤訊息，進行邏輯分析，並提供 **漸進式的提示 (Hint)**。\n"
+        "**不要直接給出完整答案或程式碼**，引導他們自己找出解決方案。\n\n"
         "題目描述：\n"
         f"---\n{problem_description}\n---\n\n"
         "學生的程式碼：\n"
@@ -642,13 +642,13 @@ def build_hint_prompt(problem_description: str, user_code: str, error_message: O
     )
 
     if error_message:
-         prompt += f"\n學生遇到的錯誤訊息：\n```\n{error_message}\n```\n\n"
+         prompt += f"\n執行/測試錯誤訊息：\n```\n{error_message}\n```\n\n"
 
     prompt += (
         "\n請提供 3 個層次的提示：\n"
         "1. **思考方向**：點出題目關鍵或可能忽略的邊界條件。\n"
         "2. **演算法建議**：建議適合的資料結構或演算法策略（如：Hash Map, Two Pointers, DP...），並簡述原因。\n"
-        "3. **程式碼除錯**（如果適用）：指出他們目前程式碼中潛在的邏輯錯誤或語法問題（如果有），但不直接幫他們改好。\n\n"
+        "3. **錯誤分析**（如果適用）：指出目前程式碼中潛在的邏輯錯誤或語法問題。\n\n"
         "請用繁體中文，以鼓勵和引導的語氣回答。"
     )
     return prompt

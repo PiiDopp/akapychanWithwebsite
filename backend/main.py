@@ -83,6 +83,14 @@ from bisect import bisect_left, bisect_right, insort, insort_left, insort_right
 from math import gcd, ceil, floor, sqrt, log, log2, log10, pi, inf, factorial, comb, perm
 """
 
+def _run_agent3_analysis(user_need: str, user_code: str, error_msg: str) -> str:
+    """呼叫 Agent 3 針對錯誤進行分析並提供提示"""
+    prompt = build_hint_prompt(
+        problem_description=user_need,
+        user_code=user_code,
+        error_message=error_msg
+    )
+    return run_model(prompt)
 def run_model(prompt: str) -> str:
     resp = generate_response(prompt)
     return resp or "[模型沒有回覆內容]"
@@ -296,13 +304,16 @@ async def chat(request: Request):
             session["step"] = "need"
             return {"text": "**模式 1｜互動開發**\n\n請描述你的功能需求（一句或一段話即可）。"}
 
+        # Agent 1: 虛擬碼生成
         if step == "need":
             ctx["need"] = msg.strip()
             vc_preview = _mode1_generate_virtual_code(ctx)
             ctx["virtual_code_preview"] = vc_preview or ""
             session["ctx"] = ctx
             session["step"] = "vc_confirm"
-            _append_history("虛擬碼產生完成(候選)")
+            _append_history("Agent 1: 虛擬碼產生完成")
+            
+            # [FIX] 回復原始觸發字串
             return {
                 "text": (
                     "=== 虛擬碼 (預覽) ===\n"
@@ -312,27 +323,19 @@ async def chat(request: Request):
                 )
             }
 
+        # 確認虛擬碼 -> Agent 2 生成測資與程式碼
         if step == "vc_confirm":
             choice = (msg or "").strip().lower()
             if choice in ("", "y", "yes"):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
-                _append_history("接受虛擬碼")
+                _append_history("確認虛擬碼")
 
+                # Agent 2 Sub-task: 生成結構化測資
                 raw_tests = generate_structured_tests(ctx["need"])
-                # 透過 normalize_tests 確保格式統一 (例如將 list 轉為 stdin 字串)
                 json_tests = normalize_tests(raw_tests)
-
-                # 存回 ctx，後面 verify 會用
                 ctx["tests"] = json_tests or []
 
-                if json_tests:
-                    print(f"[提示] ✅ 已成功提取 {len(json_tests)} 筆測資。")
-                    # for i, t in enumerate(json_tests, 1):
-                    #    print(f"  {i}. 輸入: {repr(t.get('input'))} → 預期輸出: {repr(t.get('output'))}")
-                else:
-                    print("[警告] ⚠️ 未能從模型回覆中提取/正規化測資。以下是模型原文：")
-                    # print(test_resp)
-
+                # Agent 2 Sub-task: 生成程式碼 (基於需求 + 虛擬碼 + 測資範例)
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
                     ctx.get("virtual_code", ""),
@@ -341,23 +344,22 @@ async def chat(request: Request):
                 code_resp = generate_response(code_prompt_string)
                 code_block = extract_code_block(code_resp)
 
-                # 若 extract_code_block 回傳 list，挑最像主程式的一段
                 if isinstance(code_block, list):
                     def _pick_python_code(blocks):
                         for b in blocks:
                             if isinstance(b, str) and ("def main(" in b or "__name__" in b or "input(" in b):
                                 return b
                         for b in blocks:
-                            if isinstance(b, str):
-                                return b
+                            if isinstance(b, str): return b
                         return None
                     code_block = _pick_python_code(code_block)
 
                 if not code_block or not isinstance(code_block, str) or not code_block.strip():
                     session["ctx"] = ctx
                     session["step"] = "need"
-                    return {"text": "模型暫時無法產生程式碼，請換個說法或補充需求後再試。"}
+                    return {"text": "Agent 2 無法產生有效程式碼，請嘗試補充需求細節。"}
 
+                # Agent 4: 初步解釋
                 explain_prompt = build_explain_prompt(ctx["need"], code_block)
                 explain_resp = run_model(explain_prompt)
 
@@ -365,22 +367,21 @@ async def chat(request: Request):
                     "code": code_block,
                     "need_text": ctx["need"],
                 })
-                # === 新增：在顯示給使用者前，先用 Pynguin 跑一次 ===
-                # 這可以幫助發現 LLM 生成的程式碼是否有明顯的語法錯誤或無法執行的問題
-                # 因為 Pynguin 需要可執行的程式碼才能生成測試
+
+                # Pynguin 初步檢查
                 py_res = run_pynguin_on_code(PYTHON_PRELUDE + "\n" + code_block, timeout=10)
                 pynguin_note = ""
                 if py_res["success"] and py_res["has_tests"]:
                     pynguin_note = "\n(✅ 系統已通過自動化工具初步驗證此程式碼的可測試性)"
-                # =================================================
 
                 session["ctx"] = ctx
                 session["step"] = "verify_prompt"
 
+                # [FIX] 回復原始觸發字串，確保按鈕出現
                 body = (
                     "=== 程式碼（初始版，stdin/stdout） ===\n"
                     f"```python\n{code_block}\n```\n"
-                    f"{pynguin_note}\n" # 加在這裡
+                    f"{pynguin_note}\n"
                     "=== 程式碼解釋 ===\n"
                     f"{explain_resp}\n\n"
                     "要執行程式（main 測試）嗎？\n"
@@ -393,7 +394,7 @@ async def chat(request: Request):
                 ctx["virtual_code_preview"] = vc_preview or ""
                 session["ctx"] = ctx
                 session["step"] = "vc_confirm"
-                _append_history("重新產生虛擬碼")
+                _append_history("Agent 1: 重新生成虛擬碼")
                 return {
                     "text": (
                         "=== 虛擬碼 (預覽-NEW) ===\n"
@@ -402,7 +403,6 @@ async def chat(request: Request):
                         "**點「輸入框上方的按鈕」即可選擇。**"
                     )
                 }
-
             elif choice == "a":
                 session["ctx"] = ctx
                 session["step"] = "need_append"
@@ -429,198 +429,104 @@ async def chat(request: Request):
                 )
             }
         
+        # 共用驗證邏輯 (Agent 3)
+        def _perform_verification(code: str, tests: List[Dict]) -> Tuple[str, str]:
+            code_to_run = PYTHON_PRELUDE + "\n" + code
+            all_passed = False
+            report_lines = []
+            error_for_agent3 = ""
+
+            # LeetCode 模式
+            is_leetcode = "class Solution" in code
+            if is_leetcode:
+                try:
+                    method_name, expected_arg_count = get_solution_method_info(code)
+                    if not method_name: method_name = infer_method_name_from_code(code)
+                    if method_name:
+                        core_tests = []
+                        for t in tests:
+                            inp = t.get("input")
+                            out = t.get("output")
+                            args = None
+                            # (簡化版參數解析)
+                            if isinstance(inp, list) and expected_arg_count > 1 and len(inp) == expected_arg_count:
+                                args = tuple(inp)
+                            else:
+                                args = (inp,)
+                            core_tests.append((method_name, args, out))
+
+                        all_passed, runlog = validate_leetcode_code(code_to_run, core_tests, class_name="Solution")
+                        report_lines.append(runlog)
+                        if not all_passed: error_for_agent3 = runlog
+                except Exception:
+                    is_leetcode = False
+
+            # STDIN 模式
+            if not is_leetcode:
+                if tests:
+                    report_lines.append("=== 程式執行/驗證結果（依測資逐筆） ===")
+                    all_passed = True
+                    for i, t in enumerate(tests, 1):
+                        stdin_str = str(t.get("input", ""))
+                        expected_str = str(t.get("output", ""))
+                        stdin_to_use = _try_flatten_input(stdin_str, code)
+                        ok, detail = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=expected_str)
+                        
+                        if not ok:
+                            flat_exp = _try_flatten_output_str(expected_str)
+                            if flat_exp and flat_exp != expected_str:
+                                ok2, _ = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=flat_exp)
+                                if ok2: ok = True
+
+                        report_lines.append(f"Case {i}: {'[通過]✅' if ok else '[失敗]❌'}\n{detail}")
+                        if not ok: 
+                            all_passed = False
+                            if not error_for_agent3: error_for_agent3 = detail
+                else:
+                    ok, detail = validate_main_function(code_to_run, stdin_input="", expected_output=None)
+                    report_lines.append(f"執行結果:\n{detail}")
+                    if not ok: error_for_agent3 = detail
+
+            return "\n".join(report_lines), error_for_agent3
+
+        # 初次驗證 (Agent 3)
         if step == "verify_prompt":
             choice = (msg or "").strip().upper()
             code = ctx.get("code") or ""
-            need_text = ctx.get("need_text", "")
             tests = ctx.get("tests") or []
 
-            if choice == "M":
-                # 自動注入常用匯入
-                code_to_run = PYTHON_PRELUDE + "\n" + code
+            if choice == "M": 
                 session["step"] = "modify_gate"
-
-                # === 嘗試 1: 自動偵測並使用 LeetCode 模式驗證 (參考模式 2) ===
-                if "class Solution" in code:
+                report_text, error_msg = _perform_verification(code, tests)
+                
+                if error_msg:
+                    report_text += "\n\n[Agent 3] 偵測到錯誤，正在分析原因並提供提示...\n"
                     try:
-                        # 0. 分析程式碼，取得方法名稱與預期參數個數
-                        method_name, expected_arg_count = get_solution_method_info(code)
-                        if not method_name:
-                            method_name = infer_method_name_from_code(code)
-
-                        if method_name:
-                            # 1. 建構核心測資
-                            core_tests = []
-                            for t in tests:
-                                inp = t.get("input")
-                                out = t.get("output")
-                                
-                                # --- 智慧參數解包 ---
-                                args = None
-                                # 嘗試多種方式解析輸入字串為結構化參數
-                                if isinstance(inp, list) and expected_arg_count > 1 and len(inp) == expected_arg_count:
-                                    args = tuple(inp)
-                                elif isinstance(inp, str):
-                                    try:
-                                        parsed = json.loads(inp)
-                                        if isinstance(parsed, list) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                            args = tuple(parsed)
-                                        elif expected_arg_count == 1:
-                                            args = (parsed,)
-                                    except:
-                                        try:
-                                            # AST Literal 解析嘗試
-                                            try_tuple_str = inp.strip()
-                                            # 簡單處理可能的換行或缺少的括號
-                                            if '\n' in try_tuple_str and not (try_tuple_str.startswith('[') and try_tuple_str.endswith(']')):
-                                                    try_tuple_str = f"({try_tuple_str.replace(chr(10), ',')})"
-                                            elif not (try_tuple_str.startswith('(') and try_tuple_str.endswith(')')):
-                                                    try_tuple_str = f"({try_tuple_str})"
-                                            parsed = ast.literal_eval(try_tuple_str)
-                                            if isinstance(parsed, tuple) and len(parsed) == expected_arg_count:
-                                                    args = parsed
-                                            elif expected_arg_count == 1:
-                                                    args = (parsed,) if not isinstance(parsed, tuple) else (parsed,)
-                                            
-                                            if args is None: # 若上述未成功，嘗試直接解析
-                                                parsed = ast.literal_eval(inp)
-                                                if isinstance(parsed, (list, tuple)) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                                    args = tuple(parsed)
-                                                elif expected_arg_count == 1:
-                                                    args = (parsed,)
-                                        except:
-                                            pass
-                                if args is None:
-                                    args = (inp,)
-
-                                # --- 預期輸出解析 ---
-                                expected_val = out
-                                if isinstance(out, str):
-                                    try:
-                                        expected_val = json.loads(out)
-                                    except:
-                                        try:
-                                            expected_val = ast.literal_eval(out)
-                                        except:
-                                            pass
-
-                                core_tests.append((method_name, args, expected_val))
-
-                            # 2. 執行 LeetCode 模式驗證
-                            all_passed, runlog = validate_leetcode_code(code_to_run, core_tests, class_name="Solution")
-                            
-                            report_text = runlog
-                            if not all_passed:
-                                report_text += "\n\n[自動分析] 針對失敗案例進行分析..."
-                                try:
-                                    fallback = explain_code_error(code_to_run)
-                                    explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                                    report_text += f"\n=== 程式碼分析 ===\n{explanation}"
-                                except Exception as e:
-                                    report_text += f"\n[分析失敗] {e}"
-                            
-                            return {"text": report_text + "\n\n是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
-
+                        analysis = _run_agent3_analysis(ctx["need"], code, error_msg)
+                        report_text += f"=== Agent 3 分析報告 ===\n{analysis}"
                     except Exception as e:
-                        # LeetCode 模式失敗，靜默回退到 STDIN 模式
-                        print(f"[Mode 1] LeetCode validation failed, falling back to STDIN: {e}")
+                        report_text += f"[Agent 3 分析失敗] {e}"
 
-                # === 嘗試 2: 回退至標準 STDIN 模式驗證 ===
-                report_lines = []
-                if tests:
-                    all_passed = True
-                    report_lines.append("=== 程式執行/驗證結果（依測資逐筆） ===")
-                    for i, t in enumerate(tests, 1):
-                        stdin_str = t.get("input", "") if isinstance(t, dict) else (str(t[0]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
-                        expected_str = t.get("output", "") if isinstance(t, dict) else (str(t[1]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
+                # [FIX] 回復原始觸發字串
+                return {"text": report_text + "\n\n是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
 
-                        # [Auto-Fix] 嘗試自動攤平輸入，解決簡單 script 無法處理 [1,2,3] 這類格式的問題
-                        stdin_to_use = _try_flatten_input(str(stdin_str), code)
-
-                        input_display = " ".join((str(stdin_str) or "").split())
-                        output_display = (str(expected_str) or "").strip()
-                        report_lines.append(f"\n--- 測試案例 {i} ---")
-                        report_lines.append(f"輸入: {input_display}")
-                        # if stdin_to_use != str(stdin_str):
-                        #      report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
-                        report_lines.append(f"預期輸出: {output_display}")
-
-                        # 第一次驗證：使用標準（或已攤平的）輸入與原始預期輸出
-                        ok, detail = validate_main_function(
-                            code=code_to_run,
-                            stdin_input=stdin_to_use,
-                            expected_output=expected_str
-                        )
-
-                        # [Auto-Fix] 若驗證失敗，嘗試放寬「預期輸出」的格式 (例如允許 [0,1] 輸出為 0 1)
-                        if not ok:
-                            flattened_expected = _try_flatten_output_str(str(expected_str))
-                            if flattened_expected and flattened_expected != str(expected_str):
-                                # 嘗試用放寬後的預期輸出再驗證一次
-                                ok_relaxed, _ = validate_main_function(
-                                    code=code_to_run,
-                                    stdin_input=stdin_to_use,
-                                    expected_output=flattened_expected
-                                )
-                                if ok_relaxed:
-                                    ok = True
-                                    # 更新詳細資訊以反映放寬後的通過狀態
-                                    detail = detail.replace("結果: [失敗]❌", "結果: [通過]✅ (已放寬輸出格式要求)")
-                                    report_lines.append("(已自動放寬預期輸出格式以匹配純文字輸出)")
-
-                        report_lines.append("結果: [通過]✅" if ok else "結果: [失敗]❌")
-                        report_lines.append(f"你的輸出:\n{detail}")
-                        if not ok:
-                            all_passed = False
-
-                    report_lines.append("\n" + "="*20)
-                    if all_passed:
-                        report_lines.append("總結: [成功]✅ 所有測資均已通過。")
-                    else:
-                        report_lines.append("總結: [失敗]❌ 部分測資未通過。")
-                        report_lines.append("\n[自動分析] 針對失敗案例進行分析...")
-                        try:
-                             fallback = explain_code_error(code_to_run)
-                             explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                             report_lines.append(f"\n=== 程式碼分析 ===\n{explanation}")
-                        except Exception as e:
-                             report_lines.append(f"\n[分析失敗] {e}")
-
-                    return {"text": "\n".join(report_lines) + "\n\n是否進入互動式修改模式？\n**點「輸入框上方的按鈕」即可選擇。**"}
-
-                else:
-                    # 無測資的情況
-                    ok, detail = validate_main_function(code_to_run, stdin_input="", expected_output=None)
-                    return {
+            elif choice == "N":
+                session["step"] = "modify_gate"
+                # [FIX] 回復原始觸發字串
+                return {
                         "text": (
-                            "=== 程式執行/驗證結果（無測資，空輸入）===\n"
-                            f"{detail}\n\n"
-                            "是否進入互動式修改模式？\n"
+                            "已略過執行驗證。\n\n是否進入互動式修改模式？\n"
                             "**點「輸入框上方的按鈕」即可選擇。**"
                         )
                     }
-
-            elif choice == "N":
-                try:
-                    validate_python_code(code, [], need_text)
-                except Exception:
-                    pass
-                session["step"] = "modify_gate"
-                return {
-                    "text": (
-                        "已略過執行驗證。\n\n是否進入互動式修改模式？\n"
-                        "**點「輸入框上方的按鈕」即可選擇。**"
-                    )
-                }
             else:
-                return {"text": 
-                        "要執行程式（main 測試）嗎？\n"
-                        "**點「輸入框上方的按鈕」即可選擇。**"}
+                return {"text": "要執行程式（main 測試）嗎？\n**點「輸入框上方的按鈕」即可選擇。**"}
 
         if step == "modify_gate":
             ans = (msg or "").strip().lower()
             if ans in ("y", "yes"):
                 session["step"] = "modify_loop"
+                # [FIX] 回復原始觸發字串
                 return {"text": "\n=== 進入互動式修改模式 ===\n"
                                 "請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
@@ -634,184 +540,40 @@ async def chat(request: Request):
             else:
                 return {"text": "請輸入 y 或 n。"}
 
+        # 迭代修改迴圈 (Agents 3 & 4)
         if step == "modify_loop":
             choice = (msg or "").strip()
             code = ctx.get("code") or ""
-            need_text = ctx.get("need_text", ctx.get("need", ""))
+            need_text = ctx.get("need_text", "")
             virtual_code = ctx.get("virtual_code", "")
             json_tests = ctx.get("tests", [])
             history = ctx.get("history", [])
             u = choice.upper()
 
+            # Agent 3: 驗證與分析
             if u in {"V", "VERIFY"}:
-                report_prefix = ""
-                
-                # === 步驟 A: 重新生成測資 (與模式 1 首次驗證相同) ===
-                try:
-                    # print(f"[DEBUG] Regenerating tests for need: {need_text[:50]}...")
-                    raw_tests = generate_structured_tests(ctx["need"])
-                    # 透過 normalize_tests 確保格式統一 (例如將 list 轉為 stdin 字串)
-                    new_tests = normalize_tests(raw_tests)
-                    
-                    if new_tests:
-                        ctx["tests"] = new_tests
-                        json_tests = new_tests
-                        report_prefix += f"[提示] 已重新生成 {len(json_tests)} 筆測資。\n\n"
-                    else:
-                        json_tests = ctx.get("tests", [])
-                        report_prefix += "[警告] 重新生成測資失敗，將使用上一次的測資。\n\n"
-                except Exception as e:
-                    json_tests = ctx.get("tests", [])
-                    report_prefix += f"[錯誤] 生成測資時發生例外 ({e})，將使用舊測資。\n\n"
-
-                # === 步驟 B: 執行驗證 (整合強健驗證邏輯) ===
-                # 自動注入常用匯入
-                code_to_run = PYTHON_PRELUDE + "\n" + code
-                report_text = ""
-                leetcode_mode_ran = False
-
-                # --- 嘗試 1: 自動偵測並使用 LeetCode 模式驗證 ---
-                if "class Solution" in code:
+                report_text, error_msg = _perform_verification(code, json_tests)
+                if error_msg:
+                    report_text += "\n\n[Agent 3] 偵測到錯誤，正在分析原因並提供提示...\n"
                     try:
-                        method_name, expected_arg_count = get_solution_method_info(code)
-                        if not method_name:
-                            method_name = infer_method_name_from_code(code)
-
-                        if method_name:
-                            # 建構核心測資
-                            core_tests = []
-                            for t in json_tests:
-                                inp = t.get("input")
-                                out = t.get("output")
-                                
-                                # 智慧參數解包
-                                args = None
-                                if isinstance(inp, list) and expected_arg_count > 1 and len(inp) == expected_arg_count:
-                                    args = tuple(inp)
-                                elif isinstance(inp, str):
-                                    try:
-                                        parsed = json.loads(inp)
-                                        if isinstance(parsed, list) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                            args = tuple(parsed)
-                                        elif expected_arg_count == 1:
-                                            args = (parsed,)
-                                    except:
-                                        try:
-                                            try_tuple_str = inp.strip()
-                                            if '\n' in try_tuple_str and not (try_tuple_str.startswith('[') and try_tuple_str.endswith(']')):
-                                                    try_tuple_str = f"({try_tuple_str.replace(chr(10), ',')})"
-                                            elif not (try_tuple_str.startswith('(') and try_tuple_str.endswith(')')):
-                                                    try_tuple_str = f"({try_tuple_str})"
-                                            parsed = ast.literal_eval(try_tuple_str)
-                                            if isinstance(parsed, tuple) and len(parsed) == expected_arg_count:
-                                                    args = parsed
-                                            elif expected_arg_count == 1:
-                                                    args = (parsed,) if not isinstance(parsed, tuple) else (parsed,)
-                                            if args is None:
-                                                parsed = ast.literal_eval(inp)
-                                                if isinstance(parsed, (list, tuple)) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                                    args = tuple(parsed)
-                                                elif expected_arg_count == 1:
-                                                    args = (parsed,)
-                                        except:
-                                            pass
-                                if args is None:
-                                    args = (inp,)
-
-                                # 預期輸出解析
-                                expected_val = out
-                                if isinstance(out, str):
-                                    try:
-                                        expected_val = json.loads(out)
-                                    except:
-                                        try:
-                                            expected_val = ast.literal_eval(out)
-                                        except:
-                                            pass
-                                core_tests.append((method_name, args, expected_val))
-
-                            # 執行 LeetCode 模式驗證
-                            all_passed, runlog = validate_leetcode_code(code_to_run, core_tests, class_name="Solution")
-                            report_text = runlog
-                            if not all_passed:
-                                report_text += "\n\n[自動分析] 針對失敗案例進行分析..."
-                                try:
-                                    fallback = explain_code_error(code_to_run)
-                                    explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                                    report_text += f"\n=== 程式碼分析 ===\n{explanation}"
-                                except Exception as e:
-                                    report_text += f"\n[分析失敗] {e}"
-                            leetcode_mode_ran = True
-
+                        analysis = _run_agent3_analysis(need_text, code, error_msg)
+                        report_text += f"=== Agent 3 分析報告 ===\n{analysis}"
                     except Exception as e:
-                        print(f"[Mode 1 Modify VERIFY] LeetCode validation failed, falling back: {e}")
-
-                # --- 嘗試 2: 回退至標準 STDIN 模式驗證 ---
-                if not leetcode_mode_ran:
-                    if json_tests:
-                        report_lines = ["=== 程式執行/驗證結果（依測資逐筆） ==="]
-                        all_passed = True
-                        for i, t in enumerate(json_tests, 1):
-                            stdin_str = t.get("input", "") if isinstance(t, dict) else (str(t[0]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
-                            expected_str = t.get("output", "") if isinstance(t, dict) else (str(t[1]) if isinstance(t, (list, tuple)) and len(t) >= 2 else "")
-                            
-                            # 自動攤平輸入
-                            stdin_to_use = _try_flatten_input(str(stdin_str), code)
-                            input_display = " ".join((str(stdin_str) or "").split())
-                            report_lines.append(f"\n--- 測試案例 {i} ---")
-                            report_lines.append(f"輸入: {input_display}")
-                            # if stdin_to_use != str(stdin_str):
-                            #     report_lines.append(f"(輸入已自動調整為: {' '.join(stdin_to_use.split())})")
-                            report_lines.append(f"預期輸出: {(str(expected_str) or '').strip()}")
-
-                            ok, detail = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=expected_str)
-                            
-                            # 放寬輸出格式重試
-                            if not ok:
-                                flattened_expected = _try_flatten_output_str(str(expected_str))
-                                if flattened_expected and flattened_expected != str(expected_str):
-                                    ok_relaxed, _ = validate_main_function(code_to_run, stdin_input=stdin_to_use, expected_output=flattened_expected)
-                                    if ok_relaxed:
-                                        ok = True
-                                        detail = detail.replace("結果: [失敗]❌", "結果: [通過]✅ (已放寬輸出格式要求)")
-                                        report_lines.append("(已自動放寬預期輸出格式以匹配純文字輸出)")
-
-                            report_lines.append("結果: [通過]✅" if ok else "結果: [失敗]❌")
-                            report_lines.append(f"你的輸出:\n{detail}")
-                            if not ok: all_passed = False
-
-                        report_lines.append("\n" + "="*20)
-                        if all_passed:
-                            report_lines.append("總結: [成功] 所有測資均已通過。")
-                        else:
-                            report_lines.append("總結: [失敗] 部分測資未通過。")
-                            report_lines.append("\n[自動分析] 針對失敗案例進行分析...")
-                            try:
-                                fallback = explain_code_error(code_to_run)
-                                explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                                report_lines.append(f"\n=== 程式碼分析 ===\n{explanation}")
-                            except Exception as e:
-                                report_lines.append(f"\n[分析失敗] {e}")
-                        report_text = "\n".join(report_lines)
-
-                    else:
-                        # 無測資的情況
-                        ok, detail = validate_main_function(code_to_run, stdin_input="", expected_output=None)
-                        report_text = f"=== 程式執行/驗證結果（無測資，空輸入）===\n{detail}"
-
-                final_output = report_prefix + report_text
-                return {"text": f"{final_output}\n\n"
-                                "請選擇您的下一步操作：\n"
+                        report_text += f"[Agent 3 分析失敗] {e}"
+                
+                # [FIX] 保持原始格式
+                return {"text": f"{report_text}\n\n請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
                                 "  - 解釋 EXPLAIN\n"
                                 "  - 完成 QUIT\n"}
 
+            # Agent 4: 解釋
             if u in {"E", "EXPLAIN"}:
                 explain_prompt = build_explain_prompt(need_text, code)
-                explain_resp = run_model(explain_prompt)
-                return {"text": f"=== 程式碼解釋 ===\n{explain_resp}\n\n"
-                                "請選擇您的下一步操作：\n"
+                text = f"=== Agent 4: 程式碼解釋 ===\n{run_model(explain_prompt)}"
+                # [FIX] 保持原始格式
+                return {"text": f"{text}\n\n請選擇您的下一步操作：\n"
                                 "  - 修改：直接輸入您的修正需求\n"
                                 "  - 驗證 VERIFY\n"
                                 "  - 解釋 EXPLAIN\n"
@@ -822,7 +584,7 @@ async def chat(request: Request):
                 session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
                 return {"text": f"已結束互動式修改模式。最終程式如下：\n```python\n{final_code}\n```"}
 
-            # 修改 / 重構
+            # Agent 4: 修正/重構
             modification_request = choice
             fix_prompt_string = build_fix_code_prompt(
                 need_text,
@@ -840,19 +602,16 @@ async def chat(request: Request):
                 history.append(f"修改: {modification_request}")
                 ctx["history"] = history
                 session["ctx"] = ctx
-                return {"text": f"=== 程式碼（新版本） ===\n```python\n{new_code}\n```\n"
-                                "請選擇您的下一步操作：\n"
-                                "  - 修改：直接輸入您的修正需求\n"
-                                "  - 驗證 VERIFY\n"
-                                "  - 解釋 EXPLAIN\n"
-                                "  - 完成 QUIT\n"}
+                text = f"=== Agent 4: 修正後程式碼 ===\n```python\n{new_code}\n```"
             else:
-                return {"text": "模型無法生成修正後的程式碼，請輸入更明確的修改需求。\n"
-                                "請選擇您的下一步操作：\n"
-                                "  - 修改：直接輸入您的修正需求\n"
-                                "  - 驗證 VERIFY\n"
-                                "  - 解釋 EXPLAIN\n"
-                                "  - 完成 QUIT\n"}
+                text = "Agent 4 無法生成修正後的程式碼，請輸入更明確的需求。"
+
+            # [FIX] 保持原始格式
+            return {"text": f"{text}\n\n請選擇您的下一步操作：\n"
+                            "  - 修改：直接輸入您的修正需求\n"
+                            "  - 驗證 VERIFY\n"
+                            "  - 解釋 EXPLAIN\n"
+                            "  - 完成 QUIT\n"}
 
         session["step"] = "need"
         return {"text": "請描述你的需求："}
@@ -863,7 +622,6 @@ async def chat(request: Request):
         step = session.get("step") or "awaiting_code"
         msg = last_user
 
-        # 階段一：等待使用者貼上程式碼
         if step == "awaiting_code":
             if not msg.strip():
                  return {"text": "**模式 2｜程式驗證**\n\n請貼上要驗證的 Python 程式碼："}
@@ -872,234 +630,69 @@ async def chat(request: Request):
             session["step"] = "awaiting_need"
             return {"text": "已收到程式碼。\n\n請輸入這段程式碼的「需求說明」，AI 將以此生成測資來驗證。\n(若不想使用測資驗證，請直接輸入 **SKIP** 或 **跳過**，將僅執行一次程式)"}
 
-        # 階段二：等待使用者輸入需求，或跳過
         if step == "awaiting_need":
             user_need = msg.strip()
             raw_user_code = ctx.get("code", "")
-            # 自動注入常用匯入，解決 NameError: name 'List' is not defined 等問題
             user_code_to_run = PYTHON_PRELUDE + "\n" + raw_user_code
-            
             report = []
 
-            # 分支 A: 使用者提供了需求 -> 生成測資並驗證
             if user_need and user_need.upper() not in ["SKIP", "跳過"]:
                 report.append(f"[提示] 正在根據需求說明生成測資...\n需求：{user_need[:100]}...\n")
-
-                # === 新增：Pynguin 自動強健性測試 ===
-                # 這裡選擇同步呼叫作為示範，實際生產環境建議用背景任務 (BackgroundTasks)
-                report.append("[系統] 同時啟動 Pynguin 進行自動化邊界測試...\n")
-                pynguin_result = run_pynguin_on_code(user_code_to_run, timeout=15) # 設定短一點的 timeout
-
-                if pynguin_result["success"] and pynguin_result["has_tests"]:
-                     report.append(f"[Pynguin] ✅ 已自動生成額外的單元測試來檢查程式強健性。\n")
-                     # 進階：您可以嘗試解析 pynguin_result["test_code"] 來看看有無失敗的斷言
-                     # 或是直接把生成的測試程式碼提供給使用者參考
-                     # report.append(f"--- Pynguin Generated Tests ---\n```python\n{pynguin_result['test_code']}\n```\n")
-                elif not pynguin_result["success"]:
-                     # Pynguin 執行失敗 (可能是程式碼本身無法解析或 timeout)
-                     print(f"[Pynguin Error] {pynguin_result.get('error')}")
-                # =================================
+                
+                # Pynguin 自動強健性測試
+                py_res = run_pynguin_on_code(user_code_to_run, timeout=15)
+                if py_res["success"] and py_res["has_tests"]:
+                     report.append(f"[Pynguin] ✅ 已自動生成額外的單元測試。\n")
                 
                 try:
-                    # 在生成測資的 Prompt 中加入使用者程式碼作為參考，提高測資格式的準確度
-                    need_with_code_context = f"需求說明:\n{user_need}\n\n參考程式碼(請確保測資能作為此程式的合法輸入):\n```python\n{raw_user_code}\n```"
-                    raw_tests = generate_structured_tests(need_with_code_context)
+                    need_with_context = f"需求: {user_need}\n\n程式碼:\n```python\n{raw_user_code}\n```"
+                    raw_tests = generate_structured_tests(need_with_context)
                     json_tests = normalize_tests(raw_tests)
-                    
-                    # 使用更強健的提取方式
-                    # json_tests = _robust_extract_tests(test_resp, user_need)
 
                     if json_tests:
-                        report.append(f"[提示] 已成功提取 {len(json_tests)} 筆測資。開始驗證...\n")
-
-                        # === 嘗試自動偵測並使用 LeetCode 模式驗證 ===
-                        if "class Solution" in raw_user_code:
+                        report.append(f"[提示] 已提取 {len(json_tests)} 筆測資。開始驗證...\n")
+                        # 使用與 Mode 1 相同的驗證邏輯 (這裡簡化重複代碼，實務上可封裝成共用函式)
+                        is_leetcode = "class Solution" in raw_user_code
+                        if is_leetcode:
                             try:
-                                report.append("[提示] 偵測到 LeetCode 風格程式碼，切換至進階驗證模式...\n")
-                                
-                                # 0. 分析程式碼，取得方法名稱與預期參數個數
-                                method_name, expected_arg_count = get_solution_method_info(raw_user_code)
-                                if not method_name:
-                                    method_name = infer_method_name_from_code(raw_user_code)
-
-                                # 1. 手動建構核心測資，確保參數解包正確
-                                core_tests = []
-                                for t in json_tests:
-                                    inp = t.get("input")
-                                    out = t.get("output")
-                                    
-                                    # --- 智慧參數解包 ---
-                                    args = None
-                                    
-                                    # 情況 A: 輸入已是列表，且長度與預期參數個數相同 (>1) -> 視為參數列表
-                                    if isinstance(inp, list) and expected_arg_count > 1 and len(inp) == expected_arg_count:
-                                        args = tuple(inp)
-                                    
-                                    # 情況 B: 輸入是字串，嘗試解析為結構化資料
-                                    elif isinstance(inp, str):
-                                        # 嘗試 1: JSON 解析
-                                        try:
-                                            parsed = json.loads(inp)
-                                            if isinstance(parsed, list) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                                args = tuple(parsed)
-                                            elif expected_arg_count == 1:
-                                                args = (parsed,)
-                                        except:
-                                            # 嘗試 2: AST Literal 解析 (處理如 "[1,2], 3" 或 "(1, 2)" 這類非標準 JSON 但合法的 Python Tuple/List 表示)
-                                            try:
-                                                # 若字串本身不是被括號包住的 tuple，嘗試加上括號解析看看是否為多個參數
-                                                # 處理換行符號分隔的情況：將換行替換為逗號，再嘗試解析
-                                                try_tuple_str = inp.strip()
-                                                if '\n' in try_tuple_str and not (try_tuple_str.startswith('[') and try_tuple_str.endswith(']')):
-                                                     try_tuple_str = f"({try_tuple_str.replace(chr(10), ',')})"
-                                                elif not (try_tuple_str.startswith('(') and try_tuple_str.endswith(')')):
-                                                     try_tuple_str = f"({try_tuple_str})"
-
-                                                parsed = ast.literal_eval(try_tuple_str)
-                                                if isinstance(parsed, tuple) and len(parsed) == expected_arg_count:
-                                                        args = parsed
-                                                elif expected_arg_count == 1:
-                                                     # 如果預期只有一個參數，但解析出來是 tuple，可能需要取第一個元素，或者它本身就是一個 tuple 參數
-                                                     # 這裡簡化處理，若預期 1 個參數，就盡量不做 tuple 拆解，除非確定是多餘的括號
-                                                     args = (parsed,) if not isinstance(parsed, tuple) else (parsed,) 
-
-                                                if args is None: # 如果上面沒成功，試著直接解析
-                                                    parsed = ast.literal_eval(inp)
-                                                    if isinstance(parsed, (list, tuple)) and expected_arg_count > 1 and len(parsed) == expected_arg_count:
-                                                        args = tuple(parsed)
-                                                    elif expected_arg_count == 1:
-                                                        args = (parsed,)
-                                            except:
-                                                pass # 解析失敗，保持為 None，稍後回退
-
-                                    # 預設回退：視為單一參數
-                                    if args is None:
-                                        args = (inp,)
-
-                                    # --- 預期輸出解析 ---
-                                    # 嘗試將字串型的預期輸出解析為 Python 物件，以便 deep_compare 正確運作
-                                    expected_val = out
-                                    if isinstance(out, str):
-                                        try:
-                                            expected_val = json.loads(out)
-                                        except:
-                                            try:
-                                                expected_val = ast.literal_eval(out)
-                                            except:
-                                                pass # 保持原字串
-
-                                    core_tests.append((method_name, args, expected_val))
-
-                                # 4. 執行驗證 (傳入帶有 Prelude 的程式碼)
-                                all_passed, runlog = validate_leetcode_code(user_code_to_run, core_tests, class_name="Solution")
-                                
-                                report.append(runlog)
-                                if not all_passed:
-                                     report.append("\n[自動分析] 針對失敗案例進行分析...")
-                                     try:
-                                         fallback = explain_code_error(user_code_to_run)
-                                         explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                                         report.append(f"\n=== 程式碼分析 ===\n{explanation}")
-                                     except Exception as e:
-                                         report.append(f"\n[分析失敗] {e}")
-
-                                session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
-                                return {"text": "\n".join(report)}
-
+                                method, cnt = get_solution_method_info(raw_user_code)
+                                if not method: method = infer_method_name_from_code(raw_user_code)
+                                if method:
+                                    core = []
+                                    for t in json_tests:
+                                        inp, out = t.get("input"), t.get("output")
+                                        args = tuple(inp) if isinstance(inp, list) and cnt > 1 and len(inp) == cnt else (inp,)
+                                        core.append((method, args, out))
+                                    ok, log = validate_leetcode_code(user_code_to_run, core, class_name="Solution")
+                                    report.append(log)
+                                    if not ok:
+                                        # 呼叫 Agent 3 分析
+                                        report.append("\n[Agent 3] 分析失敗原因...\n")
+                                        report.append(_run_agent3_analysis(user_need, raw_user_code, log))
                             except Exception as e:
-                                report.append(f"[警告] LeetCode 模式驗證發生錯誤 ({e})，將回退至標準 STDIN 模式...\n")
-                                # 若失敗則繼續往下執行標準 STDIN 模式
-
-                        # === 標準 STDIN 模式驗證 ===
-                        all_passed = True
-                        first_failure_msg = None
-
-                        for i, test in enumerate(json_tests):
-                            t_input = test.get("input", "") if isinstance(test, dict) else (test[0] if isinstance(test, list) and len(test)>0 else "")
-                            t_output = test.get("output", "") if isinstance(test, dict) else (test[1] if isinstance(test, list) and len(test)>1 else None)
-                            
-                            stdin_str = str(t_input) if t_input is not None else ""
-                            expected_str = str(t_output) if t_output is not None else None
-
-                            # [Auto-Fix] 嘗試自動攤平輸入，解決簡單 script 無法處理 [1,2,3] 這類格式的問題
-                            stdin_to_use = _try_flatten_input(stdin_str, user_code_to_run)
-
-                            report.append(f"--- 測試案例 {i+1} ---")
-                            report.append(f"輸入: {repr(stdin_str)}")
-                            # if stdin_to_use != stdin_str:
-                            #     #  report.append(f"(輸入已自動調整為: {repr(stdin_to_use)})")
-                            report.append(f"預期輸出: {repr(expected_str)}")
-
-                            # 第一次驗證
-                            ok, detail = validate_main_function(user_code_to_run, stdin_input=stdin_to_use, expected_output=expected_str)
-                            
-                            # [Auto-Fix] 若驗證失敗，嘗試放寬「預期輸出」的格式 (例如允許 [0,1] 輸出為 0 1)
-                            if not ok:
-                                flattened_expected = _try_flatten_output_str(str(expected_str))
-                                if flattened_expected and flattened_expected != str(expected_str):
-                                    # 嘗試用放寬後的預期輸出再驗證一次
-                                    ok_relaxed, _ = validate_main_function(
-                                        code=user_code_to_run,
-                                        stdin_input=stdin_to_use,
-                                        expected_output=flattened_expected
-                                    )
-                                    if ok_relaxed:
-                                        ok = True
-                                        # 更新詳細資訊以反映放寬後的通過狀態
-                                        detail = detail.replace("結果: [失敗]❌", "結果: [通過]✅ (已放寬輸出格式要求)")
-                                        report.append("(已自動放寬預期輸出格式以匹配純文字輸出)")
-
-                            if ok:
-                                report.append("結果: [通過] ✅\n")
-                            else:
-                                report.append("結果: [失敗] ❌")
-                                report.append(f"詳細資訊:\n{detail}\n")
-                                all_passed = False
-                                if first_failure_msg is None:
-                                    first_failure_msg = detail
-
-                        report.append("="*20)
-                        if all_passed:
-                             report.append("總結: [成功] 您的程式碼已通過所有 AI 生成的測資。")
+                                report.append(f"[LeetCode 驗證錯誤] {e}")
                         else:
-                             report.append("總結: [失敗] 您的程式碼未通過部分測資。")
-                             report.append("\n[自動分析] 針對失敗案例進行分析...")
-                             try:
-                                 fallback = explain_code_error(user_code_to_run)
-                                 explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                                 report.append(f"\n=== 程式碼分析 ===\n{explanation}")
-                             except Exception as e:
-                                 report.append(f"\n[分析失敗] {e}")
-
+                            for i, t in enumerate(json_tests):
+                                inp = str(t.get("input",""))
+                                out = str(t.get("output",""))
+                                inp_flat = _try_flatten_input(inp, user_code_to_run)
+                                ok, det = validate_main_function(user_code_to_run, stdin_input=inp_flat, expected_output=out)
+                                report.append(f"Case {i+1}: {'[通過]' if ok else '[失敗]'}\n{det}")
+                                if not ok:
+                                     report.append("\n[Agent 3] 分析失敗原因...\n")
+                                     report.append(_run_agent3_analysis(user_need, raw_user_code, det))
+                                     break 
                     else:
-                        # 無法提取測資時的回退機制
-                        report.append("[警告] 未能提取有效測資，改為僅執行一次...\n")
-                        ok, detail = validate_main_function(user_code_to_run, stdin_input=None, expected_output=None)
-                        report.append("=== 執行結果 (無測資) ===")
-                        report.append(detail)
-
+                        report.append("[警告] 未能提取有效測資，僅執行一次。")
+                        ok, det = validate_main_function(user_code_to_run, None, None)
+                        report.append(det)
                 except Exception as e:
-                    report.append(f"[錯誤] 測資生成或驗證過程發生例外: {e}")
-
-            # 分支 B: 使用者選擇跳過測資生成 -> 僅執行一次
+                    report.append(f"[錯誤] {e}")
             else:
-                report.append("[提示] 跳過測資生成，僅執行一次程式。\n")
-                ok, detail = validate_main_function(user_code_to_run, stdin_input=None, expected_output=None)
-                if ok:
-                    report.append("=== 程式執行成功 ===")
-                    report.append(detail)
-                else:
-                    report.append("=== 程式執行失敗 ===")
-                    report.append(detail)
-                    report.append("\n[自動分析] 執行失敗，開始分析...")
-                    try:
-                        fallback = explain_code_error(user_code_to_run)
-                        explanation = fallback.explanation if hasattr(fallback, "explanation") else str(fallback)
-                        report.append(f"\n=== 程式碼分析 ===\n{explanation}")
-                    except Exception as e:
-                        report.append(f"\n[分析失敗] {e}")
+                report.append("[提示] 跳過測資生成，僅執行。")
+                ok, det = validate_main_function(user_code_to_run, None, None)
+                report.append(det)
 
-            # 完成後重置會話狀態
             session.update({"mode": None, "awaiting": False, "step": None, "ctx": {}})
             return {"text": "\n".join(report)}
 
