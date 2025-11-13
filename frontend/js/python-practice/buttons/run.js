@@ -113,11 +113,12 @@ export async function handleRun(e) {
       return;
     }
 
-    setStatus(
-      data.ok && data.verdict === "correct"
-        ? "[成功] 所有測資通過 ✅"
-        : data.suggestions || "錯誤，請再試一次"
-    );
+    if (data.ok && data.verdict === "correct") {
+      // 如果後端有回傳詳細執行紀錄 (data.log)，直接顯示它；否則顯示預設訊息
+      setStatus(data.log || "[成功] 所有測資通過 ✅");
+    } else {
+      setStatus(data.suggestions || "錯誤，請再試一次");
+    }
 
     if (outputEl) outputEl.scrollTop = outputEl.scrollHeight;
   } catch (err) {
