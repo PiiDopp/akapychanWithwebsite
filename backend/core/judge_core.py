@@ -446,18 +446,32 @@ def validate_stdin_code(code: str, examples: list[dict], *, timeout_sec: int = 5
                 if p.stderr:
                     print(p.stderr[:400], file=log)
                 return False, log.getvalue()
+            
             out = normalize(p.stdout)
             # 允許 'output' 或 'expected'
             exp_raw = ex.get("output", ex.get("expected", ""))
             exp = normalize(exp_raw)
+
+            # === 詳細輸出區塊 ===
+            print(f"=== 測試案例 {idx} ===", file=log)
+            # 稍微修剪一下 input 避免太多空行
+            inp_val = ex.get('input','').strip()
+            print(f"輸入 (Input):\n{inp_val}", file=log)
+            print(f"預期輸出 (Expected):\n{exp}", file=log)
+            print(f"你的輸出 (Your Output):\n{out}", file=log)
+
             if out != exp:
-                print(f"[錯誤] 第 {idx} 筆：輸出不符", file=log)
-                print(f"【Input】\n{ex.get('input','')}", file=log)
-                print(f"【Your Output】\n{out}", file=log)
-                print(f"【Expected】\n{exp}", file=log)
+                print(f"結果: ❌ 失敗", file=log)
+                print("-" * 20, file=log)
                 return False, log.getvalue()
-        print("[成功] 所有 STDIN 測資通過 ✅", file=log)
+            else:
+                print(f"結果: ✅ 通過", file=log)
+                print("-" * 20, file=log)
+            # ===================
+
+        print("\n[成功] 所有 STDIN 測資通過 ✅", file=log)
         return True, log.getvalue()
+
     except subprocess.TimeoutExpired:
         print("[錯誤] 程式執行逾時", file=log)
         return False, log.getvalue()
