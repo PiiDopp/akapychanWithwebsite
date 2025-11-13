@@ -15,7 +15,7 @@ from core import (
 )
 from core.model_interface import (
     build_virtual_code_prompt, build_test_prompt, build_explain_prompt,
-    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt, generate_structured_tests,
+    build_stdin_code_prompt, build_fix_code_prompt,build_hint_prompt, generate_structured_tests, ChainOfThoughtTestAgent, leetcode_execution_adapter,   
     #omm
     interactive_chat_api, normalize_tests
 )
@@ -233,7 +233,86 @@ def _robust_extract_tests(model_response: str, user_need: str = "") -> List[Dict
          
     return json_tests or []
 
+def _run_full_agent_pipeline(user_need: str, code: str) -> str:
+    """
+    呼叫 ChainOfThoughtTestAgent 執行完整五階段測試 (A-E)。
+    包含：需求分析、測資生成、執行驗證、錯誤反饋、變異測試。
+    """
+    agent = ChainOfThoughtTestAgent()
+    
+    # 用來攔截執行 Log 的容器
+    captured_logs = []
 
+    # 定義一個攔截器，包裝原始的 leetcode_execution_adapter
+    def capturing_adapter(c: str, t: list) -> tuple[bool, str]:
+        ok, log = leetcode_execution_adapter(c, t)
+        captured_logs.append(log) # 將執行結果存起來
+        return ok, log
+
+    # 啟動 Agent Pipeline
+    # 注意：這裡會自動觸發 Agent A (分析) -> Agent B (生成) -> Agent C (執行)
+    # 若失敗 -> Agent D (反饋)
+    # 若成功 -> Agent E (變異測試)
+    try:
+        result = agent.run_pipeline(
+            user_need=user_need, 
+            target_code=code, 
+            execution_callback=capturing_adapter
+        )
+    except Exception as e:
+        return f"[系統錯誤] Agent Pipeline 執行失敗: {e}"
+
+    # === 格式化報告 ===
+    report = []
+    
+    # 1. Agent A: 分析
+    report.append("📝 **Agent A: 需求邏輯分析報告**")
+    report.append(result.get("analysis", "(無分析資料)"))
+    report.append("-" * 20)
+
+    # 2. Agent B: 測資
+    cases = result.get("test_cases", [])
+    report.append(f"🧪 **Agent B: 自動生成 {len(cases)} 筆結構化測資**")
+    # 簡略顯示前幾筆
+    for i, tc in enumerate(cases[:3], 1):
+        inp = str(tc.get('input'))[:50]
+        out = str(tc.get('output'))[:50]
+        report.append(f"  - Case {i}: In=`{inp}` / Out=`{out}` ({tc.get('type', 'Normal')})")
+    if len(cases) > 3:
+        report.append(f"  ... (還有 {len(cases)-3} 筆)")
+    report.append("-" * 20)
+
+    # 3. Agent C: 執行結果 (從 captured_logs 取出)
+    if captured_logs:
+        report.append("🏃 **Agent C: 程式執行與驗證**")
+        # 只顯示最後一次執行的 Log (避免變異測試的 Log 混淆，或是全部顯示)
+        # 這裡簡單顯示主要驗證的 Log
+        report.append(captured_logs[0]) 
+        report.append("-" * 20)
+
+    # 4. Agent D: 錯誤反饋 (如果有)
+    if result.get("feedback"):
+        report.append("🔧 **Agent D: 錯誤分析與修正建議**")
+        report.append(result["feedback"])
+        report.append("-" * 20)
+
+    # 5. Agent E: 變異測試 (Mutation Testing)
+    mut = result.get("mutation_report")
+    if mut:
+        score = mut.get('score', 0)
+        report.append(f"🧬 **Agent E: 變異測試品質報告 (Mutation Score: {score:.1f}%)**")
+        report.append(f"  - 成功攔截(Killed): {mut.get('killed', 0)} / 變異體總數: {mut.get('total', 0)}")
+        
+        new_cases = mut.get("new_cases", [])
+        if new_cases:
+            report.append(f"  - ✨ 為了抓出潛在錯誤，Agent E 已自動追加 {len(new_cases)} 筆『殺手級測資』！")
+        else:
+            if score == 100:
+                report.append("  - ✅ 完美！目前的測資非常嚴謹，所有變異體都被抓出來了。")
+            else:
+                report.append("  - ⚠️ 部分變異體倖存，建議增加更多邊界測試。")
+
+    return "\n".join(report)
 
 # ====== 聊天入口（給前端）======
 @app.post("/chat")
