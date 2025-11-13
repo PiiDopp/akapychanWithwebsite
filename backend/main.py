@@ -405,14 +405,12 @@ async def chat(request: Request):
                 ctx["virtual_code"] = ctx.get("virtual_code_preview", "")
                 _append_history("確認虛擬碼")
 
-                raw_tests = generate_structured_tests(ctx["need"])
-                json_tests = normalize_tests(raw_tests)
-                ctx["tests"] = json_tests or []
-
+                # [Changed] 1. 先生成程式碼 (暫時不提供 tests，因為還沒生成)
+                # 我們讓 Agent 2 根據需求和虛擬碼先寫出 Python Code
                 code_prompt_string = build_stdin_code_prompt(
                     ctx["need"],
                     ctx.get("virtual_code", ""),
-                    ctx.get("tests", [])
+                    [] # Empty tests initially
                 )
                 code_resp = generate_response(code_prompt_string)
                 code_block = extract_code_block(code_resp)
@@ -431,6 +429,13 @@ async def chat(request: Request):
                     session["ctx"] = ctx
                     session["step"] = "need"
                     return {"text": "Agent 2 無法產生有效程式碼，請嘗試補充需求細節。"}
+
+                # [Changed] 2. 再根據「需求 + 已生成的程式碼」來生成測資
+                # 這樣生成的測資會考慮到程式碼實際的輸入輸出格式
+                test_gen_context = f"需求：{ctx['need']}\n\n程式碼：\n```python\n{code_block}\n```"
+                raw_tests = generate_structured_tests(test_gen_context)
+                json_tests = normalize_tests(raw_tests)
+                ctx["tests"] = json_tests or []
 
                 explain_prompt = build_explain_prompt(ctx["need"], code_block)
                 explain_resp = run_model(explain_prompt)
@@ -630,6 +635,17 @@ async def chat(request: Request):
             u = choice.upper()
 
             if u in {"V", "VERIFY"}:
+                # [Modified] 驗證前重新生成測資，確保測資符合當前程式碼邏輯
+                test_gen_context = f"需求：{need_text}\n\n程式碼：\n```python\n{code}\n```"
+                try:
+                    raw_tests = generate_structured_tests(test_gen_context)
+                    new_json_tests = normalize_tests(raw_tests)
+                    if new_json_tests:
+                        json_tests = new_json_tests
+                        ctx["tests"] = json_tests
+                except Exception as e:
+                    print(f"[Warning] 重新生成測資失敗: {e}")
+
                 report_text, error_msg = _perform_verification(code, json_tests)
                 if error_msg:
                     report_text += "\n\n[Agent 3] 偵測到錯誤，正在分析原因並提供提示...\n"
